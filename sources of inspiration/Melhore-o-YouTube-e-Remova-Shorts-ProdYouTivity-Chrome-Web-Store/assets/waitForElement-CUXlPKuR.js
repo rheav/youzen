@@ -1,0 +1,1 @@
+const s=(n,o,a=3e3)=>{const i=Date.now(),e=async()=>{const t=document.querySelector(n);t&&o(t),Date.now()-i<a&&(await new Promise(m=>setTimeout(m,300)),requestAnimationFrame(e))};requestAnimationFrame(e)};export{s as w};

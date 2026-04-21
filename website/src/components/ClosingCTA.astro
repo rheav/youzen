@@ -1,0 +1,75 @@
+---
+/**
+ * ClosingCTA — the final "add to browser" band before the FAQ.
+ *
+ * Takes the role the old Waitlist section used to play: one last warm nudge
+ * to install before the page wraps with questions. Uses the same
+ * ChromeButton the hero/navbar use — the product has exactly one CTA.
+ *
+ * Atmosphere:
+ *   - Breathing blob behind the copy for continuity with the rest of the page.
+ *   - A soft garden-arc at the base (SVG curve) that hints at grass without
+ *     being literal, picking up the leaf-mist color.
+ *   - Cursive accent with the `sway` animation so the headline has the same
+ *     alive-grass breath as the hero.
+ */
+import ChromeButton from "./ChromeButton.astro";
+import { Leaf } from "@lucide/astro";
+---
+
+<section id="install" class="relative overflow-x-clip px-6 py-24 md:py-32">
+  <!-- Ambient blobs, breathing via global.css .blob keyframes -->
+  <div
+    class="blob"
+    aria-hidden="true"
+    style="top: -10%; left: 15%; width: 520px; height: 520px; background: #D4E5CD; opacity: 0.65;"
+  >
+  </div>
+  <div
+    class="blob blob-alt"
+    aria-hidden="true"
+    style="bottom: -25%; right: 10%; width: 460px; height: 460px; background: #E6E6FA; opacity: 0.55;"
+  >
+  </div>
+
+  <div
+    class="reveal-group relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center"
+  >
+    <span
+      class="reveal mb-6 inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/60 px-3 py-1 text-xs font-medium text-stone-500 shadow-softly backdrop-blur-sm"
+    >
+      <Leaf size={12} color="#7fa87f" stroke-width={2.2} />
+      Ready when you are
+    </span>
+
+    <h2
+      class="reveal text-ink text-4xl leading-[1.05] font-medium tracking-tight md:text-5xl lg:text-6xl"
+    >
+      Take a
+      <span
+        class="sway inline-block text-[1.15em] leading-none"
+        style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 500;"
+      >
+        quiet
+      </span>
+      breath.
+      <br class="hidden md:block" />
+      Then one more click.
+    </h2>
+
+    <p
+      class="reveal text-muted mx-auto mt-6 max-w-[480px] text-base md:text-lg"
+    >
+      Install youZen and the chaos goes away. The channels you love stay. That's
+      the whole deal.
+    </p>
+
+    <div class="reveal mt-9">
+      <ChromeButton>Add to your browser</ChromeButton>
+    </div>
+
+    <p class="reveal mt-6 text-xs text-stone-400">
+      Free · no account · works offline · open source
+    </p>
+  </div>
+</section>

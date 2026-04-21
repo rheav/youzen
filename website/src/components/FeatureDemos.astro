@@ -1,0 +1,775 @@
+---
+import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
+
+/* ─── What this section shows ──────────────────────────────────────────────
+ *
+ * Three compact, self-contained looping demos (pure CSS, zero JS) that each
+ * illustrate a single extension feature in under ~10 seconds:
+ *
+ *   A. "Quiet the thumbnails"  — noisy clickbait thumbs cross-fade to calm
+ *                                pastel ones; the underlying titles never move.
+ *   B. "Silence the comments"  — a column of angry comments fades out and a
+ *                                gentle "comments — paused" note fades in.
+ *   C. "Block whatever bugs you" — four titles visible, a `drama` pill appears
+ *                                in the blocklist, matching titles collapse.
+ *
+ * All three loops are 10s, staggered by 0.6s between cards so they never fire
+ * in perfect unison (which reads as mechanical). Each card pauses in its
+ * clean state for ~40% of the loop. Reduced-motion freezes each at its clean
+ * state and hides the "noisy" layer entirely.
+ *
+ * All mini-mockup styles are prefixed `.fd-*` to avoid collisions with the
+ * larger AppPreview mockup's `.yt-*` / `.sp-*` styles.
+ */
+---
+
+<section id="features" class="relative overflow-x-clip px-6 py-24 md:py-32">
+  <!-- Soft supporting blobs. These bleed into neighbors because the
+       section is overflow-x-clip (not overflow-hidden). -->
+  <div
+    class="blob"
+    aria-hidden="true"
+    style="top: 8%; right: -12%; width: 420px; height: 420px; background: #d4e5cd; opacity: 0.45;"
+  >
+  </div>
+
+  <!-- Heading block -->
+  <div class="reveal-group mx-auto max-w-3xl text-center">
+    <span
+      class="reveal text-xs font-medium tracking-widest text-stone-400 uppercase"
+    >
+      Three quiet things it does
+    </span>
+    <h2 class="reveal mt-3 text-3xl font-medium tracking-tight md:text-5xl">
+      Small toggles,
+      <span
+        class="text-[1.05em] leading-none"
+        style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 400;"
+      >
+        big
+      </span>
+      exhales.
+    </h2>
+    <p class="reveal text-muted mx-auto mt-5 max-w-xl text-base md:text-lg">
+      Each demo below loops live. Nothing is a video — they're the real CSS
+      states the extension flips on your YouTube, just staged on a mock feed.
+    </p>
+  </div>
+
+  <!-- Three feature demo cards. Copy lives in the `demos` array in the
+       frontmatter; mockup markup is inlined below because each is unique. -->
+  <div
+    class="reveal mx-auto mt-16 grid max-w-5xl gap-5 md:grid-cols-3 md:gap-6"
+  >
+    <!-- ───── Demo A: Quiet the thumbnails ───── -->
+    <article
+      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-white p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
+    >
+      <div class="fd-stage">
+        <div class="fd-thumbs">
+          <div class="fd-thumb">
+            <div class="fd-thumb-calm fd-c1"></div>
+            <div class="fd-thumb-noisy fd-n1">
+              <span class="fd-thumb-noisy-text">YOU WON'T<br />BELIEVE</span>
+            </div>
+            <div class="fd-thumb-title">
+              <span class="bar" style="width: 80%"></span>
+              <span class="bar" style="width: 55%"></span>
+            </div>
+          </div>
+          <div class="fd-thumb">
+            <div class="fd-thumb-calm fd-c2"></div>
+            <div class="fd-thumb-noisy fd-n2">
+              <span class="fd-thumb-noisy-text">!!! DRAMA !!!</span>
+            </div>
+            <div class="fd-thumb-title">
+              <span class="bar" style="width: 65%"></span>
+              <span class="bar" style="width: 45%"></span>
+            </div>
+          </div>
+          <div class="fd-thumb">
+            <div class="fd-thumb-calm fd-c3"></div>
+            <div class="fd-thumb-noisy fd-n3">
+              <span class="fd-thumb-noisy-text">GONE WRONG</span>
+            </div>
+            <div class="fd-thumb-title">
+              <span class="bar" style="width: 88%"></span>
+              <span class="bar" style="width: 60%"></span>
+            </div>
+          </div>
+          <div class="fd-thumb">
+            <div class="fd-thumb-calm fd-c4"></div>
+            <div class="fd-thumb-noisy fd-n4">
+              <span class="fd-thumb-noisy-text">REACTION 🔥</span>
+            </div>
+            <div class="fd-thumb-title">
+              <span class="bar" style="width: 72%"></span>
+              <span class="bar" style="width: 48%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-start gap-3">
+        <span
+          class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+          style="background-color: rgba(127, 168, 127, 0.22);"
+          aria-hidden="true"
+        >
+          <Wand2 size={14} color="#1c1c1c" strokeWidth={2} />
+        </span>
+        <div>
+          <p
+            class="text-xs font-medium tracking-widest text-stone-400 uppercase"
+          >
+            Quiet mode
+          </p>
+          <h3 class="mt-1 text-xl font-medium tracking-tight md:text-2xl">
+            Quiet the
+            <span
+              class="text-[1.15em]"
+              style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 400; line-height: 1;"
+            >
+              thumbnails
+            </span>.
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-stone-600 md:text-[15px]">
+            Clickbait art gets its bright colors turned down and its loud text
+            pulled off. The titles stay — just the shouting leaves.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ───── Demo B: Silence the comments ───── -->
+    <article
+      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-white p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
+    >
+      <div class="fd-stage">
+        <div class="fd-comments">
+          <div class="fd-comment">
+            <div class="fd-avatar fd-avatar-1"></div>
+            <div class="fd-comment-body">
+              <div class="fd-comment-meta">
+                <span class="fd-comment-name">@loud_user_82</span>
+                <span class="fd-comment-like">▲ 1.2k</span>
+              </div>
+              <div class="fd-comment-text angry long"></div>
+              <div class="fd-comment-text short"></div>
+            </div>
+          </div>
+          <div class="fd-comment">
+            <div class="fd-avatar fd-avatar-2"></div>
+            <div class="fd-comment-body">
+              <div class="fd-comment-meta">
+                <span class="fd-comment-name">@hotTake99</span>
+                <span class="fd-comment-like">▲ 803</span>
+              </div>
+              <div class="fd-comment-text angry long"></div>
+            </div>
+          </div>
+          <div class="fd-comment">
+            <div class="fd-avatar fd-avatar-3"></div>
+            <div class="fd-comment-body">
+              <div class="fd-comment-meta">
+                <span class="fd-comment-name">@nuance_free</span>
+                <span class="fd-comment-like">▲ 412</span>
+              </div>
+              <div class="fd-comment-text long"></div>
+              <div class="fd-comment-text short"></div>
+            </div>
+          </div>
+          <div class="fd-comment">
+            <div class="fd-avatar fd-avatar-4"></div>
+            <div class="fd-comment-body">
+              <div class="fd-comment-meta">
+                <span class="fd-comment-name">@sigh__</span>
+                <span class="fd-comment-like">▲ 228</span>
+              </div>
+              <div class="fd-comment-text angry short"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fd-paused">
+          <div class="fd-paused-leaf" aria-hidden="true">
+            <Leaf size={14} color="#ffffff" strokeWidth={2.5} />
+          </div>
+          <span class="fd-paused-cursive">quieter.</span>
+          <span class="fd-paused-text">comments paused on this tab</span>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-start gap-3">
+        <span
+          class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+          style="background-color: rgba(168, 201, 160, 0.22);"
+          aria-hidden="true"
+        >
+          <MessageSquareOff size={14} color="#1c1c1c" strokeWidth={2} />
+        </span>
+        <div>
+          <p
+            class="text-xs font-medium tracking-widest text-stone-400 uppercase"
+          >
+            No-comment
+          </p>
+          <h3 class="mt-1 text-xl font-medium tracking-tight md:text-2xl">
+            Silence the
+            <span
+              class="text-[1.15em]"
+              style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 400; line-height: 1;"
+            >
+              comments
+            </span>.
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-stone-600 md:text-[15px]">
+            Hide the comment section on videos you open anyway. A small note
+            reminds you it's still there when you ask for it.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ───── Demo C: Block whatever bugs you ───── -->
+    <article
+      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-white p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
+    >
+      <div class="fd-stage">
+        <div class="fd-blocklist">
+          <!-- Blocklist pill bar at the top -->
+          <div class="fd-pill-bar">
+            <span class="fd-pill-bar-label">blocking</span>
+            <span class="fd-pill">
+              <span aria-hidden="true">×</span> drama
+            </span>
+          </div>
+
+          <!-- Title rows -->
+          <div class="fd-row">
+            <span class="fd-row-thumb"></span>
+            <span class="fd-row-text">10 tips to focus this week</span>
+          </div>
+          <div class="fd-row fd-row-blocked">
+            <span
+              class="fd-row-thumb"
+              style="background: linear-gradient(135deg,#f87171,#ef4444);"
+            ></span>
+            <span class="fd-row-text">celebrity drama unfolds (live)</span>
+            <span class="fd-row-badge">BLOCKED</span>
+          </div>
+          <div class="fd-row">
+            <span class="fd-row-thumb"></span>
+            <span class="fd-row-text">a quiet morning routine</span>
+          </div>
+          <div class="fd-row fd-row-blocked">
+            <span
+              class="fd-row-thumb"
+              style="background: linear-gradient(135deg,#f59e0b,#dc2626);"
+            ></span>
+            <span class="fd-row-text">another reaction to the drama</span>
+            <span class="fd-row-badge">BLOCKED</span>
+          </div>
+          <div class="fd-row">
+            <span class="fd-row-thumb"></span>
+            <span class="fd-row-text">basil, from seed to jar</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-start gap-3">
+        <span
+          class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+          style="background-color: rgba(198, 216, 169, 0.35);"
+          aria-hidden="true"
+        >
+          <Shield size={14} color="#1c1c1c" strokeWidth={2} />
+        </span>
+        <div>
+          <p
+            class="text-xs font-medium tracking-widest text-stone-400 uppercase"
+          >
+            Blocklist
+          </p>
+          <h3 class="mt-1 text-xl font-medium tracking-tight md:text-2xl">
+            Block whatever
+            <span
+              class="text-[1.15em]"
+              style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 400; line-height: 1;"
+            >
+              bugs you
+            </span>.
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-stone-600 md:text-[15px]">
+            Add a word and anything carrying it quietly leaves your home feed —
+            drama, reaction, prank, whatever it is today.
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ─── Styles: scoped to `.fd-*` classes so they can't leak. ─────────── -->
+<style is:global>
+  /* ───── Shared mini-mockup frame ───────────────────────────────── */
+  .fd-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 1.25rem;
+    background: #fafaf9;
+    border: 1px solid #f5f5f4;
+    padding: 12px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .fd-stage::before {
+    /* Tiny browser dots in the corner, for context. */
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    width: 32px;
+    height: 6px;
+    background:
+      radial-gradient(circle at 3px 3px, #ff5f57 2.5px, transparent 2.5px),
+      radial-gradient(circle at 14px 3px, #febc2e 2.5px, transparent 2.5px),
+      radial-gradient(circle at 25px 3px, #28c840 2.5px, transparent 2.5px);
+    z-index: 2;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+       Demo A: Quiet the thumbnails
+       - 2×2 grid of thumbs
+       - Each thumb has a "noisy" overlay + a "calm" layer
+       - Cross-fade the overlays in/out on a 10s loop
+       ═══════════════════════════════════════════════════════════════ */
+  .fd-thumbs {
+    position: absolute;
+    inset: 26px 12px 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
+  }
+  .fd-thumb {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .fd-thumb-calm {
+    position: absolute;
+    inset: 0;
+  }
+  .fd-thumb-noisy {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fd-thumb-hush 10s ease-in-out infinite;
+  }
+  .fd-thumb-noisy-text {
+    color: #fff;
+    font-weight: 800;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    line-height: 1.1;
+  }
+  /* Colorful noisy gradients */
+  .fd-n1 {
+    background: linear-gradient(135deg, #ff4d4d 0%, #ff9500 100%);
+  }
+  .fd-n2 {
+    background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+  }
+  .fd-n3 {
+    background: linear-gradient(135deg, #ff0033 0%, #ff8c00 100%);
+  }
+  .fd-n4 {
+    background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 100%);
+  }
+  /* Calm pastel replacements, same dimensions. */
+  .fd-c1 {
+    background: linear-gradient(135deg, #d4e5cd 0%, #a8c9a0 100%);
+  }
+  .fd-c2 {
+    background: linear-gradient(135deg, #efedf4 0%, #d4e5cd 100%);
+  }
+  .fd-c3 {
+    background: linear-gradient(135deg, #e8efe8 0%, #c6d8a9 100%);
+  }
+  .fd-c4 {
+    background: linear-gradient(135deg, #faf9f5 0%, #d4e5cd 100%);
+  }
+
+  /* Tiny title bars under each thumb — these never change. */
+  .fd-thumb-title {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0.85;
+  }
+  .fd-thumb-title .bar {
+    height: 3px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.75);
+  }
+
+  /* Cross-fade animation: noisy layer fades OUT at 30%, fades back IN at 90% */
+  @keyframes fd-thumb-hush {
+    0%,
+    20% {
+      opacity: 1;
+      filter: saturate(1);
+    }
+    35%,
+    85% {
+      opacity: 0;
+      filter: saturate(0.3);
+    }
+    95%,
+    100% {
+      opacity: 1;
+      filter: saturate(1);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+       Demo B: Silence the comments
+       - Column of 4 comment rows
+       - At ~30% of loop, all rows fade out AND a calm "paused" note fades in
+       ═══════════════════════════════════════════════════════════════ */
+  .fd-comments {
+    position: absolute;
+    inset: 28px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .fd-comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: #fafaf9;
+    border: 1px solid #f1f1ef;
+    animation: fd-comment-fade 10s ease-in-out infinite;
+  }
+  .fd-avatar {
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+    background: #d6d3d1;
+  }
+  .fd-avatar-1 {
+    background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+  }
+  .fd-avatar-2 {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  }
+  .fd-avatar-3 {
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  }
+  .fd-avatar-4 {
+    background: linear-gradient(135deg, #84cc16 0%, #eab308 100%);
+  }
+  .fd-comment-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .fd-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .fd-comment-name {
+    font-size: 9px;
+    font-weight: 600;
+    color: #44403c;
+  }
+  .fd-comment-like {
+    font-size: 8px;
+    color: #a8a29e;
+    margin-left: auto;
+  }
+  .fd-comment-text {
+    height: 4px;
+    border-radius: 9999px;
+    background: #e7e5e4;
+  }
+  .fd-comment-text.short {
+    width: 60%;
+  }
+  .fd-comment-text.long {
+    width: 85%;
+  }
+  .fd-comment-text.angry {
+    background: linear-gradient(90deg, #fca5a5 0%, #f87171 70%, #e7e5e4 100%);
+  }
+
+  /* "Comments paused" replacement note */
+  .fd-paused {
+    position: absolute;
+    inset: 28px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0;
+    animation: fd-paused-appear 10s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .fd-paused-leaf {
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #7fa87f 0%, #c6d8a9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .fd-paused-text {
+    font-size: 12px;
+    color: #5e5d59;
+  }
+  .fd-paused-cursive {
+    font-family: var(--font-cursive);
+    font-size: 24px;
+    color: var(--color-leaf-deep);
+    line-height: 1;
+  }
+
+  @keyframes fd-comment-fade {
+    0%,
+    20% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    30%,
+    85% {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+      filter: blur(2px);
+    }
+    95%,
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+  @keyframes fd-paused-appear {
+    0%,
+    28% {
+      opacity: 0;
+    }
+    40%,
+    82% {
+      opacity: 1;
+    }
+    90%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+       Demo C: Block whatever bugs you
+       - List of 4 titles with meta
+       - Pill "drama" appears (width grows) at ~20%
+       - Two matching rows collapse at ~35%
+       ═══════════════════════════════════════════════════════════════ */
+  .fd-blocklist {
+    position: absolute;
+    inset: 26px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Blocklist pill bar at the top */
+  .fd-pill-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    background: rgba(168, 201, 160, 0.12);
+    border: 1px solid rgba(168, 201, 160, 0.4);
+    border-radius: 9999px;
+    font-size: 9px;
+    color: #5e5d59;
+  }
+  .fd-pill-bar-label {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .fd-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: #7fa87f;
+    color: #fff;
+    border-radius: 9999px;
+    font-size: 9px;
+    font-weight: 600;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: fd-pill-appear 10s ease-in-out infinite;
+  }
+
+  /* Title rows */
+  .fd-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 6px;
+    border-radius: 8px;
+    font-size: 9px;
+    color: #44403c;
+    overflow: hidden;
+    max-height: 26px;
+  }
+  .fd-row-thumb {
+    flex-shrink: 0;
+    width: 24px;
+    height: 14px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #c6d8a9 0%, #e8efe8 100%);
+  }
+  .fd-row-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .fd-row-badge {
+    flex-shrink: 0;
+    font-size: 8px;
+    color: #c96442;
+    font-weight: 700;
+    opacity: 0;
+    animation: fd-badge-appear 10s ease-in-out infinite;
+  }
+
+  /* These two rows collapse when "drama" is blocked. */
+  .fd-row-blocked {
+    animation: fd-row-collapse 10s ease-in-out infinite;
+  }
+
+  @keyframes fd-pill-appear {
+    0%,
+    15% {
+      max-width: 0;
+      opacity: 0;
+    }
+    22% {
+      max-width: 80px;
+      opacity: 1;
+    }
+    85% {
+      max-width: 80px;
+      opacity: 1;
+    }
+    95%,
+    100% {
+      max-width: 0;
+      opacity: 0;
+    }
+  }
+
+  @keyframes fd-badge-appear {
+    0%,
+    15% {
+      opacity: 0;
+    }
+    22%,
+    30% {
+      opacity: 1;
+    }
+    40%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fd-row-collapse {
+    0%,
+    28% {
+      max-height: 26px;
+      opacity: 1;
+      margin-bottom: 0;
+      transform: scale(1);
+      filter: blur(0);
+    }
+    38%,
+    85% {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: -6px;
+      transform: scale(0.96);
+      filter: blur(2px);
+    }
+    95%,
+    100% {
+      max-height: 26px;
+      opacity: 1;
+      margin-bottom: 0;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+
+  /* Reduced motion: each demo snaps to the "clean" state and never loops. */
+  @media (prefers-reduced-motion: reduce) {
+    .fd-thumb-noisy,
+    .fd-comment,
+    .fd-row-blocked,
+    .fd-row-badge,
+    .fd-pill,
+    .fd-paused {
+      animation: none !important;
+    }
+    .fd-thumb-noisy {
+      opacity: 0 !important;
+    }
+    .fd-comment {
+      display: none !important;
+    }
+    .fd-paused {
+      opacity: 1 !important;
+    }
+    .fd-row-blocked {
+      display: none !important;
+    }
+    .fd-pill {
+      max-width: 80px !important;
+      opacity: 1 !important;
+    }
+    .fd-row-badge {
+      opacity: 0 !important;
+    }
+  }
+</style>

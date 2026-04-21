@@ -1,0 +1,86 @@
+---
+import { Mail, Sparkles } from "@lucide/astro";
+---
+
+<section id="waitlist" class="relative overflow-x-clip px-6 py-24 md:py-32">
+  <!-- High-blur floating gradients behind the form -->
+  <div
+    class="blob"
+    aria-hidden="true"
+    style="top: -10%; left: 20%; width: 520px; height: 520px; background: #D4E5CD; opacity: 0.55;"
+  >
+  </div>
+  <div
+    class="blob blob-alt"
+    aria-hidden="true"
+    style="bottom: -20%; right: 10%; width: 480px; height: 480px; background: #E6E6FA; opacity: 0.55;"
+  >
+  </div>
+
+  <div class="reveal-group relative z-10 mx-auto max-w-2xl text-center">
+    <!-- Dark icon chip with coral dot -->
+    <div
+      class="reveal mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
+      style="background-color: #292524;"
+    >
+      <div class="relative">
+        <Sparkles size={22} color="#ffffff" strokeWidth={1.75} />
+        <span
+          class="absolute -top-1 -right-1 block h-2 w-2 rounded-full"
+          style="background-color: #A8C9A0;"></span>
+      </div>
+    </div>
+
+    <h2 class="reveal mt-8 text-3xl font-medium tracking-tight md:text-5xl">
+      Be the first to
+      <span
+        class="text-[1.05em] leading-none"
+        style="font-family: var(--font-cursive); color: #A8C9A0; font-weight: 400;"
+      >
+        exhale.
+      </span>
+    </h2>
+    <p class="reveal text-muted mx-auto mt-5 max-w-md text-base md:text-lg">
+      Drop your email. We'll tell you when youZen lands on the Chrome Web Store.
+      No marketing. No newsletters. One email, maybe two.
+    </p>
+
+    <form
+      class="reveal mx-auto mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:flex-row"
+      onsubmit="event.preventDefault(); this.querySelector('[data-thanks]').classList.remove('hidden'); this.querySelector('[data-form]').classList.add('hidden');"
+    >
+      <div
+        data-form
+        class="flex w-full flex-col items-stretch gap-3 sm:flex-row"
+      >
+        <label class="relative flex-1">
+          <span class="sr-only">Email address</span>
+          <Mail
+            size={16}
+            class="absolute top-1/2 left-4 -translate-y-1/2 text-stone-400"
+          />
+          <input
+            type="email"
+            required
+            placeholder="you@calm.com"
+            class="w-full rounded-full bg-stone-50 py-3.5 pr-4 pl-11 text-sm text-ink placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#A8C9A0]/50"
+          />
+        </label>
+        <button
+          type="submit"
+          class="rounded-full px-6 py-3.5 text-sm font-medium text-white transition-transform duration-300 hover:scale-[1.04]"
+          style="background-color: #292524;"
+        >
+          Reserve my quiet
+        </button>
+      </div>
+      <p data-thanks class="hidden text-sm text-stone-500 sm:text-base">
+        Thank you. We'll write when it's ready — probably on a rainy Tuesday.
+      </p>
+    </form>
+
+    <p class="reveal mt-6 text-xs text-stone-400">
+      No spam. No pixels. No trackers. (We built this to undo those.)
+    </p>
+  </div>
+</section>

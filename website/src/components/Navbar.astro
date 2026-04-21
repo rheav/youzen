@@ -1,0 +1,93 @@
+---
+/**
+ * Navbar — floating pill, always visible.
+ *
+ * Hover effects on nav links (the "beautiful hover" brief):
+ *   1. Underline that wipes in from the left on a 350ms ease-out curve
+ *      using a linear-gradient background — keeps crisp at any DPR and
+ *      supports multi-line if the pill ever wraps.
+ *   2. A tiny leaf dot appears *above* the label when hovered, fading in
+ *      and nudging down a few pixels so it feels like it landed.
+ *   3. Text color shifts from muted stone to ink, combined with a 2px lift
+ *      so the whole link seems to take a gentle breath.
+ *
+ * The CTA slot is the ChromeButton (size="small") — the whole product only
+ * has one CTA and it lives everywhere.
+ */
+import ChromeButton from "./ChromeButton.astro";
+---
+
+<nav
+  class="fixed top-4 right-4 left-4 z-40 mx-auto flex max-w-5xl items-center justify-between rounded-full border border-stone-200/70 px-4 py-2 shadow-softly backdrop-blur-xl md:px-6 md:py-2.5"
+  style="background-color: rgba(255, 255, 255, 0.72);"
+  aria-label="Main"
+>
+  <a href="/" class="group flex items-center gap-2" aria-label="youZen home">
+    <span
+      class="nav-logo-chip relative flex h-7 w-7 items-center justify-center rounded-full"
+      style="background-color: #A8C9A0;"
+      aria-hidden="true"
+    >
+      <span class="block h-2 w-2 rounded-full bg-white"></span>
+    </span>
+    <span class="text-ink text-base font-medium tracking-tight">youZen</span>
+  </a>
+
+  <div
+    class="hidden items-center gap-6 text-sm font-medium text-stone-500 md:flex"
+  >
+    <a href="#scenarios" class="nav-link leaf-burst">Moments</a>
+    <a href="#preview" class="nav-link leaf-burst">Inside</a>
+    <a href="#features" class="nav-link leaf-burst">Quiet things</a>
+    <a href="#diary" class="nav-link leaf-burst">Diary</a>
+    <a href="#faq" class="nav-link leaf-burst">Questions</a>
+  </div>
+
+  <ChromeButton size="small"> Add to browser </ChromeButton>
+</nav>
+
+<style>
+  /* ─── Nav-link hover: soft underline wipe + color shift ───────────
+   * Minimalist: one effect, long easing, zero lift. The intent is
+   * elegance — the link acknowledges you with a thin green line that
+   * slowly draws in from the left, and a gentle color warming. No
+   * bounce, no dot, no translate. */
+  .nav-link {
+    position: relative;
+    padding: 2px 0;
+    color: var(--color-muted);
+    background-image: linear-gradient(
+      to right,
+      var(--color-leaf-deep),
+      var(--color-leaf)
+    );
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    background-position: 0 100%;
+    transition:
+      color 450ms ease,
+      background-size 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--color-ink);
+    background-size: 100% 1.5px;
+    outline: none;
+  }
+
+  /* Logo: barely-there brighten on hover, no rotation or halo. */
+  .nav-logo-chip {
+    transition: filter 400ms ease;
+  }
+  .group:hover .nav-logo-chip {
+    filter: brightness(1.05);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link,
+    .nav-link:hover,
+    .nav-logo-chip {
+      transition: color 200ms ease !important;
+    }
+  }
+</style>

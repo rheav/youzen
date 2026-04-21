@@ -1,0 +1,295 @@
+/*
+ * yt-cleanse — YouTube page stylesheet
+ *
+ * Injected at document_start into every YouTube page via the content-script
+ * manifest entry. Rules are keyed on html[data-ytc-*] attributes that the
+ * ISOLATED-world content script sets from chrome.storage.local.
+ *
+ * Conventions:
+ *   • One rule block per CSS-kind feature in src/config/features.js.
+ *   • Prefer stable semantic selectors (ytd-*, aria-label, [is-shorts])
+ *     over generated class names.
+ *   • Group related selectors in one rule so a YouTube rename breaks ONE
+ *     feature, not five.
+ *   • Mobile DOM (m.youtube.com) is NOT covered by these selectors in v1.
+ *
+ * Phase 7 refines selectors against captured fixtures.
+ */
+
+/* ───────────────────────────────────────────────────────────
+ * #2 Hide Shorts shelves on homepage
+ * data-ytc-home-shorts
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-home-shorts] ytd-rich-shelf-renderer[is-shorts],
+html[data-ytc-home-shorts] ytd-reel-shelf-renderer,
+html[data-ytc-home-shorts] grid-shelf-view-model:has(a[href*='/shorts/']),
+html[data-ytc-home-shorts] ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #5 Hide Shorts in the left sidebar nav
+ * data-ytc-nav-shorts
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-nav-shorts] ytd-guide-entry-renderer a[title='Shorts'],
+html[data-ytc-nav-shorts] ytd-mini-guide-entry-renderer[aria-label='Shorts'] {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #6 Hide Shorts tab on channel pages
+ * data-ytc-channel-shorts
+ * Channel tabs use yt-tab-shape-wiz with a title attribute.
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-channel-shorts] tp-yt-paper-tab:has(> .tab-content:is(:where(:not(:empty)))),
+html[data-ytc-channel-shorts] yt-tab-shape[tab-title='Shorts'],
+html[data-ytc-channel-shorts] tp-yt-paper-tab[aria-label='Shorts'] {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #18 Hide Shorts in search results
+ * data-ytc-search-shorts
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-search-shorts] ytd-reel-shelf-renderer,
+html[data-ytc-search-shorts] ytd-video-renderer:has(a[href*='/shorts/']) {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #20 Hide Shorts on Subscriptions feed
+ * data-ytc-subs-shorts
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-subs-shorts]
+  ytd-browse[page-subtype='subscriptions']
+  ytd-rich-shelf-renderer[is-shorts],
+html[data-ytc-subs-shorts] ytd-browse[page-subtype='subscriptions'] ytd-reel-shelf-renderer,
+html[data-ytc-subs-shorts]
+  ytd-browse[page-subtype='subscriptions']
+  ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #1 Hide homepage feed — "empty" mode only (CSS-side)
+ * data-ytc-home-feed + data-ytc-home-feed-mode='empty'
+ * Quick-links and redirect modes are handled by pages/home.js in Phase 3.
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-home-feed][data-ytc-home-feed-mode='empty']
+  ytd-browse[page-subtype='home']
+  ytd-two-column-browse-results-renderer,
+html[data-ytc-home-feed][data-ytc-home-feed-mode='empty']
+  ytd-browse[page-subtype='home']
+  #header.ytd-browse {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #3 Hide chip / category bar (All / Music / Gaming / …)
+ * data-ytc-chip-bar
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-chip-bar] ytd-feed-filter-chip-bar-renderer,
+html[data-ytc-chip-bar] #chips-wrapper,
+html[data-ytc-chip-bar] iron-selector#chips.ytd-feed-filter-chip-bar-renderer {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #4 Hide "Breaking news" / featured shelves
+ * data-ytc-breaking
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-breaking] ytd-rich-shelf-renderer[is-breaking-news],
+html[data-ytc-breaking] ytd-rich-section-renderer:has(ytd-statement-banner-renderer),
+html[data-ytc-breaking] ytd-rich-shelf-renderer[title='Breaking news'] {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #19 Hide "People also watched" / mixed shelves on search
+ * data-ytc-search-mixed
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-search-mixed] ytd-shelf-renderer,
+html[data-ytc-search-mixed] ytd-horizontal-card-list-renderer,
+html[data-ytc-search-mixed] ytd-item-section-renderer:has(ytd-shelf-renderer) {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #8 Hide left sidebar entirely
+ * data-ytc-left-sidebar
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-left-sidebar] ytd-mini-guide-renderer,
+html[data-ytc-left-sidebar] tp-yt-app-drawer#guide,
+html[data-ytc-left-sidebar] #guide-button.ytd-masthead {
+  display: none !important;
+}
+html[data-ytc-left-sidebar] ytd-page-manager {
+  margin-left: 0 !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #9 Hide notification bell
+ * data-ytc-notif-bell
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-notif-bell] ytd-notification-topbar-button-renderer,
+html[data-ytc-notif-bell] #notification-topbar-button {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #10 Hide trending / explore entries in the sidebar
+ * data-ytc-trending
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-trending] ytd-guide-entry-renderer a[title='Trending'],
+html[data-ytc-trending] ytd-guide-entry-renderer a[title='Explore'],
+html[data-ytc-trending] ytd-mini-guide-entry-renderer[aria-label='Trending'],
+html[data-ytc-trending] ytd-mini-guide-entry-renderer[aria-label='Explore'] {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #11 Hide comments
+ * data-ytc-comments
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-comments] ytd-comments,
+html[data-ytc-comments] #comments {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #12 Hide live chat
+ * data-ytc-live-chat
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-live-chat] ytd-live-chat-frame,
+html[data-ytc-live-chat] #chat,
+html[data-ytc-live-chat] #chat-container {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #13 Hide related videos sidebar
+ * data-ytc-related
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-related] ytd-watch-flexy #secondary,
+html[data-ytc-related] #secondary.ytd-watch-flexy,
+html[data-ytc-related] #related {
+  display: none !important;
+}
+/* Widen the primary column when the sidebar is gone. */
+html[data-ytc-related] ytd-watch-flexy[flexy][is-two-columns_] #primary.ytd-watch-flexy {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #14 Hide end-screen cards (the video overlay "up next" cards)
+ * data-ytc-end-cards
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-end-cards] .ytp-ce-element,
+html[data-ytc-end-cards] .ytp-endscreen-content,
+html[data-ytc-end-cards] .html5-endscreen,
+html[data-ytc-end-cards] .ytp-cards-teaser {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #15 Hide the "Up next autoplay" toggle
+ * data-ytc-autoplay-toggle
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-autoplay-toggle] .ytp-autonav-toggle-button-container,
+html[data-ytc-autoplay-toggle] ytd-compact-autoplay-renderer {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #16 Hide merch / ticket shelves below the video
+ * data-ytc-merch
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-merch] ytd-merch-shelf-renderer,
+html[data-ytc-merch] ytd-product-list-item-renderer,
+html[data-ytc-merch] ytd-item-section-renderer:has(ytd-merch-shelf-renderer),
+html[data-ytc-merch] ytd-ticket-shelf-renderer {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Hide the "Join" / sponsor (member) button under the video
+ * data-ytc-join-button
+ * Lives inside ytd-video-owner-renderer next to the channel name.
+ * Keeps avatar/channel name/subscribe button intact.
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-join-button] ytd-video-owner-renderer #sponsor-button,
+html[data-ytc-join-button] ytd-video-owner-renderer #purchase-button {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Hide the per-channel notification bell next to Subscribe
+ * data-ytc-subscribe-bell
+ * Distinct from the global masthead bell (data-ytc-notif-bell).
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-subscribe-bell] ytd-subscribe-button-renderer #notification-preference-button,
+html[data-ytc-subscribe-bell]
+  ytd-subscribe-button-renderer
+  ytd-subscription-notification-toggle-button-renderer-next {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Hide the "Create" button in the masthead
+ * data-ytc-create-button
+ * aria-label is localized (Create / Criar / Crear / …); match the
+ * "+" SVG path, which is stable across locales.
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-create-button] ytd-masthead ytd-button-renderer:has(path[d^="M12 3a1 1 0 00-1 1v7H4"]) {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Hide watch-page action buttons (Share, Save, Ask/Perguntar)
+ * data-ytc-watch-actions
+ * Keeps the like/dislike segmented button visible. #actions-inner
+ * holds the like cluster plus a <yt-flexible-actions-view-model>
+ * and a menu button — hide those two siblings, leave the like
+ * cluster alone.
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner yt-flexible-actions-view-model,
+html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner #menu,
+html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner ytd-menu-renderer {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Hide like / dislike segmented button
+ * data-ytc-like-dislike
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-like-dislike] segmented-like-dislike-button-view-model,
+html[data-ytc-like-dislike] ytd-watch-metadata like-button-view-model,
+html[data-ytc-like-dislike] ytd-watch-metadata dislike-button-view-model {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * #17 Collapse video description by default — CSS half
+ * data-ytc-collapse-desc
+ * The JS handler (pages/watch.js, Phase 3) clicks the collapse button
+ * when the expander is already in the expanded state. CSS covers first
+ * paint by clamping the non-expanded state.
+ * ─────────────────────────────────────────────────────────── */
+html[data-ytc-collapse-desc] ytd-watch-metadata ytd-text-inline-expander:not([is-expanded]) {
+  max-height: 48px;
+  overflow: hidden;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Blocklist — cards marked by content/modules/blocklist-filter.js
+ * ─────────────────────────────────────────────────────────── */
+[data-ytc-blocked] {
+  display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────
+ * Pause — all feature attributes are removed by the applier and
+ * data-ytc-paused is set. No rule body needed; this comment marker
+ * makes the convention visible to future readers.
+ * ─────────────────────────────────────────────────────────── */

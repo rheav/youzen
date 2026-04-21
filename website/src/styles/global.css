@@ -1,0 +1,296 @@
+@import "@fontsource-variable/outfit";
+@import "@fontsource-variable/caveat";
+@import "tailwindcss";
+
+/* ─── Softly palette — leafy edition ─── */
+/* Primary accent is now pastel sage-green (not coral). Keeps the soft,
+   analog feel while leaning "garden" over "peach". */
+@theme {
+  --color-canvas: #fdfcf8;
+  --color-sage: #e8efe8;
+  --color-lavender: #efedf4;
+
+  /* Leafy accent family */
+  --color-leaf: #a8c9a0; /* primary accent */
+  --color-leaf-deep: #7fa87f; /* hover / gradient-from */
+  --color-leaf-mist: #d4e5cd; /* background blobs, pills */
+  --color-pistachio: #c6d8a9; /* gradient-to complement */
+
+  /* Supporting tints (kept for blob variation) */
+  --color-iris-soft: #e6e6fa;
+
+  --color-ink: #292524;
+  --color-muted: #78716c;
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-800: #292524;
+
+  --font-outfit:
+    "Outfit Variable", "Outfit", system-ui, -apple-system, sans-serif;
+  --font-cursive: "Caveat Variable", "Caveat", cursive;
+}
+
+/* Plain-CSS vars that are ONLY referenced in scoped component <style>
+   blocks (not by Tailwind utilities) need to live in a normal :root
+   block. Tailwind v4's @theme only emits theme vars that a utility class
+   actually uses, so anything we consume through raw var(...) — like the
+   ChromeButton gradient — must be declared here. */
+:root {
+  --color-accent-from: #5f9a6a; /* darker than leaf-deep for contrast */
+  --color-accent-to: #a8c9a0; /* leaf */
+}
+
+/* ─── Base ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-outfit);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  font-feature-settings: "ss01", "cv01";
+}
+
+/* Sentence-case headings, tracking-tight by default */
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+p {
+  color: var(--color-ink);
+  line-height: 1.6;
+}
+
+/* ─── Grain overlay (global, always on) ─── */
+/* SVG fractal noise, fixed full-viewport, mix-blend-mode: overlay, 0.35 opacity.
+   The noise is encoded as a data URI so there's zero network round-trip. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.14  0 0 0 0 0.14  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+}
+
+/* ─── Scroll-triggered reveal ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children inside a .reveal-group */
+.reveal-group > .reveal:nth-child(1) {
+  transition-delay: 0ms;
+}
+.reveal-group > .reveal:nth-child(2) {
+  transition-delay: 100ms;
+}
+.reveal-group > .reveal:nth-child(3) {
+  transition-delay: 200ms;
+}
+.reveal-group > .reveal:nth-child(4) {
+  transition-delay: 300ms;
+}
+.reveal-group > .reveal:nth-child(5) {
+  transition-delay: 400ms;
+}
+.reveal-group > .reveal:nth-child(6) {
+  transition-delay: 500ms;
+}
+
+/* ─── Floating blobs — breathing, drifting ─────────────────────────────────
+ * Much slower than before (14s vs 6s) and now scales subtly in + out, so
+ * each blob reads as "breathing". Keeps the zen atmosphere the brand wants. */
+@keyframes blob-breathe {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  50% {
+    transform: translateY(-14px) translateX(8px) scale(1.04);
+  }
+}
+@keyframes blob-breathe-alt {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  50% {
+    transform: translateY(12px) translateX(-10px) scale(1.03);
+  }
+}
+
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.6;
+  animation: blob-breathe 14s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform;
+  /* Radial mask: even if a blob is positioned at the edge and the parent
+     clips horizontally, the mask already faded the blob to 0 before the
+     clip boundary — so no hard vertical cut ever appears.               */
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    #000 45%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(circle at center, #000 45%, transparent 82%);
+}
+.blob-alt {
+  animation: blob-breathe-alt 17s ease-in-out infinite;
+}
+
+/* ─── Floating leaves — ambient particles drifting up the viewport ───────
+ * Rendered by FloatingLeaves.astro as 6 fixed-positioned SVG leaves that
+ * drift slowly upward with gentle horizontal sway and rotation. Each leaf
+ * uses a different duration/delay so the set never cycles in unison. */
+@keyframes leaf-drift {
+  0% {
+    transform: translate3d(0, 110vh, 0) rotate(-20deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: var(--leaf-opacity, 0.18);
+  }
+  50% {
+    transform: translate3d(20px, 50vh, 0) rotate(45deg);
+  }
+  92% {
+    opacity: var(--leaf-opacity, 0.18);
+  }
+  100% {
+    transform: translate3d(-15px, -15vh, 0) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* ─── Cursive-word sway — very subtle, for Hero-style accents ──────────── */
+@keyframes cursive-sway {
+  0%,
+  100% {
+    transform: rotate(-0.8deg);
+  }
+  50% {
+    transform: rotate(0.8deg);
+  }
+}
+.sway {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  animation: cursive-sway 7s ease-in-out infinite;
+}
+
+/* ─── Shadows (soft, never harsh) ─── */
+.shadow-softly {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+.shadow-softly-lg {
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.06);
+}
+
+/* ─── Pulse used on the Breathe button (very slow, meditative) ─── */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(168, 201, 160, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 18px rgba(168, 201, 160, 0);
+  }
+}
+.breathe-pulse {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* ─── Marquee-ish helper for horizontal-scroll shelves ─── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* ─── FAQ accordion transitions ─── */
+.faq-item .faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 500ms ease-in-out;
+}
+.faq-item[open] .faq-panel {
+  grid-template-rows: 1fr;
+}
+.faq-item .faq-panel-inner {
+  overflow: hidden;
+}
+.faq-item .faq-icon {
+  transition: transform 300ms ease-in-out;
+}
+.faq-item[open] .faq-icon {
+  transform: rotate(45deg);
+}
+/* Remove the default <summary> triangle */
+.faq-item > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ─── Reduced motion: switch off every non-essential animation ─── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-group > .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .blob,
+  .blob-alt,
+  .breathe-pulse,
+  .sway,
+  .floating-leaf {
+    animation: none !important;
+  }
+  .floating-leaf {
+    opacity: 0 !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

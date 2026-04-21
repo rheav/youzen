@@ -1,0 +1,395 @@
+@import '@fontsource-variable/outfit';
+@import '@fontsource-variable/caveat';
+@import 'tailwindcss';
+
+/* ─── Brand colors (Softly — leafy edition) ─── */
+/* Primary accent is pastel sage-green; the palette still honors the warm
+   parchment canvas that the extension has always lived on. */
+@theme {
+  /* Leafy accent family — the new signature. */
+  --color-leaf: #a8c9a0; /* primary accent */
+  --color-leaf-deep: #7fa87f; /* hover / gradient-from */
+  --color-leaf-mist: #d4e5cd; /* subtle tint, active-tab halos */
+  --color-pistachio: #c6d8a9; /* gradient-to complement */
+  --color-forest: #3a5a40; /* deeper leaf, used for focused success states */
+
+  /* Warm neutrals (parchment canvas) — unchanged from the youZen pass. */
+  --color-parchment: #f5f4ed;
+  --color-ivory: #faf9f5;
+  --color-sand: #e8e6dc;
+  --color-olive-gray: #5e5d59;
+  --color-stone-gray: #87867f;
+  --color-near-black: #141413;
+
+  /* Standalone error token — kept warm-red on purpose; never re-themed. */
+  --color-brute-red: #c96442;
+
+  /* Typography */
+  --font-outfit: 'Outfit Variable', 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-cursive: 'Caveat Variable', 'Caveat', cursive;
+}
+
+/* ─── Light theme (default) — warm cream + leaf accent ───────────────
+ * Palette realigned with the marketing website. The extension used to
+ * sit on a yellow-green "parchment" canvas (#f3f3e8) with olive-tinted
+ * borders; that read as "greenish" everywhere, even on surfaces that
+ * weren't meant to carry the leaf accent. We now mirror the website's
+ * cream canvas (#fdfcf8) with neutral warm stone borders, and reserve
+ * the leaf family exclusively for intentional accents (buttons, links,
+ * selection, focus, scrollbars, active tab halos). */
+:root {
+  --radius: 10px;
+  --radius-sm: 10px;
+  --radius-lg: 16px;
+
+  /* Accent gradient — leaf-deep → leaf. Darker end on the left so white
+     text on a solid --accent fill still hits a safe contrast ratio. */
+  --color-accent-from: #7fa87f;
+  --color-accent-to: #a8c9a0;
+
+  --accent: var(--color-accent-from);
+  --accent-hover: #6b9a6b;
+  --accent-text: #faf9f5;
+
+  /* Cream canvas (matches website's --color-canvas #fdfcf8) and warm
+     stone for elevated surfaces / subtle tints. No green in the neutrals. */
+  --bg-primary: #fdfcf8;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f5f4;
+
+  /* Neutral warm stone borders (matches website's stone-200 / stone-100).
+     These used to carry an olive tint (#d9dcc2 / #e8e9d2) which bled into
+     every card and control and made the whole UI look green. */
+  --border: #e7e5e4;
+  --border-subtle: #f0efed;
+
+  --text-primary: #292524;
+  --text-secondary: #57534e;
+  --text-muted: #78716c;
+
+  --shadow-sm: 0 0 0 1px rgba(41, 37, 36, 0.04);
+  --shadow: 0 0 0 1px rgba(41, 37, 36, 0.05), 0 1px 3px rgba(41, 37, 36, 0.06);
+  --shadow-md: 0 0 0 1px rgba(41, 37, 36, 0.05), 0 4px 12px rgba(87, 83, 78, 0.08);
+  --shadow-hover: 0 0 0 1px rgba(127, 168, 127, 0.22), 0 8px 24px rgba(87, 83, 78, 0.12);
+
+  --transition-fast: 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slow: 350ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  --success: var(--color-forest);
+  --success-subtle: rgba(58, 90, 64, 0.14);
+  --error: var(--color-brute-red);
+  --error-subtle: rgba(201, 100, 66, 0.12);
+  --warning: #d9a441;
+  --warning-subtle: rgba(217, 164, 65, 0.16);
+  --info: #7a8fa3;
+  --info-subtle: rgba(122, 143, 163, 0.12);
+}
+
+/* ─── Dark theme — warm charcoal, leaf accent ─── */
+[data-theme='dark'] {
+  --accent-hover: #9bc095;
+
+  --bg-primary: #1f2620;
+  --bg-secondary: #2a332b;
+  --bg-tertiary: #343e36;
+
+  --border: #4a5449;
+  --border-subtle: rgba(74, 84, 73, 0.55);
+
+  --text-primary: #f5f4ed;
+  --text-secondary: #b0aea5;
+  --text-muted: #87867f;
+
+  --shadow-sm: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  --shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 0 0 1px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 0 0 1px rgba(127, 168, 127, 0.28), 0 8px 24px rgba(0, 0, 0, 0.55);
+
+  --success-subtle: rgba(168, 201, 160, 0.22);
+  --error-subtle: rgba(201, 100, 66, 0.22);
+  --warning-subtle: rgba(217, 164, 65, 0.2);
+  --info-subtle: rgba(176, 174, 165, 0.16);
+
+  color-scheme: dark;
+}
+
+/* ─── Base ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-outfit);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+}
+
+/* ─── Root atmospheres ─── */
+/* Soft leaf radial warmth on the parchment canvas. Two greens at play: a
+   pale leaf-mist at the top and a deeper pistachio pooling at the bottom. */
+
+/* Light-theme atmosphere: whisper-quiet leaf breath in the corners, never
+   the whole canvas. The previous version layered three 20%-opacity leaf
+   washes that effectively recolored every surface green; now we keep a
+   single faint mist at the top-center and one tiny pistachio pool at the
+   bottom-right so the accent still echoes where the UI lifts off, without
+   tinting the rest of the UI. */
+.bg-light-app {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 90% 40% at 50% -5%, rgba(168, 201, 160, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 45% at 100% 105%, rgba(198, 216, 169, 0.08) 0%, transparent 65%);
+}
+
+.bg-dark-app {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse 110% 55% at 50% -5%, rgba(168, 201, 160, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 85% 60% at 0% 95%, rgba(127, 168, 127, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 85% 55% at 100% 100%, rgba(58, 90, 64, 0.22) 0%, transparent 55%);
+}
+
+::selection {
+  background: rgba(168, 201, 160, 0.35);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] ::selection {
+  background: rgba(168, 201, 160, 0.35);
+  color: #f5f4ed;
+}
+
+/* ─── Scrollbar (7px warm accent gradient, both themes) ─── */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-leaf-deep) 0%, var(--color-pistachio) 100%);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6b9a6b 0%, #b8cc98 100%);
+}
+
+/* ─── Focus ─── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Animations ─── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Warm accent-gradient motion — used on wordmark, active tab, loading skeleton. */
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ─── Utility Classes ─── */
+
+/* Leafy accent gradient on text — leaf-deep → leaf → pistachio, identical
+   in both themes. Slow-moving so it reads as breath, not sparkle. */
+.text-accent-gradient {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-leaf-deep) 0%,
+    var(--color-leaf) 50%,
+    var(--color-pistachio) 100%
+  );
+  background-size: 300% 100%;
+  animation: moveGradient 7s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Optional cursive accent — for the one word per major label that deserves it. */
+.text-cursive {
+  font-family: var(--font-cursive);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Solid warm gradient surface — e.g. primary ADD buttons, logo chip. */
+.bg-accent-gradient {
+  background: linear-gradient(135deg, var(--color-accent-from) 0%, var(--color-accent-to) 100%);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 25%,
+    var(--bg-secondary) 50%,
+    var(--bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in var(--transition) ease forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up var(--transition-slow) ease forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down var(--transition) ease forwards;
+}
+
+.animate-toast-enter {
+  animation: toast-enter 300ms cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+.animate-toast-exit {
+  animation: toast-exit 200ms ease-in forwards;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+/* ─── Sidepanel-specific ─── */
+.sidepanel-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.sidepanel-app main {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}

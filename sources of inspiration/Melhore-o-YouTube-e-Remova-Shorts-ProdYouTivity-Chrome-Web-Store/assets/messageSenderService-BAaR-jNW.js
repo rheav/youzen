@@ -1,0 +1,1 @@
+import{c as i}from"./constants-CLBLhVLu.js";const u=()=>new Promise(r=>{chrome.runtime.sendMessage({action:i},e=>{e&&e.isPremium===!0?r({isPremium:!0,user:e.user}):r({isPremium:!1,user:null})})});export{u as i};

@@ -1,0 +1,1 @@
+const p="/assets/pyt-red-border-BvDQZb63.png",h=o=>{o=Number(o);const t=Math.floor(o/(3600*24)),s=Math.floor(o%(3600*24)/3600),a=Math.floor(o%3600/60),l=t>0?t+"d ":"",n=s>0?s+"h ":"",r=a>0?a+"min ":"";return l+n+r===""?"1min":l+n+r};export{p as l,h as s};

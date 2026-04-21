@@ -1,0 +1,1131 @@
+---
+import { Leaf, Lock, Search, Bell, Menu } from "@lucide/astro";
+
+/* ─── What the animation will show ───────────────────────────────────────────
+ *
+ * A realistic Chrome-on-macOS window is docked next to the extension's native
+ * side panel. Both live inside a single CSS mockup that loops a 12-second
+ * "decluttering" sequence, in sync across the sidepanel and the feed:
+ *
+ *   t =  0.0s → Clutter visible, all toggles OFF
+ *   t =  1.0s → Toggle 1 flips ON
+ *   t =  1.3s → Shorts shelf collapses (height + opacity)
+ *   t =  3.0s → Toggle 2 flips ON
+ *   t =  3.3s → "Clickbait" card 1 vanishes
+ *   t =  5.0s → Toggle 3 flips ON
+ *   t =  5.3s → "Drama" card 2 vanishes
+ *   t =  6.5s → Hold clean state
+ *   t = 10.0s → All toggles flip OFF simultaneously
+ *   t = 10.5s → Items fade back in for the reset
+ *   t = 12.0s → Loop
+ *
+ * The whole show runs off pure CSS keyframes — no JS, no frameworks, no
+ * animation libraries. It also respects prefers-reduced-motion: all three
+ * infinite loops are paused + forced to their "clean" state.
+ *
+ * Note — fake video thumbnails: the colored rectangles in the YouTube mock
+ * are intentionally non-branded gradients. Changing them to real thumbnails
+ * is a 10-minute swap (one <img> per card).
+ */
+---
+
+<section
+  id="preview"
+  class="relative overflow-x-clip px-4 py-24 md:px-6 md:py-32"
+>
+  <!-- Subtle backdrop blob -->
+  <div
+    class="blob"
+    aria-hidden="true"
+    style="top: 20%; left: -20%; width: 380px; height: 380px; background: #efedf4;"
+  >
+  </div>
+
+  <!-- Heading block (unchanged vibe) -->
+  <div class="reveal-group mx-auto max-w-3xl text-center">
+    <span
+      class="reveal text-xs font-medium tracking-widest text-stone-400 uppercase"
+    >
+      Inside the extension
+    </span>
+    <h2 class="reveal mt-3 text-3xl font-medium tracking-tight md:text-5xl">
+      A sidepanel that
+      <span
+        class="text-[1.05em] leading-none"
+        style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 400;"
+      >
+        breathes
+      </span>
+      with you.
+    </h2>
+    <p class="reveal text-muted mx-auto mt-5 max-w-xl text-base md:text-lg">
+      Watch it clean a noisy feed live. Toggles on the side, Shorts shelf out
+      the door, clickbait gently gone.
+    </p>
+  </div>
+
+  <!-- Live badge -->
+  <div class="reveal mx-auto mt-10 flex items-center justify-center gap-2">
+    <span class="relative flex h-2 w-2">
+      <span
+        class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+        style="background-color: var(--color-leaf);"></span>
+      <span
+        class="relative inline-flex h-2 w-2 rounded-full"
+        style="background-color: var(--color-leaf-deep);"></span>
+    </span>
+    <span class="text-xs tracking-widest text-stone-500 uppercase">
+      Live demo · looping
+    </span>
+  </div>
+
+  <!-- ─── The mockup ─────────────────────────────────────────────────────── -->
+  <div
+    class="reveal mx-auto mt-10 w-full max-w-5xl"
+    style="perspective: 1400px;"
+  >
+    <div class="mockup-shell">
+      <div class="mac-window">
+        <!-- Chrome titlebar -->
+        <div class="titlebar">
+          <div class="traffic-lights" aria-hidden="true">
+            <span class="tl tl-red"></span>
+            <span class="tl tl-yellow"></span>
+            <span class="tl tl-green"></span>
+          </div>
+
+          <!-- Tab -->
+          <div class="tab-strip">
+            <div class="tab tab-active">
+              <span class="tab-fav" aria-hidden="true"></span>
+              <span class="tab-title">YouTube</span>
+            </div>
+            <span class="tab-plus" aria-hidden="true">+</span>
+          </div>
+        </div>
+
+        <!-- Chrome URL bar -->
+        <div class="urlbar">
+          <div class="urlbar-btn" aria-hidden="true">‹</div>
+          <div class="urlbar-btn" aria-hidden="true">›</div>
+          <div class="urlbar-btn" aria-hidden="true">↻</div>
+          <div class="urlbar-pill">
+            <Lock size={11} strokeWidth={2.25} class="text-stone-500" />
+            <span>youtube.com</span>
+          </div>
+          <div class="urlbar-right">
+            <span class="urlbar-ext" aria-hidden="true">
+              <Leaf size={12} color="#7fa87f" strokeWidth={2.5} />
+            </span>
+          </div>
+        </div>
+
+        <!-- Browser body: YouTube + sidepanel, split -->
+        <div class="browser-body">
+          <!-- ── YouTube content ── -->
+          <div class="yt-shell">
+            <!-- YouTube topbar (simplified) -->
+            <div class="yt-topbar">
+              <div class="yt-hamb"><Menu size={14} strokeWidth={2} /></div>
+              <div class="yt-logo">
+                <span class="yt-logo-mark" aria-hidden="true">▶</span>
+                <span class="yt-logo-text">YouTube</span>
+              </div>
+              <div class="yt-search">
+                <Search size={11} class="text-stone-400" strokeWidth={2} />
+                <span>Search</span>
+              </div>
+              <div class="yt-bell">
+                <Bell size={12} class="text-stone-500" strokeWidth={2} />
+              </div>
+              <div class="yt-avatar" aria-hidden="true"></div>
+            </div>
+
+            <!-- Feed body -->
+            <div class="yt-feed">
+              <!-- Row 1: Recommended (always visible) -->
+              <div class="yt-row">
+                <div class="yt-row-title">Recommended</div>
+                <div class="yt-grid">
+                  <div class="yt-card">
+                    <div class="thumb thumb-a"></div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[85%]"></div>
+                        <div class="bar w-[55%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                  <div class="yt-card">
+                    <div class="thumb thumb-b"></div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[70%]"></div>
+                        <div class="bar w-[45%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                  <div class="yt-card">
+                    <div class="thumb thumb-c"></div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[92%]"></div>
+                        <div class="bar w-[40%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Shorts shelf — VANISHES in the animation -->
+              <div class="yt-shelf vanish-shorts">
+                <div class="yt-row-title shelf-title">
+                  <span
+                    class="shelf-badge"
+                    style="background: #ff0033;"
+                    aria-hidden="true">▶</span
+                  >
+                  Shorts
+                </div>
+                <div class="shelf-grid">
+                  <div class="short-card short-a"></div>
+                  <div class="short-card short-b"></div>
+                  <div class="short-card short-c"></div>
+                  <div class="short-card short-d"></div>
+                </div>
+              </div>
+
+              <!-- Row 2: Trending — two cards VANISH (clickbait, drama).
+                   Uses flex so the remaining cards flow in when siblings
+                   collapse (not grid — grid cells don't release space). -->
+              <div class="yt-row">
+                <div class="yt-row-title">Trending</div>
+                <div class="yt-grid yt-grid-flex">
+                  <div class="yt-card">
+                    <div class="thumb thumb-d"></div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[75%]"></div>
+                        <div class="bar w-[50%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                  <!-- Clickbait card → vanishes at ~3.3s -->
+                  <div class="yt-card vanish-card-1" data-block="clickbait">
+                    <div class="thumb thumb-bait">
+                      <span class="bait-label">!!! YOU WON'T BELIEVE !!!</span>
+                    </div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[95%]"></div>
+                        <div class="bar w-[60%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                  <div class="yt-card">
+                    <div class="thumb thumb-e"></div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[80%]"></div>
+                        <div class="bar w-[48%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                  <!-- Drama card → vanishes at ~5.3s -->
+                  <div class="yt-card vanish-card-2" data-block="drama">
+                    <div class="thumb thumb-drama">
+                      <span class="bait-label">DRAMA · REACTION</span>
+                    </div>
+                    <div class="meta">
+                      <div class="meta-title">
+                        <div class="bar w-[88%]"></div>
+                        <div class="bar w-[52%]"></div>
+                      </div>
+                      <div class="meta-sub"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Extension sidepanel ── -->
+          <aside class="sp">
+            <!-- Header -->
+            <div class="sp-header">
+              <div class="sp-logo" aria-hidden="true">
+                <Leaf size={14} color="#faf9f5" strokeWidth={2.25} />
+              </div>
+              <div class="sp-brand">
+                <span class="sp-wordmark">youZen</span>
+                <span class="sp-tagline">declutter your YouTube</span>
+              </div>
+            </div>
+
+            <!-- Tab nav -->
+            <div class="sp-tabs">
+              <button class="sp-tab sp-tab-active" type="button">Feeds</button>
+              <button class="sp-tab" type="button">Blocklist</button>
+              <button class="sp-tab" type="button">Watch</button>
+            </div>
+
+            <!-- Rules/toggles -->
+            <div class="sp-section">
+              <div class="sp-row" data-label="Hide Shorts shelf">
+                <span class="sp-row-label">Hide Shorts shelf</span>
+                <span class="sp-switch switch-1">
+                  <span class="sp-thumb thumb-1"></span>
+                </span>
+              </div>
+              <div class="sp-row" data-label="Block clickbait">
+                <span class="sp-row-label">Block <em>clickbait</em></span>
+                <span class="sp-switch switch-2">
+                  <span class="sp-thumb thumb-2"></span>
+                </span>
+              </div>
+              <div class="sp-row" data-label="Block drama">
+                <span class="sp-row-label">Block <em>drama</em></span>
+                <span class="sp-switch switch-3">
+                  <span class="sp-thumb thumb-3"></span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Footer cursive -->
+            <div class="sp-foot">
+              <span class="sp-foot-cursive">you're quieter now.</span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Mockup styles ─────────────────────────────────────────────────────
+     All scoped with a .mockup-shell ancestor so they can't leak to the rest
+     of the site. -->
+<style is:global>
+  /* Outer wrapper — applies the soft drop shadow + tiny perspective tilt. */
+  .mockup-shell {
+    position: relative;
+    width: 100%;
+    transform: rotateX(1deg);
+    filter: drop-shadow(0 30px 60px rgba(31, 41, 55, 0.1))
+      drop-shadow(0 12px 24px rgba(31, 41, 55, 0.08));
+  }
+
+  .mac-window {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* ── macOS titlebar ── */
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 0;
+    background: linear-gradient(180deg, #ededeb 0%, #e4e4e1 100%);
+    height: 36px;
+    position: relative;
+  }
+
+  .traffic-lights {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+  }
+  .tl {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.15);
+  }
+  .tl-red {
+    background: #ff5f57;
+  }
+  .tl-yellow {
+    background: #febc2e;
+  }
+  .tl-green {
+    background: #28c840;
+  }
+
+  .tab-strip {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    margin-left: 12px;
+    flex: 1;
+    height: 100%;
+  }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 6px;
+    max-width: 180px;
+    font-size: 11px;
+    color: #52525b;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: none;
+    border-radius: 7px 7px 0 0;
+    position: relative;
+    top: 1px;
+  }
+  .tab-active {
+    background: #fafaf9;
+    color: #1c1c1c;
+    font-weight: 500;
+  }
+  .tab-fav {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: #ff0033;
+    flex-shrink: 0;
+  }
+  .tab-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .tab-plus {
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1;
+    padding: 3px 8px;
+  }
+
+  /* ── Chrome URL bar ── */
+  .urlbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fafaf9;
+    border-bottom: 1px solid #e7e5e4;
+  }
+  .urlbar-btn {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #78716c;
+    border-radius: 9999px;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .urlbar-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #f3f3f2;
+    border-radius: 9999px;
+    font-size: 11px;
+    color: #374151;
+    min-width: 0;
+  }
+  .urlbar-pill span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .urlbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 4px;
+  }
+  .urlbar-ext {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: rgba(168, 201, 160, 0.18);
+  }
+
+  /* ── Body: feed + sidepanel split ── */
+  .browser-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    background: #ffffff;
+    min-height: 520px;
+  }
+  @media (max-width: 767px) {
+    .browser-body {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── YouTube shell ── */
+  .yt-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: #ffffff;
+    border-right: 1px solid #e7e5e4;
+    overflow: hidden;
+  }
+  @media (max-width: 767px) {
+    .yt-shell {
+      border-right: none;
+      border-bottom: 1px solid #e7e5e4;
+    }
+  }
+
+  .yt-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f1f1ef;
+    background: #ffffff;
+  }
+  .yt-hamb {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #52525b;
+  }
+  .yt-logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .yt-logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 16px;
+    background: #ff0033;
+    color: white;
+    border-radius: 4px;
+    font-size: 8px;
+  }
+  .yt-logo-text {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    color: #1c1c1c;
+  }
+  .yt-search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 280px;
+    margin: 0 auto;
+    padding: 4px 10px;
+    background: #fafaf9;
+    border: 1px solid #e7e5e4;
+    border-radius: 9999px;
+    font-size: 11px;
+    color: #78716c;
+  }
+  .yt-bell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: #52525b;
+  }
+  .yt-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #d4e5cd 0%, #a8c9a0 100%);
+  }
+
+  .yt-feed {
+    flex: 1;
+    padding: 14px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow: hidden;
+  }
+
+  .yt-row-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #78716c;
+    margin-bottom: 10px;
+  }
+
+  .yt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  /* Trending row: flex so vanishing cards release layout space. */
+  .yt-grid-flex {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .yt-grid-flex .yt-card {
+    flex: 1 1 0;
+  }
+
+  .yt-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    transform-origin: center;
+  }
+  .thumb {
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #e7e5e4 0%, #d6d3d1 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .thumb-a {
+    background: linear-gradient(135deg, #c6d8a9 0%, #a8c9a0 100%);
+  }
+  .thumb-b {
+    background: linear-gradient(135deg, #efedf4 0%, #d4e5cd 100%);
+  }
+  .thumb-c {
+    background: linear-gradient(135deg, #e8efe8 0%, #7fa87f 100%);
+  }
+  .thumb-d {
+    background: linear-gradient(135deg, #fdfcf8 0%, #e7e5e4 100%);
+  }
+  .thumb-e {
+    background: linear-gradient(135deg, #d4e5cd 0%, #e6e6fa 100%);
+  }
+  /* Loud, garish "clickbait" and "drama" thumbnails — the ones we hide. */
+  .thumb-bait {
+    background: linear-gradient(135deg, #ff4d4d 0%, #ffb400 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+  }
+  .thumb-drama {
+    background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+  }
+  .bait-label {
+    color: #fff;
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  }
+
+  .meta {
+    display: flex;
+    gap: 6px;
+  }
+  .meta-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .meta-sub {
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background: #e7e5e4;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+  .bar {
+    height: 6px;
+    border-radius: 9999px;
+    background: #e7e5e4;
+  }
+
+  /* ── Shorts shelf ── */
+  .yt-shelf {
+    padding: 10px 0 0;
+    border-top: 1px solid #f1f1ef;
+    overflow: hidden;
+    /* Default max-height matches the animation's visible state so we don't
+       flash a larger size during the pre-animation delay. */
+    max-height: 140px;
+  }
+  .shelf-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .shelf-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 18px;
+    border-radius: 3px;
+    color: white;
+    font-size: 8px;
+  }
+  .shelf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .short-card {
+    aspect-ratio: 9 / 16;
+    max-height: 120px;
+    border-radius: 6px;
+  }
+  .short-a {
+    background: linear-gradient(160deg, #ff8c00 0%, #ff0033 100%);
+  }
+  .short-b {
+    background: linear-gradient(160deg, #9333ea 0%, #3b0764 100%);
+  }
+  .short-c {
+    background: linear-gradient(160deg, #06b6d4 0%, #0e7490 100%);
+  }
+  .short-d {
+    background: linear-gradient(160deg, #fde047 0%, #ca8a04 100%);
+  }
+
+  /* ── Extension sidepanel ── */
+  .sp {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    background-color: #f3f3e8;
+    background-image:
+      radial-gradient(
+        ellipse 110% 55% at 50% -5%,
+        rgba(168, 201, 160, 0.18) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 85% 60% at 0% 95%,
+        rgba(198, 216, 169, 0.22) 0%,
+        transparent 55%
+      );
+    border-left: 1px solid #e7e5e4;
+  }
+  @media (max-width: 767px) {
+    .sp {
+      border-left: none;
+    }
+  }
+
+  .sp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 2px 10px;
+  }
+  .sp-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #7fa87f 0%, #c6d8a9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 0 0 1px rgba(127, 168, 127, 0.28),
+      0 6px 14px rgba(127, 168, 127, 0.25);
+  }
+  .sp-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .sp-wordmark {
+    font-family: var(--font-cursive);
+    font-weight: 400;
+    line-height: 0.9;
+    font-size: 24px;
+    color: #1c1c1c;
+    background: linear-gradient(90deg, #7fa87f 0%, #a8c9a0 50%, #c6d8a9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sp-tagline {
+    font-size: 9px;
+    letter-spacing: 0.01em;
+    color: #5e5d59;
+    font-weight: 500;
+  }
+
+  .sp-tabs {
+    display: flex;
+    background: rgba(250, 249, 240, 0.7);
+    border: 1px solid #d9dcc2;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .sp-tab {
+    flex: 1;
+    padding: 6px 0;
+    background: transparent;
+    border: none;
+    font-size: 10px;
+    font-weight: 500;
+    color: #87867f;
+    cursor: pointer;
+  }
+  .sp-tab + .sp-tab {
+    border-left: 1px solid #e8e9d2;
+  }
+  .sp-tab-active {
+    background: rgba(168, 201, 160, 0.18);
+    color: #3a5a40;
+    font-weight: 600;
+  }
+
+  .sp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sp-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 11px;
+    background: rgba(250, 249, 240, 0.72);
+    border: 1px solid #e8e9d2;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #1c1c1c;
+  }
+  .sp-row em {
+    font-style: normal;
+    font-weight: 600;
+    color: #5e5d59;
+  }
+  .sp-row-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .sp-switch {
+    position: relative;
+    flex-shrink: 0;
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+    border-radius: 9999px;
+    background: #d6d3d1;
+    transition: background 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sp-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sp-foot {
+    margin-top: auto;
+    padding-top: 8px;
+    text-align: center;
+    border-top: 1px dashed #d9dcc2;
+  }
+  .sp-foot-cursive {
+    font-family: var(--font-cursive);
+    font-size: 18px;
+    line-height: 1;
+    color: #7fa87f;
+  }
+
+  /* ── Animations ───────────────────────────────────────────────────────
+     12-second synchronized loop. See the frontmatter comment for the
+     timeline breakdown. All values in keyframes are percentages of 12s. */
+
+  @keyframes vanish-shorts {
+    0%,
+    10% {
+      max-height: 140px;
+      opacity: 1;
+      margin-top: 0;
+      padding-top: 10px;
+      transform: scaleY(1);
+    }
+    20%,
+    83% {
+      max-height: 0;
+      opacity: 0;
+      margin-top: -18px;
+      padding-top: 0;
+      transform: scaleY(0.8);
+    }
+    92%,
+    100% {
+      max-height: 140px;
+      opacity: 1;
+      margin-top: 0;
+      padding-top: 10px;
+      transform: scaleY(1);
+    }
+  }
+
+  /* Card 1 (clickbait) — starts vanishing at ~27%, gone by 33%.
+     Animates flex + max-width so neighbors slide over to fill. */
+  @keyframes vanish-card-1 {
+    0%,
+    27% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+      flex: 1 1 0;
+      max-width: 300px;
+      margin-right: 0;
+    }
+    33%,
+    83% {
+      opacity: 0;
+      transform: scale(0.85);
+      filter: blur(3px);
+      flex: 0 0 0;
+      max-width: 0;
+      margin-right: -10px;
+    }
+    92%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+      flex: 1 1 0;
+      max-width: 300px;
+      margin-right: 0;
+    }
+  }
+
+  /* Card 2 (drama) — a beat later, starts at ~44%. */
+  @keyframes vanish-card-2 {
+    0%,
+    44% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+      flex: 1 1 0;
+      max-width: 300px;
+      margin-right: 0;
+    }
+    50%,
+    83% {
+      opacity: 0;
+      transform: scale(0.85);
+      filter: blur(3px);
+      flex: 0 0 0;
+      max-width: 0;
+      margin-right: -10px;
+    }
+    92%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+      flex: 1 1 0;
+      max-width: 300px;
+      margin-right: 0;
+    }
+  }
+
+  /* Toggles — background + thumb transform synced to each vanish. */
+  @keyframes switch-bg-1 {
+    0%,
+    8% {
+      background-color: #d6d3d1;
+    }
+    12%,
+    85% {
+      background-color: #7fa87f;
+    }
+    90%,
+    100% {
+      background-color: #d6d3d1;
+    }
+  }
+  @keyframes switch-thumb-1 {
+    0%,
+    8% {
+      transform: translateX(0);
+    }
+    12%,
+    85% {
+      transform: translateX(12px);
+    }
+    90%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes switch-bg-2 {
+    0%,
+    23% {
+      background-color: #d6d3d1;
+    }
+    28%,
+    85% {
+      background-color: #7fa87f;
+    }
+    90%,
+    100% {
+      background-color: #d6d3d1;
+    }
+  }
+  @keyframes switch-thumb-2 {
+    0%,
+    23% {
+      transform: translateX(0);
+    }
+    28%,
+    85% {
+      transform: translateX(12px);
+    }
+    90%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes switch-bg-3 {
+    0%,
+    40% {
+      background-color: #d6d3d1;
+    }
+    45%,
+    85% {
+      background-color: #7fa87f;
+    }
+    90%,
+    100% {
+      background-color: #d6d3d1;
+    }
+  }
+  @keyframes switch-thumb-3 {
+    0%,
+    40% {
+      transform: translateX(0);
+    }
+    45%,
+    85% {
+      transform: translateX(12px);
+    }
+    90%,
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  /* Apply animations */
+  .vanish-shorts {
+    animation: vanish-shorts 12s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    animation-delay: 0.3s;
+    transform-origin: top center;
+  }
+  .vanish-card-1 {
+    animation: vanish-card-1 12s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    animation-delay: 0.3s;
+  }
+  .vanish-card-2 {
+    animation: vanish-card-2 12s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    animation-delay: 0.3s;
+  }
+  .switch-1 {
+    animation: switch-bg-1 12s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+  .thumb-1 {
+    animation: switch-thumb-1 12s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+  .switch-2 {
+    animation: switch-bg-2 12s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+  .thumb-2 {
+    animation: switch-thumb-2 12s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+  .switch-3 {
+    animation: switch-bg-3 12s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+  .thumb-3 {
+    animation: switch-thumb-3 12s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+
+  /* ── Reduced-motion: freeze at the clean state so the feature still
+        reads without any motion. ── */
+  @media (prefers-reduced-motion: reduce) {
+    .vanish-shorts,
+    .vanish-card-1,
+    .vanish-card-2,
+    .switch-1,
+    .switch-2,
+    .switch-3,
+    .thumb-1,
+    .thumb-2,
+    .thumb-3 {
+      animation: none !important;
+    }
+    .vanish-shorts {
+      display: none;
+    }
+    .vanish-card-1,
+    .vanish-card-2 {
+      display: none;
+    }
+    .switch-1,
+    .switch-2,
+    .switch-3 {
+      background-color: #7fa87f !important;
+    }
+    .thumb-1,
+    .thumb-2,
+    .thumb-3 {
+      transform: translateX(12px) !important;
+    }
+  }
+</style>

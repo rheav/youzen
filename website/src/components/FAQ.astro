@@ -1,0 +1,143 @@
+---
+import { Plus } from "@lucide/astro";
+
+const faqs = [
+  {
+    q: "Does youZen collect any data?",
+    a: "No. Nothing. No analytics, no telemetry, no external requests. Everything lives in your browser's local storage. You can audit every line on GitHub.",
+  },
+  {
+    q: "Will it break when YouTube redesigns?",
+    a: "Probably, eventually — every YouTube extension has to catch up once or twice a year. We watch for it and ship a fix. The extension is small enough that a patch is usually a one-line change.",
+  },
+  {
+    q: "Can I pause it on a specific video?",
+    a: 'Right-click on any YouTube page and choose "Pause youZen on this tab." It resumes automatically when you close the tab. Great for the occasional dive into chaos.',
+  },
+  {
+    q: "Is this going to cost money?",
+    a: 'youZen is free, forever, on the Chrome Web Store. If you\'d like to support the work, there will be an optional "buy me a slow afternoon" link. No paywalls, no pro tier.',
+  },
+  {
+    q: "Does it work on mobile YouTube?",
+    a: "Not yet — Chrome extensions don't run on the YouTube mobile app. The extension does work on m.youtube.com in desktop browsers. A proper mobile companion is being sketched.",
+  },
+  {
+    q: "Why the name?",
+    a: '"You" and "zen", quietly stitched together. The extension isn\'t trying to fix YouTube — it\'s trying to hand you back the stillness that the feed keeps taking. youZen is what\'s left when the noise is gone.',
+  },
+];
+---
+
+<section id="faq" class="relative px-6 py-24 md:py-32">
+  <div class="reveal-group mx-auto max-w-2xl text-center">
+    <span
+      class="reveal text-xs font-medium tracking-widest text-stone-400 uppercase"
+    >
+      Small questions
+    </span>
+    <h2 class="reveal mt-3 text-3xl font-medium tracking-tight md:text-5xl">
+      The things people
+      <span
+        class="text-[1.05em] leading-none"
+        style="font-family: var(--font-cursive); color: #A8C9A0; font-weight: 400;"
+      >
+        usually
+      </span>
+      ask.
+    </h2>
+  </div>
+
+  <div class="mx-auto mt-12 max-w-2xl space-y-3">
+    {
+      faqs.map((f) => (
+        <details class="faq-item reveal overflow-hidden rounded-2xl border border-stone-100 bg-white">
+          <summary class="flex items-center justify-between gap-4 px-6 py-6 text-base font-medium text-ink md:text-lg">
+            <span>{f.q}</span>
+            <span
+              class="faq-icon flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-stone-500"
+              aria-hidden="true"
+            >
+              <Plus size={18} stroke-width={1.75} />
+            </span>
+          </summary>
+          <div class="faq-panel">
+            <div class="faq-panel-inner">
+              <p class="px-6 pb-6 text-sm leading-relaxed text-stone-600 md:text-base">
+                {f.a}
+              </p>
+            </div>
+          </div>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<script is:inline>
+  /**
+   * Smooth open AND close for <details> panels.
+   *
+   * The native `<details>` toggle is synchronous: when you click a summary
+   * the `open` attribute flips and the browser hides the content box
+   * immediately, which blows past any CSS transition on .faq-panel.
+   *
+   * Fix: intercept the click, animate .faq-panel-inner's height from its
+   * current scrollHeight to 0 (close) or 0 to scrollHeight (open), then
+   * commit the `open` attribute change at the end. Uses `height` rather
+   * than `grid-template-rows: 0fr→1fr` because the grid interpolation
+   * still isn't universally supported in Safari for close transitions.
+   */
+  (function () {
+    const items = document.querySelectorAll(".faq-item");
+    items.forEach((item) => {
+      const summary = item.querySelector("summary");
+      const panel = item.querySelector(".faq-panel-inner");
+      if (!summary || !panel) return;
+
+      // Set up panel as height-animatable.
+      panel.style.overflow = "hidden";
+      panel.style.height = item.hasAttribute("open")
+        ? panel.scrollHeight + "px"
+        : "0px";
+      panel.style.transition = "height 420ms cubic-bezier(0.22, 1, 0.36, 1)";
+
+      summary.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isOpen = item.hasAttribute("open");
+
+        if (isOpen) {
+          // CLOSE: from current height → 0
+          panel.style.height = panel.scrollHeight + "px";
+          // force reflow so the browser sees the fixed start value
+          panel.getBoundingClientRect();
+          requestAnimationFrame(() => {
+            panel.style.height = "0px";
+          });
+          panel.addEventListener("transitionend", function onEnd(ev) {
+            if (ev.propertyName !== "height") return;
+            item.removeAttribute("open");
+            panel.removeEventListener("transitionend", onEnd);
+          });
+        } else {
+          // OPEN: commit attribute first so content has a real height to
+          // measure, then animate 0 → scrollHeight → auto.
+          item.setAttribute("open", "");
+          panel.style.height = "0px";
+          panel.getBoundingClientRect();
+          const target = panel.scrollHeight;
+          requestAnimationFrame(() => {
+            panel.style.height = target + "px";
+          });
+          panel.addEventListener("transitionend", function onEnd(ev) {
+            if (ev.propertyName !== "height") return;
+            // Release the fixed height so long answers can reflow
+            // naturally on window resize.
+            panel.style.height = "auto";
+            panel.removeEventListener("transitionend", onEnd);
+          });
+        }
+      });
+    });
+  })();
+</script>

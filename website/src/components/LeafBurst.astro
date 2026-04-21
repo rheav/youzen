@@ -1,0 +1,226 @@
+---
+/**
+ * LeafBurst — a tiny site-wide particle system.
+ *
+ * Any element that has the class `leaf-burst` will emit a burst of 10–14
+ * serene falling leaves on `pointerenter`. The leaves are petal-shaped
+ * divs (not SVGs) styled with a radial-gradient fill, a stem ::before,
+ * and a vein ::after — ported from the user's reference HTML but with
+ * tokenized colors so they always match the brand palette.
+ *
+ * The system is shared: navbar links AND the ChromeButton both trigger
+ * bursts, so the feature lives here as a single component included once
+ * by Layout.astro.
+ *
+ * Mechanics:
+ *   - listener is delegated on document (survives HMR + dynamic nodes)
+ *   - each leaf gets CSS custom props --x, --y, --rot, --duration that
+ *     drive the `leaf-fly` keyframes defined below
+ *   - the burst throttles per-element to 400ms so rapid re-hovers stay
+ *     calm instead of spawning a swarm
+ *   - fully respects prefers-reduced-motion (no-op in that case)
+ */
+---
+
+<style is:global>
+  /* ─── Leaf particle ────────────────────────────────────────────────
+   * Positioned absolute inside its trigger (which must be
+   * position: relative + overflow: visible). The element lives at the
+   * trigger's center and animates outward via CSS custom props set by
+   * the JS at spawn time. */
+  .leaf-particle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 60;
+    border-radius: 70% 25% 65% 30%;
+    box-shadow:
+      inset 5px 6px 10px rgba(255, 255, 255, 0.45),
+      inset -3px -3px 6px rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+    animation: leaf-fly var(--duration, 2.6s) cubic-bezier(0.22, 1, 0.36, 1)
+      forwards;
+    will-change: transform, opacity;
+  }
+
+  /* Stem — a thin dark-green bar rotated through the leaf */
+  .leaf-particle::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 48%;
+    width: 2.5px;
+    height: 60%;
+    background: #3e7a42;
+    transform: translate(-50%, -50%) rotate(38deg);
+    border-radius: 3px;
+    opacity: 0.85;
+  }
+
+  /* Midrib highlight — a pale diagonal vein for detail */
+  .leaf-particle::after {
+    content: "";
+    position: absolute;
+    top: 28%;
+    left: 32%;
+    width: 1px;
+    height: 62%;
+    background: rgba(255, 255, 255, 0.7);
+    transform: rotate(25deg);
+    opacity: 0.55;
+  }
+
+  @keyframes leaf-fly {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.35) rotate(0deg);
+    }
+    18% {
+      opacity: 0.55;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+        scale(0.95) rotate(var(--rot));
+    }
+  }
+
+  /* Reduced-motion: no particles at all. */
+  @media (prefers-reduced-motion: reduce) {
+    .leaf-particle {
+      display: none !important;
+    }
+  }
+
+  /* Any trigger element needs relative + overflow: visible at minimum.
+     We can't set overflow: visible on the chrome-button (it needs
+     overflow: hidden for the shine sweep), so those buttons get an
+     absolute wrapper .leaf-host added at runtime. */
+  .leaf-burst {
+    position: relative;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    const LAST_BURST = new WeakMap();
+    const THROTTLE_MS = 380;
+
+    /**
+     * Spawns `count` leaf particles centered on the element's bounding box.
+     * If the element clips overflow (e.g. the ChromeButton), we create an
+     * absolute sibling `.leaf-host` anchored to the element's rect so
+     * leaves can escape the button's rounded rect.
+     */
+    function burst(el) {
+      const now = performance.now();
+      const last = LAST_BURST.get(el) || 0;
+      if (now - last < THROTTLE_MS) return;
+      LAST_BURST.set(el, now);
+
+      const overflowHidden =
+        getComputedStyle(el).overflow === "hidden" ||
+        el.classList.contains("chrome-button");
+
+      // Choose a host: the element itself, or a new sibling that matches
+      // the element's rect so particles aren't clipped.
+      let host = el;
+      if (overflowHidden) {
+        const rect = el.getBoundingClientRect();
+        const parentRect = el.parentElement.getBoundingClientRect();
+        host = document.createElement("span");
+        host.className = "leaf-host";
+        host.style.cssText = [
+          "position: absolute",
+          `left: ${rect.left - parentRect.left + rect.width / 2}px`,
+          `top: ${rect.top - parentRect.top + rect.height / 2}px`,
+          "width: 0",
+          "height: 0",
+          "pointer-events: none",
+          "z-index: 60",
+        ].join(";");
+        el.parentElement.style.position =
+          el.parentElement.style.position || "relative";
+        el.parentElement.appendChild(host);
+        // Auto-clean the host shortly after the longest possible animation.
+        setTimeout(() => host.remove(), 3200);
+      }
+
+      // Fewer leaves than before — the burst should feel like a breath,
+      // not a handful of confetti.
+      const leafCount = 5 + Math.floor(Math.random() * 3); // 5..7
+      for (let i = 0; i < leafCount; i++) {
+        spawnLeaf(host, overflowHidden);
+      }
+    }
+
+    function spawnLeaf(host, centered) {
+      const leaf = document.createElement("span");
+      leaf.className = "leaf-particle";
+
+      const size = 9 + Math.random() * 5; // 9..14 px — smaller, daintier
+      leaf.style.width = size + "px";
+      leaf.style.height = size * 1.48 + "px";
+
+      // Position: centered on host for overflow-hidden elements,
+      // centered on host's bounding box for regular triggers.
+      if (centered) {
+        leaf.style.left = "0px";
+        leaf.style.top = "0px";
+      } else {
+        const hostRect = host.getBoundingClientRect();
+        leaf.style.left = hostRect.width / 2 + "px";
+        leaf.style.top = hostRect.height / 2 + "px";
+      }
+
+      // Outward vector: random angle, distance 50..110 px, upward bias.
+      // Shorter throw so leaves settle near the trigger instead of
+      // scattering across the page.
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 50 + Math.random() * 60;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance - 50; // gentle upward bias
+      leaf.style.setProperty("--x", tx.toFixed(1) + "px");
+      leaf.style.setProperty("--y", ty.toFixed(1) + "px");
+      leaf.style.setProperty(
+        "--rot",
+        ((Math.random() - 0.5) * 240).toFixed(0) + "deg",
+      );
+
+      // Palette: softly-leaf family via HSL so each particle is a slightly
+      // different shade without straying from brand.
+      const lightness = 60 + Math.random() * 14; // 60..74
+      const hue = 108 + Math.random() * 16; // 108..124
+      leaf.style.background = `radial-gradient(circle at 35% 25%, hsl(${hue}, 55%, ${lightness}%), hsl(${hue - 4}, 60%, ${lightness - 16}%))`;
+
+      // Gentle timing — slightly longer so fades overlap rather than pop.
+      const duration = (2.4 + Math.random() * 1.0).toFixed(2) + "s";
+      leaf.style.setProperty("--duration", duration);
+      leaf.style.animationDelay = (Math.random() * 0.18).toFixed(2) + "s";
+
+      host.appendChild(leaf);
+      setTimeout(() => leaf.remove(), 3200);
+    }
+
+    // Delegate on document so newly-added .leaf-burst nodes still work
+    // after Astro view transitions or HMR swaps.
+    document.addEventListener(
+      "pointerenter",
+      (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        const trigger = target.closest(".leaf-burst");
+        if (!trigger) return;
+        burst(trigger);
+      },
+      true,
+    );
+  })();
+</script>

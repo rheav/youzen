@@ -1,0 +1,49 @@
+---
+/**
+ * FloatingLeaves — ambient drifting particles for the zen atmosphere.
+ *
+ * 7 fixed-position tiny leaves that drift slowly from bottom to top of the
+ * viewport, each with a different duration, delay, horizontal start
+ * position, base scale and tint. Uses the `leaf-drift` keyframes defined
+ * in `global.css` so the motion language is consistent with the blobs.
+ *
+ * Design notes:
+ *   - z-index 5: behind all content (which sits at z-10+) but in front of
+ *     the page background. The grain overlay at z-50 still wins.
+ *   - pointer-events: none — never interferes with clicks.
+ *   - opacity capped at ~0.2 so it's atmospheric, not visual noise.
+ *   - reduced-motion: hidden entirely via the global.css guard.
+ *
+ * The leaf SVG is a single handcrafted path — small payload, scales nicely,
+ * no extra HTTP. Tint changes via `currentColor` so each instance picks up
+ * a slightly different palette hue.
+ */
+
+const leaves = [
+  // left: vw start, size: px, delay: s, duration: s, color, opacity
+  { left: '8%',  size: 18, delay: 0,  duration: 28, color: '#7fa87f', opacity: 0.18 },
+  { left: '22%', size: 12, delay: 6,  duration: 34, color: '#a8c9a0', opacity: 0.16 },
+  { left: '38%', size: 22, delay: 13, duration: 40, color: '#c6d8a9', opacity: 0.14 },
+  { left: '54%', size: 14, delay: 2,  duration: 32, color: '#7fa87f', opacity: 0.20 },
+  { left: '68%', size: 20, delay: 18, duration: 38, color: '#a8c9a0', opacity: 0.15 },
+  { left: '82%', size: 16, delay: 9,  duration: 30, color: '#c6d8a9', opacity: 0.17 },
+  { left: '92%', size: 13, delay: 22, duration: 36, color: '#7fa87f', opacity: 0.14 },
+];
+---
+
+<div class="pointer-events-none fixed inset-0 z-[5] overflow-hidden" aria-hidden="true">
+  {
+    leaves.map((l) => (
+      <svg
+        class="floating-leaf absolute"
+        style={`left: ${l.left}; bottom: -30px; width: ${l.size}px; height: ${l.size}px; color: ${l.color}; --leaf-opacity: ${l.opacity}; animation: leaf-drift ${l.duration}s linear ${l.delay}s infinite;`}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* A soft, organic leaf silhouette. */}
+        <path d="M12 2C8 2 4 5 4 11c0 4 2 7 5 9 1-4 3-7 6-9-2 3-3 6-4 9 4-1 8-4 9-10 0-5-4-8-8-8z" />
+      </svg>
+    ))
+  }
+</div>

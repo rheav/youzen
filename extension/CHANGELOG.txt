@@ -1,0 +1,99 @@
+youZen - Changelog
+
+================================================================================
+
+youZen is a Chrome extension for people who want YouTube to stop wasting
+their time. One sidepanel, a pile of toggles, and a blocklist — kill Shorts,
+strip comments, silence related videos, hide the like/dislike numbers, and
+block any channel or keyword that ever makes you groan.
+
+No tracking. No accounts. No sync. Your settings live in local storage and
+never leave the browser.
+
+🎯 CORE FEATURES:
+
+  🚫 Hide Shorts Everywhere
+     Kill Shorts on the homepage, left sidebar, channel tabs, search results,
+     and the Subscriptions feed. One master toggle, or cherry-pick per surface.
+
+  🧹 Declutter the Homepage
+     Hide the main feed (empty / quick-links card / redirect to Subscriptions),
+     the category chip bar, and breaking-news shelves.
+
+  🔍 Declutter Search
+     Drop the "People also watched" and mixed shelves so search stays a list
+     of videos, not an ad for sidequests.
+
+  🎬 Watch Page, Calmer
+     Hide related videos, end-screen cards, the autoplay toggle, merch and
+     ticket shelves, the "Join" / member button, the per-channel notification
+     bell, the Share/Save/Ask action bar, the like/dislike segmented button,
+     and collapse the description by default — all individual toggles.
+
+  💬 Comments, Your Call
+     Hide comments, live chat, or both. Nothing renders until you ask for it.
+
+  🧭 Navigation Chrome
+     Hide the full left sidebar, the masthead notification bell, the trending
+     and explore entries, and the "Create" button in the topbar.
+
+  ⛔ Blocklist by Keyword or Channel
+     Right-click any selected text on YouTube to block it as a substring rule
+     or a channel rule. Matched cards vanish; the feed reflows.
+
+  ↪️ Redirect Shorts to /watch
+     Shorts open as normal video pages — full playback controls, no vertical
+     scroll cage.
+
+  ⏸️ Per-Tab Pause & Global Kill-Switch
+     Right-click the page to pause youZen on just that tab. Use the global
+     toggle to turn everything off at once, without losing your settings.
+
+  🎨 Light & Dark Themes
+     Auto-follows your system theme, or pick one. Warm red-to-yellow accent
+     either way.
+
+  🔒 Zero Data Collection
+     No telemetry, no accounts, no external requests. Permissions are the
+     minimum needed: sidepanel, storage, context menus, and YouTube host
+     access. That's it.
+
+--------------------------------------------------------------------------------
+
+🆕 19/04/2026 - v1.0.0j Released:
+
+INITIAL RELEASE.
+
+NEW - CSS-Attribute Engine:
+- Flicker-free: rules fire at document_start before YouTube paints
+- Every toggle maps to a data-ytc-* attribute on <html>
+- 25 individually togglable features across Feeds + Watch tabs
+
+NEW - Feature Panel (Sidepanel):
+- Grouped toggles with master/sub indeterminate states
+- Home-feed mode picker: Empty / Quick-links card / Redirect to Subs
+- Light / Dark / Auto theme with warm accent gradient
+
+NEW - Blocklist:
+- Keyword rules (substring, default case-insensitive) + channel rules
+- Right-click "Block selection" context menu entries
+- Live MutationObserver sweeps new cards as they load
+- Scoped to card-level selectors so layout never breaks
+
+NEW - Control:
+- Per-tab pause (right-click → pause on this tab)
+- Global kill-switch that un-applies every attribute instantly
+- Reset-to-defaults from the Options menu
+
+NEW - Stability:
+- 217 unit + integration tests, including 29 CSS-rule assertions that
+  prove every selector in src/styles/youtube.css hides what it claims
+- Non-destructive storage top-up on extension updates: your settings
+  survive, new keys get sensible defaults
+- 71 KB gzipped bundle
+
+KNOWN LIMITATIONS:
+- Mobile DOM (m.youtube.com) selectors are v2 territory
+- A handful of selectors target language-invariant attributes (icon SVG
+  paths, aria titles); if YouTube renames a container tomorrow, expect
+  a patch release within a day or two

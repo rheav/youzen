@@ -1,0 +1,1 @@
+import{a as i}from"./SubscriptionContext-B7tI60LQ.js";import{j as r,e as l}from"./useStorageContext-ygh2tSNM.js";function f({storageKey:n,children:t,activateOnPremium:e=!1}){return r(i.Consumer,{children:({isPremium:o})=>r(l.Consumer,{children:({store:u,loading:s})=>s||e&&!o?null:u[n]?t:null})})}export{f as B};
