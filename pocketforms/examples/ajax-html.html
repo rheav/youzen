@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PocketForms — AJAX example</title>
+    <style>
+      body {
+        font: 16px/1.5 system-ui, sans-serif;
+        max-width: 480px;
+        margin: 4rem auto;
+        padding: 0 1.5rem;
+        color: #292524;
+      }
+      h1 { font-weight: 500; letter-spacing: -0.02em; }
+      label { display: block; margin-top: 1rem; font-size: 14px; color: #57534e; }
+      input, textarea {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid #e7e5e4;
+        border-radius: 8px;
+        font: inherit;
+      }
+      button {
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.2rem;
+        border: 0;
+        border-radius: 999px;
+        background: #7fa87f;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      button[disabled] { opacity: 0.6; cursor: progress; }
+
+      /* The SDK toggles data-pocketforms-state on the form. */
+      form[data-pocketforms-state="success"] .pf-msg-ok    { display: block; }
+      form[data-pocketforms-state="error"]   .pf-msg-error { display: block; }
+      .pf-msg-ok, .pf-msg-error { display: none; margin-top: 1rem; padding: 0.7rem 0.9rem; border-radius: 8px; }
+      .pf-msg-ok    { background: #ecfdf5; color: #065f46; }
+      .pf-msg-error { background: #fef2f2; color: #991b1b; }
+    </style>
+  </head>
+  <body>
+    <h1>Send us a note (AJAX)</h1>
+
+    <!--
+      AJAX mode = no page reload. The SDK hijacks `submit`, POSTs via
+      fetch(), reads JSON, and toggles `data-pocketforms-state` on the
+      form so you can style success/error messages declaratively.
+    -->
+    <form data-pocketforms="contact" data-pocketforms-mode="ajax">
+      <label>
+        Your email
+        <input type="email" name="email" required />
+      </label>
+      <label>
+        What's on your mind?
+        <textarea name="message" rows="5" required></textarea>
+      </label>
+
+      <button type="submit">Send</button>
+
+      <p class="pf-msg-ok">Thanks — your message is on its way.</p>
+      <p class="pf-msg-error">That didn't go through. Try again in a moment.</p>
+    </form>
+
+    <script
+      src="../dist/pocketforms.iife.js"
+      data-pocketbase-url="https://pb.example.com"
+    ></script>
+  </body>
+</html>

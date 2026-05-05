@@ -1,0 +1,51 @@
+{
+  "name": "@pocketforms/client",
+  "version": "0.1.0",
+  "description": "Self-hostable HTML form backend on PocketBase, with built-in honeypot, time-trap, rate-limit, blacklist and Turnstile support.",
+  "type": "module",
+  "main": "./dist/pocketforms.cjs",
+  "module": "./dist/pocketforms.js",
+  "browser": "./dist/pocketforms.iife.js",
+  "exports": {
+    ".": {
+      "import": "./dist/pocketforms.js",
+      "require": "./dist/pocketforms.cjs",
+      "default": "./dist/pocketforms.iife.js"
+    },
+    "./auto": "./dist/pocketforms.iife.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "backend",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "pocketbase",
+    "forms",
+    "form-backend",
+    "honeypot",
+    "spam-protection",
+    "turnstile",
+    "contact-form",
+    "formsubmit",
+    "self-hosted"
+  ],
+  "scripts": {
+    "build": "node ./build.js",
+    "dev": "node ./build.js --watch",
+    "lint": "echo 'no linter configured' && exit 0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/rheav/youzen/tree/main/pocketforms",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rheav/youzen.git",
+    "directory": "pocketforms"
+  }
+}
