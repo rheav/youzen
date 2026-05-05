@@ -12,7 +12,6 @@ export default [
         ...globals.browser,
         ...globals.webextensions,
         chrome: 'readonly',
-        __ENABLE_ANALYTICS__: 'readonly',
         __DEBUG_MODE__: 'readonly',
       },
       parserOptions: {

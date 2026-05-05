@@ -28,7 +28,6 @@ export default defineConfig({
   base: './',
 
   define: {
-    __ENABLE_ANALYTICS__: FLAGS.ENABLE_ANALYTICS,
     __DEBUG_MODE__: FLAGS.DEBUG_MODE,
   },
 

@@ -33,7 +33,6 @@ export function computeDefaults() {
     language: null,
     compactMode: false,
     flags: { welcomeDismissed: false },
-    analytics: { enabled: false },
   };
   for (const entry of FEATURES) {
     if (entry.isMaster) continue;

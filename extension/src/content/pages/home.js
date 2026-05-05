@@ -11,6 +11,8 @@
  * set html[data-ytc-home-feed] + the mode attr by the time we run.
  */
 
+import { isPausedNow, onPauseChange } from '../modules/pause-state.js';
+
 const CARD_ID = 'ytc-home-quicklinks';
 
 const QUICK_LINKS = [
@@ -133,6 +135,14 @@ export function makeHomeHandler(ch = chrome) {
   let observer = null;
 
   const maybeReconcile = async () => {
+    // While paused, neuter all JS side-effects and strip the quick-links
+    // card if we previously mounted it.
+    if (await isPausedNow(ch)) {
+      const existing = document.getElementById(CARD_ID);
+      existing?.remove();
+      return;
+    }
+
     const { hideHomeFeed, hideHomeFeedMode } = await new Promise((resolve) =>
       ch.storage.local.get(['hideHomeFeed', 'hideHomeFeedMode'], (r) => resolve(r ?? {})),
     );
@@ -163,6 +173,12 @@ export function makeHomeHandler(ch = chrome) {
       };
       ch.storage.onChanged.addListener(onStorageChange);
 
+      // React to pause flipping mid-session so the quick-links card
+      // appears/disappears without a page reload.
+      const disposePauseListener = onPauseChange(() => {
+        void maybeReconcile();
+      });
+
       // YouTube hydrates home lazily. Watch for ytd-browse to appear, then
       // reconcile once.
       observer = new MutationObserver(() => {
@@ -184,6 +200,7 @@ export function makeHomeHandler(ch = chrome) {
         observer?.disconnect();
         observer = null;
         ch.storage.onChanged.removeListener(onStorageChange);
+        disposePauseListener();
         const existing = document.getElementById(CARD_ID);
         existing?.remove();
       };

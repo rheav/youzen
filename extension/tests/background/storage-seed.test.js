@@ -81,7 +81,12 @@ describe('computeDefaults', () => {
     expect(d.language).toBe(null);
     expect(d.compactMode).toBe(false);
     expect(d.flags).toEqual({ welcomeDismissed: false });
-    expect(d.analytics).toEqual({ enabled: false });
+  });
+
+  it('does not include any analytics scaffolding', () => {
+    const d = computeDefaults();
+    expect(d).not.toHaveProperty('analytics');
+    expect(d).not.toHaveProperty('analytics_client_id');
   });
 });
 
@@ -101,9 +106,7 @@ describe('seedDefaults — non-destructive top-up', () => {
   it('preserves existing user values', async () => {
     // Simulate a user who had hideHomeFeed: true before we shipped a new feature.
     chrome.storage.local.store.hideHomeFeed = true;
-    chrome.storage.local.store.blocklistKeywords = [
-      { id: 'r1', text: 'test', mode: 'substring' },
-    ];
+    chrome.storage.local.store.blocklistKeywords = [{ id: 'r1', text: 'test', mode: 'substring' }];
     await seedDefaults();
     expect(chrome.storage.local.store.hideHomeFeed).toBe(true);
     expect(chrome.storage.local.store.blocklistKeywords).toHaveLength(1);

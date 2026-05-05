@@ -13,6 +13,7 @@
  */
 
 import { compileRules, evaluateText } from '@/utils/blocklist-matcher';
+import { isPausedNow, onPauseChange } from './pause-state.js';
 
 /**
  * Broad CSS selector for "a card representing a single video or shelf item".
@@ -51,10 +52,7 @@ export function extractTitle(el) {
     const node = el.querySelector(sel);
     if (node) {
       const text =
-        node.getAttribute('title') ||
-        node.textContent ||
-        node.getAttribute('aria-label') ||
-        '';
+        node.getAttribute('title') || node.textContent || node.getAttribute('aria-label') || '';
       if (text.trim()) return text.trim();
     }
   }
@@ -143,35 +141,46 @@ export function rescanAll(root, matchers) {
  * @param {Document}      opts.document
  * @returns {() => void}   Disposer that tears down all listeners.
  */
-export function initBlocklistFilter({
-  chrome: ch = chrome,
-  document: doc = document,
-} = {}) {
+export function initBlocklistFilter({ chrome: ch = chrome, document: doc = document } = {}) {
   let matchers = { keyword: [], channel: [] };
   let scheduled = false;
+
+  /**
+   * Remove every `data-ytc-blocked` attribute from the document. Used
+   * when the user pauses youZen so previously-hidden cards reappear.
+   */
+  function clearBlocked() {
+    for (const card of doc.querySelectorAll(`[${BLOCKED_ATTR}]`)) {
+      card.removeAttribute(BLOCKED_ATTR);
+    }
+  }
 
   function scheduleScan() {
     if (scheduled) return;
     scheduled = true;
     // Batch multiple mutations into one scan per microtask.
-    queueMicrotask(() => {
+    queueMicrotask(async () => {
       scheduled = false;
+      // Skip scanning while paused; any leftover `data-ytc-blocked` was
+      // already cleared by the pause-change listener below.
+      if (await isPausedNow(ch)) return;
       scanRoot(doc, matchers);
     });
   }
 
   async function reloadRules() {
-    const { blocklistKeywords, blocklistChannels } = await new Promise(
-      (resolve) =>
-        ch.storage.local.get(
-          ['blocklistKeywords', 'blocklistChannels'],
-          (r) => resolve(r ?? {}),
-        ),
+    const { blocklistKeywords, blocklistChannels } = await new Promise((resolve) =>
+      ch.storage.local.get(['blocklistKeywords', 'blocklistChannels'], (r) => resolve(r ?? {})),
     );
     matchers = {
       keyword: compileRules(blocklistKeywords ?? []),
       channel: compileRules(blocklistChannels ?? []),
     };
+    if (await isPausedNow(ch)) {
+      // Rules may have changed, but we must not re-hide while paused.
+      clearBlocked();
+      return;
+    }
     rescanAll(doc, matchers);
   }
 
@@ -183,6 +192,15 @@ export function initBlocklistFilter({
   };
   ch.storage.onChanged.addListener(onStorageChange);
 
+  // React to pause flips: unhide on pause, re-scan on resume.
+  const disposePauseListener = onPauseChange((paused) => {
+    if (paused) {
+      clearBlocked();
+    } else {
+      rescanAll(doc, matchers);
+    }
+  });
+
   const observer = new MutationObserver(() => scheduleScan());
   observer.observe(doc.documentElement, { childList: true, subtree: true });
 
@@ -192,5 +210,6 @@ export function initBlocklistFilter({
   return function dispose() {
     observer.disconnect();
     ch.storage.onChanged.removeListener(onStorageChange);
+    disposePauseListener();
   };
 }

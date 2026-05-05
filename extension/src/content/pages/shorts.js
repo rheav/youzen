@@ -15,6 +15,8 @@
  *     Shorts browse surface, not a specific short.
  */
 
+import { isPausedNow } from '../modules/pause-state.js';
+
 const SHORTS_ID_RE = /^\/shorts\/([^/?#]+)/;
 
 /** Extract a Shorts video id from a URL path. Returns null if none. */
@@ -49,6 +51,8 @@ export function makeShortsHandler(ch = chrome) {
     id: 'shorts',
     test: (url) => /^\/shorts\//.test(url.pathname),
     onEnter: async (url) => {
+      // Honour pause: never redirect while paused on this tab (or globally).
+      if (await isPausedNow(ch)) return;
       const { redirectShorts } = await new Promise((resolve) =>
         ch.storage.local.get('redirectShorts', (r) => resolve(r ?? {})),
       );

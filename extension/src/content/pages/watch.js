@@ -11,6 +11,8 @@
  * page in stages).
  */
 
+import { isPausedNow, onPauseChange } from '../modules/pause-state.js';
+
 const EXPANDER_SELECTOR = 'ytd-watch-metadata ytd-text-inline-expander';
 
 /**
@@ -27,8 +29,7 @@ export function collapseDescriptionIfExpanded(doc) {
 
   // Preferred: click the #collapse button YouTube provides.
   const collapseBtn =
-    expander.querySelector('#collapse') ||
-    expander.querySelector('tp-yt-paper-button#collapse');
+    expander.querySelector('#collapse') || expander.querySelector('tp-yt-paper-button#collapse');
   if (collapseBtn && typeof collapseBtn.click === 'function') {
     collapseBtn.click();
     return true;
@@ -47,6 +48,7 @@ export function makeWatchHandler(ch = chrome) {
   let observer = null;
 
   const maybeCollapse = async () => {
+    if (await isPausedNow(ch)) return;
     const { hideDescription } = await new Promise((resolve) =>
       ch.storage.local.get('hideDescription', (r) => resolve(r ?? {})),
     );
@@ -64,6 +66,12 @@ export function makeWatchHandler(ch = chrome) {
         if ('hideDescription' in changes) void maybeCollapse();
       };
       ch.storage.onChanged.addListener(onStorageChange);
+
+      // React to pause flipping so unpausing mid-watch can re-collapse
+      // the description if the feature is enabled.
+      const disposePauseListener = onPauseChange(() => {
+        void maybeCollapse();
+      });
 
       // Wait for the description expander to hydrate.
       observer = new MutationObserver(() => {
@@ -84,6 +92,7 @@ export function makeWatchHandler(ch = chrome) {
         observer?.disconnect();
         observer = null;
         ch.storage.onChanged.removeListener(onStorageChange);
+        disposePauseListener();
       };
     },
   };

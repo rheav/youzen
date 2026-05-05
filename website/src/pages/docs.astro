@@ -1,0 +1,680 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+
+/**
+ * /docs — full reference for every youZen feature and toggle.
+ *
+ * The structure mirrors `extension/src/config/features.js`, which is the
+ * single source of truth in the extension. Update this page whenever a
+ * toggle is added, removed, or renamed there.
+ */
+
+const sections = [
+  {
+    id: "feeds",
+    tab: "Feeds",
+    intro:
+      "Everything you see before you click a video — homepage, sidebar, search, and the navigation chrome.",
+    groups: [
+      {
+        id: "hide-shorts",
+        title: "Hide Shorts across YouTube",
+        master: "hideShorts",
+        summary:
+          "One master toggle that flips every Shorts surface at once, plus per-surface toggles if you want to keep one and kill the rest.",
+        features: [
+          {
+            id: "hideHomeShorts",
+            label: "Homepage Shorts shelves",
+            default: "On",
+            kind: "CSS",
+            body: "Removes the dedicated Shorts shelves on the homepage feed (the rows with vertical thumbnails). Regular videos around them stay where they are; the feed just reflows.",
+          },
+          {
+            id: "hideNavShorts",
+            label: "Left sidebar nav",
+            default: "On",
+            kind: "CSS",
+            body: "Hides the Shorts entry in the left sidebar nav so you cannot accidentally click into the Shorts surface from there.",
+          },
+          {
+            id: "hideChannelShortsTab",
+            label: "Channel Shorts tab",
+            default: "On",
+            kind: "CSS",
+            body: "On a creator's channel page, the row of tabs (Home / Videos / Shorts / Live / Playlists / Community) loses its Shorts entry.",
+          },
+          {
+            id: "hideSearchShorts",
+            label: "Search results",
+            default: "On",
+            kind: "CSS",
+            body: "Search results stop showing Shorts shelves and individual Shorts cards. You see videos, channels, and playlists only.",
+          },
+          {
+            id: "hideSubsShorts",
+            label: "Subscriptions feed",
+            default: "On",
+            kind: "CSS",
+            body: "Strips Shorts from your Subscriptions feed so it stays a chronological list of long-form uploads from the channels you actually follow.",
+          },
+        ],
+      },
+      {
+        id: "declutter-home",
+        title: "Declutter homepage",
+        master: "declutterHome",
+        summary:
+          "The homepage feed is the loudest surface on YouTube. Pick what shows there — or replace it entirely.",
+        features: [
+          {
+            id: "hideHomeFeed",
+            label: "Hide homepage feed",
+            default: "Off",
+            kind: "Hybrid",
+            body: "Hides the main grid of thumbnails on youtube.com. When enabled, you choose what shows in its place via the dropdown next to the toggle:",
+            extras: [
+              {
+                value: "Empty",
+                body: "Just whitespace where the feed used to be. The cleanest option — useful if you only ever come to YouTube via direct links.",
+              },
+              {
+                value: "Quick links card",
+                body: "A small card with one-tap entries for Subscriptions, History, Playlists, and Watch Later. Default option.",
+              },
+              {
+                value: "Redirect to Subscriptions",
+                body: "Whenever you load the homepage, the extension immediately navigates to /feed/subscriptions so you skip the algorithmic feed entirely.",
+              },
+            ],
+          },
+          {
+            id: "hideChipBar",
+            label: "Chip / category bar",
+            default: "Off",
+            kind: "CSS",
+            body: "Hides the row of pill-shaped chips at the top of the homepage (All, Music, Gaming, News, Live, …). They are a category re-ranker, not a real navigation control.",
+          },
+          {
+            id: "hideBreakingShelves",
+            label: "Breaking news & featured shelves",
+            default: "Off",
+            kind: "CSS",
+            body: "Removes the Breaking News and similar editorial shelves that occasionally appear at the top of the feed.",
+          },
+        ],
+      },
+      {
+        id: "declutter-search",
+        title: "Declutter search",
+        master: "declutterSearch",
+        summary:
+          "Make search behave like a search engine: a list of videos that match your query, nothing else.",
+        features: [
+          {
+            id: "hideSearchMixedShelves",
+            label: '"People also watched" & mixed shelves',
+            default: "Off",
+            kind: "CSS",
+            body: 'Drops the inline shelves YouTube splices into search results — "People also watched", "From related searches", "For you", and similar — so the result list stays a single column of relevant videos.',
+          },
+        ],
+      },
+      {
+        id: "nav-chrome",
+        title: "Navigation chrome",
+        master: null,
+        summary:
+          "Standalone toggles for the global YouTube UI elements that follow you across every page.",
+        features: [
+          {
+            id: "hideLeftSidebar",
+            label: "Hide left sidebar entirely",
+            default: "Off",
+            kind: "CSS",
+            body: "Hides the entire left navigation rail. Aggressive — only enable this if you reach playlists, history, and subscriptions through bookmarks or the homepage replacement.",
+          },
+          {
+            id: "hideNotificationBell",
+            label: "Hide notification bell",
+            default: "Off",
+            kind: "CSS",
+            body: "Removes the bell icon in the YouTube masthead. The bell is a standing invitation to interrupt yourself; this turns it off without unsubscribing from notifications.",
+          },
+          {
+            id: "hideTrending",
+            label: "Hide trending / explore",
+            default: "Off",
+            kind: "CSS",
+            body: "Hides the Trending and Explore entries in the left sidebar so you cannot fall into a curated rabbit hole.",
+          },
+          {
+            id: "hideCreateButton",
+            label: 'Hide "Create" button in navbar',
+            default: "On",
+            kind: "CSS",
+            body: "Removes the top-bar Create / upload button. If you do not run a channel, the button is just visual noise.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "watch",
+    tab: "Watch",
+    intro:
+      "Everything around the player on a /watch page — comments, related videos, the action bar, and the description.",
+    groups: [
+      {
+        id: "comments-area",
+        title: "Hide comments area",
+        master: "commentsArea",
+        summary:
+          "The comments and live chat boxes are the noisiest part of any video page. Hide them entirely or keep one and drop the other.",
+        features: [
+          {
+            id: "hideComments",
+            label: "Comments",
+            default: "Off",
+            kind: "CSS",
+            body: "Hides the comments section on regular videos. Comments don't even render — there is nothing to scroll past.",
+          },
+          {
+            id: "hideLiveChat",
+            label: "Live chat",
+            default: "Off",
+            kind: "CSS",
+            body: "Hides the live chat panel on premieres and livestreams so you can watch the stream without the chat firehose in your peripheral vision.",
+          },
+        ],
+      },
+      {
+        id: "declutter-watch",
+        title: "Declutter player surroundings",
+        master: "declutterWatch",
+        summary:
+          "Strip the watch page back to a video and a title. Each toggle is independent — turn off the master to flip them all at once.",
+        features: [
+          {
+            id: "hideRelatedVideos",
+            label: "Related videos sidebar",
+            default: "Off",
+            kind: "CSS",
+            body: "Hides the up-next sidebar on the right of the player. The video plays full-width on wide screens; on narrow screens the empty column is just removed.",
+          },
+          {
+            id: "hideEndScreenCards",
+            label: "End-screen cards",
+            default: "On",
+            kind: "CSS",
+            body: "Hides the cards that overlay the last 5–20 seconds of a video pushing related videos. The video ends when the video ends.",
+          },
+          {
+            id: "hideAutoplayToggle",
+            label: "Up-next autoplay toggle",
+            default: "On",
+            kind: "CSS",
+            body: 'Removes the autoplay switch from the player controls. Combine with "Related videos sidebar" off to make autoplay practically unreachable.',
+          },
+          {
+            id: "hideMerchShelves",
+            label: "Merch & ticket shelves",
+            default: "On",
+            kind: "CSS",
+            body: "Hides the merch, ticket, and product shelves YouTube injects below videos.",
+          },
+          {
+            id: "hideJoinButton",
+            label: 'Hide "Join" / member button',
+            default: "On",
+            kind: "CSS",
+            body: 'Removes the channel-membership "Join" button next to Subscribe. You can still join from the channel page if you ever decide to.',
+          },
+          {
+            id: "hideSubscribeBell",
+            label: "Hide notification bell",
+            default: "On",
+            kind: "CSS",
+            body: "Hides the bell icon next to the Subscribe button on a video page. Subscribe stays — just the bell goes.",
+          },
+          {
+            id: "hideWatchActions",
+            label: "Hide action buttons",
+            default: "On",
+            kind: "CSS",
+            body: "Hides the Share / Save / Ask / Clip action bar under the video. Like and dislike are controlled separately by the next toggle.",
+          },
+          {
+            id: "hideLikeDislike",
+            label: "Hide like / dislike",
+            default: "On",
+            kind: "CSS",
+            body: "Hides the like and dislike buttons and their counts. If a number is going to colour your judgement of a video, this stops it.",
+          },
+          {
+            id: "hideDescription",
+            label: "Collapse description by default",
+            default: "Off",
+            kind: "Hybrid",
+            body: "Forces the description to render in its collapsed state. CSS clamps it on first paint; a tiny JS step re-collapses it if YouTube hydrates it expanded. Click the description to read it normally.",
+          },
+        ],
+      },
+      {
+        id: "watch-loose",
+        title: "Other watch behaviors",
+        master: null,
+        summary: "Standalone watch-page toggles that don't fit a group.",
+        features: [
+          {
+            id: "redirectShorts",
+            label: "Redirect Shorts to normal video page",
+            default: "On",
+            kind: "JS",
+            body: "When you open a /shorts/<id> URL, the extension immediately navigates to /watch?v=<id>. You get the regular player, full controls, and no vertical-scroll cage. The redirect uses location.replace so Back goes wherever you came from, not back into Shorts.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "blocklist",
+    tab: "Blocklist",
+    intro:
+      "Two lists of rules — one for keywords, one for channels — that hide matching cards everywhere youZen runs.",
+    groups: [
+      {
+        id: "blocklist-rules",
+        title: "Rules",
+        master: null,
+        summary:
+          "Add a rule from the Blocklist tab in the sidepanel, or right-click any selected text on YouTube to drop it into the keyword or channel list directly.",
+        features: [
+          {
+            id: "blocklistKeywords",
+            label: "Keyword rules",
+            default: "Empty",
+            kind: "JS",
+            body: "Match against a card's title text. Each rule has a mode and a case-sensitivity flag.",
+            extras: [
+              {
+                value: "Substring",
+                body: "Matches if the title contains the rule text anywhere. Default mode — case-insensitive unless you turn that on.",
+              },
+              {
+                value: "Whole word",
+                body: 'Matches only when the rule text appears as a complete word — useful for short, common terms ("AI" without matching "Brain").',
+              },
+              {
+                value: "Regex",
+                body: "Matches a JavaScript regular expression. Invalid patterns are silently ignored so a typo never breaks the feed.",
+              },
+            ],
+          },
+          {
+            id: "blocklistChannels",
+            label: "Channel rules",
+            default: "Empty",
+            kind: "JS",
+            body: "Match against the channel name or @handle on each card. Same three modes — substring, whole-word, regex — and the same case-sensitivity option.",
+          },
+        ],
+      },
+      {
+        id: "blocklist-howto",
+        title: "How matching works",
+        master: null,
+        summary: "What gets scanned, when, and what happens to matches.",
+        features: [
+          {
+            id: "scope",
+            label: "Where rules apply",
+            default: "All feeds",
+            kind: "Info",
+            body: "Homepage, Subscriptions, search results, the Watch page sidebar, channel pages, and any other surface that uses YouTube's standard video card components. The scanner runs at document_start and re-runs on every DOM mutation, so infinite scroll is covered.",
+          },
+          {
+            id: "effect",
+            label: "What a block does",
+            default: "Hide",
+            kind: "Info",
+            body: "Matched cards get a data-ytc-blocked attribute and are hidden via CSS. The card stays in the DOM (so YouTube does not try to refill the slot) but takes up no space and does not respond to hover or clicks.",
+          },
+          {
+            id: "right-click",
+            label: "Right-click to add",
+            default: "On",
+            kind: "Info",
+            body: 'Highlight any text on a YouTube page and right-click — the menu shows "youZen: Block \u201c…\u201d as keyword" and "youZen: Block channel \u201c…\u201d". Both append a substring rule with case-insensitive matching, idempotent against duplicates.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "global",
+    tab: "Pause & global controls",
+    intro:
+      "The toggles that aren't per-feature: pausing youZen on a tab or globally, and resetting your settings.",
+    groups: [
+      {
+        id: "pause",
+        title: "Pause",
+        master: null,
+        summary:
+          "Two ways to switch youZen off without losing your settings. Both kill every CSS rule and every JS behavior — the page reverts to vanilla YouTube until you flip them back.",
+        features: [
+          {
+            id: "tabPause",
+            label: "Per-tab pause",
+            default: "Off",
+            kind: "Session",
+            body: 'Right-click anywhere on a YouTube page and choose "Pause youZen on this tab". The pause lives in chrome.storage.session, so it lasts as long as the tab does and clears when the tab closes. Only the active tab is affected; other tabs keep their settings.',
+          },
+          {
+            id: "globallyPaused",
+            label: "Global kill-switch",
+            default: "Off",
+            kind: "Persistent",
+            body: 'The big toggle in the sidepanel header. Disables youZen on every YouTube tab, in every window, until you flip it back. Settings, blocklists, and per-toggle state all stay exactly as you left them — pause is purely "stop applying", not "forget".',
+          },
+        ],
+      },
+      {
+        id: "appearance",
+        title: "Appearance",
+        master: null,
+        summary:
+          "The sidepanel respects your system theme by default and remembers any explicit choice across sessions.",
+        features: [
+          {
+            id: "theme",
+            label: "Light / dark theme",
+            default: "Auto (system)",
+            kind: "Persistent",
+            body: 'Click the gear icon in the sidepanel header to toggle dark mode. Until you make a choice, the panel follows prefers-color-scheme; once you pick a side, that choice is stored under "appTheme" and used everywhere.',
+          },
+        ],
+      },
+      {
+        id: "reset",
+        title: "Reset",
+        master: null,
+        summary: "Start fresh.",
+        features: [
+          {
+            id: "reset",
+            label: "Reset to defaults",
+            default: "—",
+            kind: "Action",
+            body: "Wipes every youZen-managed key in chrome.storage.local and re-seeds the install defaults. Your blocklist is cleared, every toggle returns to its default state, and the global pause flips back off. There is no undo; the action is local — nothing is sent anywhere.",
+          },
+        ],
+      },
+    ],
+  },
+];
+
+const kindBadge = (kind: string) => {
+  const map: Record<string, string> = {
+    CSS: "bg-leaf-mist text-stone-700",
+    JS: "bg-pistachio text-stone-800",
+    Hybrid: "bg-iris-soft text-stone-700",
+    Session: "bg-stone-100 text-stone-700",
+    Persistent: "bg-stone-100 text-stone-700",
+    Action: "bg-stone-100 text-stone-700",
+    Info: "bg-stone-100 text-stone-500",
+  };
+  return map[kind] ?? "bg-stone-100 text-stone-700";
+};
+---
+
+<Layout
+  title="Docs — youZen"
+  description="Every toggle in youZen, what it does, and what it changes on YouTube. No tracking, no telemetry, no remote configuration."
+>
+  <Navbar />
+
+  <main class="relative z-10 px-6 pt-32 pb-24 md:pt-40">
+    <article class="mx-auto max-w-3xl">
+      <!-- ─── Header ─── -->
+      <header class="reveal mb-14 md:mb-20">
+        <p class="text-leaf-deep mb-3 text-sm tracking-widest uppercase">
+          Reference
+        </p>
+        <h1
+          class="text-ink mb-5 text-4xl font-medium tracking-tight md:text-5xl"
+        >
+          Every toggle, in
+          <span
+            class="font-cursive text-leaf-deep relative inline-block text-[1.1em] leading-none"
+            >plain language</span
+          >.
+        </h1>
+        <p class="max-w-2xl text-lg leading-relaxed text-stone-600">
+          youZen ships with one sidepanel and a small pile of switches. This
+          page documents every one of them — what each switch does, what it
+          changes on the page, and what happens when you flip it. Nothing is
+          remote-configurable; what's here is what runs in your browser.
+        </p>
+
+        <p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-500">
+          Defaults shown below are the values you get on a fresh install. The
+          sidepanel groups things into <strong class="text-ink">Feeds</strong>,
+          <strong class="text-ink">Watch</strong>, and
+          <strong class="text-ink">Blocklist</strong> tabs; this page mirrors
+          that order and adds a section for the global controls.
+        </p>
+      </header>
+
+      <!-- ─── TOC ─── -->
+      <nav
+        class="reveal mb-16 rounded-2xl border border-stone-200/80 bg-white/60 p-6 backdrop-blur-sm md:mb-20"
+        aria-label="Table of contents"
+      >
+        <p
+          class="mb-4 text-xs font-medium tracking-widest text-stone-400 uppercase"
+        >
+          Contents
+        </p>
+        <ol class="space-y-3 text-sm md:columns-2">
+          {
+            sections.map((s) => (
+              <li>
+                <a
+                  href={`#${s.id}`}
+                  class="footer-link text-stone-600 hover:text-ink"
+                >
+                  {s.tab}
+                </a>
+                <ul class="mt-2 space-y-1.5 pl-3 text-xs text-stone-500">
+                  {s.groups.map((g) => (
+                    <li>
+                      <a
+                        href={`#${s.id}-${g.id}`}
+                        class="footer-link hover:text-ink"
+                      >
+                        {g.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+          <li>
+            <a href="#privacy" class="footer-link text-stone-600 hover:text-ink"
+              >Privacy</a
+            >
+          </li>
+        </ol>
+      </nav>
+
+      <!-- ─── Sections ─── -->
+      {
+        sections.map((s) => (
+          <section
+            id={s.id}
+            class="reveal mb-20 scroll-mt-32 last:mb-12"
+            aria-labelledby={`${s.id}-title`}
+          >
+            <header class="mb-8 border-b border-stone-200/70 pb-4">
+              <p class="text-leaf-deep mb-2 text-xs tracking-widest uppercase">
+                Tab
+              </p>
+              <h2
+                id={`${s.id}-title`}
+                class="text-ink text-3xl font-medium tracking-tight md:text-4xl"
+              >
+                {s.tab}
+              </h2>
+              <p class="mt-3 max-w-2xl text-stone-600">{s.intro}</p>
+            </header>
+
+            {s.groups.map((g) => (
+              <section
+                id={`${s.id}-${g.id}`}
+                class="mb-12 scroll-mt-32"
+                aria-labelledby={`${s.id}-${g.id}-title`}
+              >
+                <header class="mb-5">
+                  <h3
+                    id={`${s.id}-${g.id}-title`}
+                    class="text-ink mb-2 text-xl font-medium tracking-tight md:text-2xl"
+                  >
+                    {g.title}
+                    {g.master && (
+                      <span class="bg-sage ml-3 align-middle rounded-full px-2.5 py-0.5 text-[10px] font-medium tracking-wider text-stone-600 uppercase">
+                        master toggle
+                      </span>
+                    )}
+                  </h3>
+                  <p class="max-w-2xl text-sm text-stone-500">{g.summary}</p>
+                </header>
+
+                <ul class="space-y-4">
+                  {g.features.map((f) => (
+                    <li class="rounded-2xl border border-stone-200/80 bg-white/70 p-5 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-md">
+                      <div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <h4 class="text-ink text-base font-medium">
+                          {f.label}
+                        </h4>
+                        <code class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-500">
+                          {f.id}
+                        </code>
+                        <span
+                          class={`rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase ${kindBadge(f.kind)}`}
+                        >
+                          {f.kind}
+                        </span>
+                        <span class="ml-auto text-xs text-stone-400">
+                          Default:{" "}
+                          <span class="text-stone-600">{f.default}</span>
+                        </span>
+                      </div>
+                      <p class="text-sm leading-relaxed text-stone-600">
+                        {f.body}
+                      </p>
+                      {f.extras && (
+                        <ul class="mt-4 space-y-2 border-l-2 border-stone-200/80 pl-4">
+                          {f.extras.map((x) => (
+                            <li>
+                              <p class="text-ink text-sm font-medium">
+                                {x.value}
+                              </p>
+                              <p class="text-sm text-stone-500">{x.body}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </section>
+        ))
+      }
+
+      <!-- ─── Privacy ─── -->
+      <section
+        id="privacy"
+        class="reveal mt-24 scroll-mt-32 rounded-3xl border border-stone-200/80 bg-white/70 p-8 backdrop-blur-sm md:p-10"
+        aria-labelledby="privacy-title"
+      >
+        <p class="text-leaf-deep mb-2 text-xs tracking-widest uppercase">
+          What leaves your browser
+        </p>
+        <h2
+          id="privacy-title"
+          class="text-ink mb-4 text-2xl font-medium tracking-tight md:text-3xl"
+        >
+          Nothing.
+        </h2>
+        <p class="mb-3 text-stone-600">
+          youZen makes zero external network requests. There is no analytics,
+          no telemetry, no remote configuration, no crash reporter, no error
+          beacon. The extension does not register an account and does not sync
+          settings across devices.
+        </p>
+        <p class="mb-3 text-stone-600">
+          Every toggle on this page is stored in <code
+            class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700"
+            >chrome.storage.local</code
+          >; per-tab pause lives in <code
+            class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700"
+            >chrome.storage.session</code
+          > and clears when the tab closes. Both are browser-local and visible
+          only to the extension itself.
+        </p>
+        <p class="text-stone-600">
+          The source is on GitHub — you can read every line, including the
+          test suite that asserts no analytics keys ship in the install
+          defaults.
+        </p>
+      </section>
+
+      <!-- ─── Closing ─── -->
+      <footer class="reveal mt-20 text-center">
+        <p class="font-cursive text-leaf-deep text-3xl">
+          Quiet on, quiet off.
+        </p>
+        <p class="mt-2 text-sm text-stone-500">
+          Found something missing or wrong? <a
+            href="https://github.com/rheav/youzen"
+            class="footer-link text-stone-600 hover:text-ink">Open an issue.</a
+          >
+        </p>
+      </footer>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  /* Local copy of the footer-link wipe so anchor links inside the docs
+     body match the rest of the site. Defined locally so the page works
+     even without the Footer component above it. */
+  .footer-link {
+    position: relative;
+    background-image: linear-gradient(
+      to right,
+      var(--color-leaf-deep),
+      var(--color-leaf)
+    );
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    background-position: 0 100%;
+    transition:
+      color 300ms ease,
+      background-size 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .footer-link:hover,
+  .footer-link:focus-visible {
+    background-size: 100% 1.5px;
+    outline: none;
+  }
+</style>

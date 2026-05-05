@@ -9,7 +9,7 @@ export default defineManifest({
   default_locale: 'en',
 
   permissions: ['sidePanel', 'storage', 'contextMenus', 'tabs'],
-  host_permissions: ['*://www.youtube.com/*', '*://m.youtube.com/*'],
+  host_permissions: ['*://www.youtube.com/*'],
 
   action: {
     default_title: 'Open youZen',
@@ -42,7 +42,7 @@ export default defineManifest({
       // ISOLATED world — attribute applier + page router + blocklist filter.
       // CSS rules in src/styles/youtube.css are keyed on html[data-ytc-*]
       // attributes set by the content script at document_start (flicker-free).
-      matches: ['*://www.youtube.com/*', '*://m.youtube.com/*'],
+      matches: ['*://www.youtube.com/*'],
       js: ['src/content/isolated-world.js'],
       css: ['src/styles/youtube.css'],
       run_at: 'document_start',
@@ -52,7 +52,7 @@ export default defineManifest({
   web_accessible_resources: [
     {
       resources: ['_locales/*', 'icons/*'],
-      matches: ['*://www.youtube.com/*', '*://m.youtube.com/*'],
+      matches: ['*://www.youtube.com/*'],
     },
   ],
 

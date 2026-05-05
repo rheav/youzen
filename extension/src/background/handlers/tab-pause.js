@@ -15,13 +15,11 @@ const MENU_ID = 'ytc-pause-tab';
 const SESSION_PREFIX = 'tabPaused:';
 const PAUSE_LABEL = 'Pause youZen on this tab';
 const RESUME_LABEL = 'Resume youZen on this tab';
-const YT_URL_PATTERNS = ['*://*.youtube.com/*'];
+const YT_URL_PATTERNS = ['*://www.youtube.com/*'];
 
 export async function isTabPaused(tabId) {
   const key = `${SESSION_PREFIX}${tabId}`;
-  return new Promise((resolve) =>
-    chrome.storage.session.get(key, (r) => resolve(!!r?.[key])),
-  );
+  return new Promise((resolve) => chrome.storage.session.get(key, (r) => resolve(!!r?.[key])));
 }
 
 export async function setTabPaused(tabId, paused) {
@@ -38,16 +36,12 @@ export async function setTabPaused(tabId, paused) {
 export async function updateMenuTitle(tabId) {
   const paused = await isTabPaused(tabId);
   return new Promise((resolve) => {
-    chrome.contextMenus.update(
-      MENU_ID,
-      { title: paused ? RESUME_LABEL : PAUSE_LABEL },
-      () => {
-        // Swallow "No menu item with id" when the menu hasn't been created
-        // yet (e.g. during first-activation race on install).
-        void chrome.runtime.lastError;
-        resolve();
-      },
-    );
+    chrome.contextMenus.update(MENU_ID, { title: paused ? RESUME_LABEL : PAUSE_LABEL }, () => {
+      // Swallow "No menu item with id" when the menu hasn't been created
+      // yet (e.g. during first-activation race on install).
+      void chrome.runtime.lastError;
+      resolve();
+    });
   });
 }
 

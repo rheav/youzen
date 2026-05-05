@@ -93,7 +93,8 @@ NEW - Stability:
 - 71 KB gzipped bundle
 
 KNOWN LIMITATIONS:
-- Mobile DOM (m.youtube.com) selectors are v2 territory
+- Mobile DOM (m.youtube.com) is out of scope: youZen only matches
+  www.youtube.com so the mobile site stays untouched
 - A handful of selectors target language-invariant attributes (icon SVG
   paths, aria titles); if YouTube renames a container tomorrow, expect
   a patch release within a day or two

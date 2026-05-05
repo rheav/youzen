@@ -11,7 +11,8 @@
  *     over generated class names.
  *   • Group related selectors in one rule so a YouTube rename breaks ONE
  *     feature, not five.
- *   • Mobile DOM (m.youtube.com) is NOT covered by these selectors in v1.
+ *   • Mobile DOM (m.youtube.com) is out of scope — the extension does not
+ *     run on mobile hosts.
  *
  * Phase 7 refines selectors against captured fixtures.
  */
@@ -241,7 +242,9 @@ html[data-ytc-subscribe-bell]
  * aria-label is localized (Create / Criar / Crear / …); match the
  * "+" SVG path, which is stable across locales.
  * ─────────────────────────────────────────────────────────── */
-html[data-ytc-create-button] ytd-masthead ytd-button-renderer:has(path[d^="M12 3a1 1 0 00-1 1v7H4"]) {
+html[data-ytc-create-button]
+  ytd-masthead
+  ytd-button-renderer:has(path[d^='M12 3a1 1 0 00-1 1v7H4']) {
   display: none !important;
 }
 

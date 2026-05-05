@@ -50,9 +50,7 @@ export async function appendRule(listKey, text) {
       caseSensitive: false,
     },
   ];
-  await new Promise((resolve) =>
-    chrome.storage.local.set({ [listKey]: next }, () => resolve()),
-  );
+  await new Promise((resolve) => chrome.storage.local.set({ [listKey]: next }, () => resolve()));
 }
 
 export function registerContextMenu() {
@@ -64,21 +62,13 @@ export function registerContextMenu() {
         id: MENU_KEYWORD,
         title: 'youZen: Block "%s" as keyword',
         contexts: ['selection'],
-        documentUrlPatterns: [
-          'https://www.youtube.com/*',
-          'https://youtube.com/*',
-          'https://m.youtube.com/*',
-        ],
+        documentUrlPatterns: ['https://www.youtube.com/*', 'https://youtube.com/*'],
       });
       chrome.contextMenus.create({
         id: MENU_CHANNEL,
         title: 'youZen: Block channel "%s"',
         contexts: ['selection'],
-        documentUrlPatterns: [
-          'https://www.youtube.com/*',
-          'https://youtube.com/*',
-          'https://m.youtube.com/*',
-        ],
+        documentUrlPatterns: ['https://www.youtube.com/*', 'https://youtube.com/*'],
       });
       createPauseMenuItem();
     });
