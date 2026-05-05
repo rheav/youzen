@@ -2,14 +2,39 @@
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import {
+  BookOpen,
+  Rocket,
+  LayoutGrid,
+  Tv,
+  ShieldOff,
+  Pause,
+  Lock,
+  ScrollText,
+} from "@lucide/astro";
 
 /**
  * /docs — full reference for every youZen feature and toggle.
+ *
+ * Layout:
+ *   - Sticky left sidebar (desktop) with section links + scroll-spy.
+ *   - Single-column main content; sections each own a stable id used by
+ *     both anchor links and the IntersectionObserver below.
  *
  * The structure mirrors `extension/src/config/features.js`, which is the
  * single source of truth in the extension. Update this page whenever a
  * toggle is added, removed, or renamed there.
  */
+
+const sidebar = [
+  { id: "quick-start", label: "Quick start", icon: Rocket },
+  { id: "feeds", label: "Feeds", icon: LayoutGrid },
+  { id: "watch", label: "Watch", icon: Tv },
+  { id: "blocklist", label: "Blocklist", icon: ShieldOff },
+  { id: "global", label: "Pause & global", icon: Pause },
+  { id: "privacy", label: "Privacy", icon: Lock },
+  { id: "changelog", label: "Changelog", icon: ScrollText },
+];
 
 const sections = [
   {
@@ -437,227 +462,397 @@ const kindBadge = (kind: string) => {
 >
   <Navbar />
 
-  <main class="relative z-10 px-6 pt-32 pb-24 md:pt-40">
-    <article class="mx-auto max-w-3xl">
-      <!-- ─── Header ─── -->
-      <header class="reveal mb-14 md:mb-20">
-        <p class="text-leaf-deep mb-3 text-sm tracking-widest uppercase">
-          Reference
-        </p>
-        <h1
-          class="text-ink mb-5 text-4xl font-medium tracking-tight md:text-5xl"
-        >
-          Every toggle, in
-          <span
-            class="font-cursive text-leaf-deep relative inline-block text-[1.1em] leading-none"
-            >plain language</span
-          >.
-        </h1>
-        <p class="max-w-2xl text-lg leading-relaxed text-stone-600">
-          youZen ships with one sidepanel and a small pile of switches. This
-          page documents every one of them — what each switch does, what it
-          changes on the page, and what happens when you flip it. Nothing is
-          remote-configurable; what's here is what runs in your browser.
-        </p>
+  <div class="docs-shell relative z-10 mx-auto max-w-6xl px-4 pt-28 pb-16 md:px-6 md:pt-36">
+    <div class="docs-grid">
+      <!-- ─── Sidebar ─── -->
+      <aside class="docs-sidebar" aria-label="Docs navigation">
+        <div class="docs-sidebar-inner">
+          <a
+            href="/docs"
+            class="text-leaf-deep flex items-center gap-2 pb-5 text-base font-medium tracking-tight"
+          >
+            <BookOpen size={18} stroke-width={2} />
+            <span>Docs</span>
+          </a>
 
-        <p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-500">
-          Defaults shown below are the values you get on a fresh install. The
-          sidepanel groups things into <strong class="text-ink">Feeds</strong>,
-          <strong class="text-ink">Watch</strong>, and
-          <strong class="text-ink">Blocklist</strong> tabs; this page mirrors
-          that order and adds a section for the global controls.
-        </p>
-      </header>
-
-      <!-- ─── TOC ─── -->
-      <nav
-        class="reveal mb-16 rounded-2xl border border-stone-200/80 bg-white/60 p-6 backdrop-blur-sm md:mb-20"
-        aria-label="Table of contents"
-      >
-        <p
-          class="mb-4 text-xs font-medium tracking-widest text-stone-400 uppercase"
-        >
-          Contents
-        </p>
-        <ol class="space-y-3 text-sm md:columns-2">
-          {
-            sections.map((s) => (
-              <li>
-                <a
-                  href={`#${s.id}`}
-                  class="footer-link text-stone-600 hover:text-ink"
-                >
-                  {s.tab}
-                </a>
-                <ul class="mt-2 space-y-1.5 pl-3 text-xs text-stone-500">
-                  {s.groups.map((g) => (
+          <nav>
+            <ul class="space-y-1 text-sm">
+              {
+                sidebar.map((item) => {
+                  const Icon = item.icon;
+                  return (
                     <li>
                       <a
-                        href={`#${s.id}-${g.id}`}
-                        class="footer-link hover:text-ink"
+                        href={`#${item.id}`}
+                        data-spy={item.id}
+                        class="docs-nav-link group flex items-center gap-2.5 rounded-lg px-3 py-2 text-stone-500 transition-colors"
                       >
-                        {g.title}
+                        <Icon size={15} stroke-width={1.8} class="docs-nav-icon shrink-0" />
+                        <span>{item.label}</span>
                       </a>
                     </li>
-                  ))}
-                </ul>
-              </li>
-            ))
-          }
-          <li>
-            <a href="#privacy" class="footer-link text-stone-600 hover:text-ink"
-              >Privacy</a
-            >
-          </li>
-        </ol>
-      </nav>
+                  );
+                })
+              }
+            </ul>
+          </nav>
 
-      <!-- ─── Sections ─── -->
-      {
-        sections.map((s) => (
-          <section
-            id={s.id}
-            class="reveal mb-20 scroll-mt-32 last:mb-12"
-            aria-labelledby={`${s.id}-title`}
-          >
-            <header class="mb-8 border-b border-stone-200/70 pb-4">
-              <p class="text-leaf-deep mb-2 text-xs tracking-widest uppercase">
-                Tab
-              </p>
-              <h2
-                id={`${s.id}-title`}
-                class="text-ink text-3xl font-medium tracking-tight md:text-4xl"
-              >
-                {s.tab}
-              </h2>
-              <p class="mt-3 max-w-2xl text-stone-600">{s.intro}</p>
-            </header>
+          <div class="mt-8 border-t border-stone-200/70 pt-5 text-xs text-stone-400">
+            <p class="leading-relaxed">
+              Every toggle, in plain language. Mirrors what's in the
+              extension's feature registry.
+            </p>
+          </div>
+        </div>
+      </aside>
 
-            {s.groups.map((g) => (
-              <section
-                id={`${s.id}-${g.id}`}
-                class="mb-12 scroll-mt-32"
-                aria-labelledby={`${s.id}-${g.id}-title`}
-              >
-                <header class="mb-5">
-                  <h3
-                    id={`${s.id}-${g.id}-title`}
-                    class="text-ink mb-2 text-xl font-medium tracking-tight md:text-2xl"
-                  >
-                    {g.title}
-                    {g.master && (
-                      <span class="bg-sage ml-3 align-middle rounded-full px-2.5 py-0.5 text-[10px] font-medium tracking-wider text-stone-600 uppercase">
-                        master toggle
-                      </span>
-                    )}
-                  </h3>
-                  <p class="max-w-2xl text-sm text-stone-500">{g.summary}</p>
-                </header>
+      <!-- ─── Main ─── -->
+      <article class="docs-main">
+        <!-- Hero -->
+        <header class="reveal mb-12">
+          <h1 class="text-ink text-4xl font-medium tracking-tight md:text-5xl">
+            <span class="text-leaf-deep">youZen</span> Docs
+          </h1>
+          <p class="mt-4 max-w-2xl text-lg leading-relaxed text-stone-600">
+            One sidepanel and a small pile of switches. Here's what each one
+            does, what it changes on the page, and what happens when you flip
+            it. Nothing is remote-configurable — what's documented is what
+            runs in your browser.
+          </p>
+        </header>
 
-                <ul class="space-y-4">
-                  {g.features.map((f) => (
-                    <li class="rounded-2xl border border-stone-200/80 bg-white/70 p-5 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-md">
-                      <div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                        <h4 class="text-ink text-base font-medium">
-                          {f.label}
-                        </h4>
-                        <code class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-500">
-                          {f.id}
-                        </code>
-                        <span
-                          class={`rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase ${kindBadge(f.kind)}`}
-                        >
-                          {f.kind}
-                        </span>
-                        <span class="ml-auto text-xs text-stone-400">
-                          Default:{" "}
-                          <span class="text-stone-600">{f.default}</span>
-                        </span>
-                      </div>
-                      <p class="text-sm leading-relaxed text-stone-600">
-                        {f.body}
-                      </p>
-                      {f.extras && (
-                        <ul class="mt-4 space-y-2 border-l-2 border-stone-200/80 pl-4">
-                          {f.extras.map((x) => (
-                            <li>
-                              <p class="text-ink text-sm font-medium">
-                                {x.value}
-                              </p>
-                              <p class="text-sm text-stone-500">{x.body}</p>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </section>
-        ))
-      }
-
-      <!-- ─── Privacy ─── -->
-      <section
-        id="privacy"
-        class="reveal mt-24 scroll-mt-32 rounded-3xl border border-stone-200/80 bg-white/70 p-8 backdrop-blur-sm md:p-10"
-        aria-labelledby="privacy-title"
-      >
-        <p class="text-leaf-deep mb-2 text-xs tracking-widest uppercase">
-          What leaves your browser
-        </p>
-        <h2
-          id="privacy-title"
-          class="text-ink mb-4 text-2xl font-medium tracking-tight md:text-3xl"
+        <!-- Quick start -->
+        <section
+          id="quick-start"
+          class="reveal mb-16 scroll-mt-28"
+          aria-labelledby="quick-start-title"
         >
-          Nothing.
-        </h2>
-        <p class="mb-3 text-stone-600">
-          youZen makes zero external network requests. There is no analytics,
-          no telemetry, no remote configuration, no crash reporter, no error
-          beacon. The extension does not register an account and does not sync
-          settings across devices.
-        </p>
-        <p class="mb-3 text-stone-600">
-          Every toggle on this page is stored in <code
-            class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700"
-            >chrome.storage.local</code
-          >; per-tab pause lives in <code
-            class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700"
-            >chrome.storage.session</code
-          > and clears when the tab closes. Both are browser-local and visible
-          only to the extension itself.
-        </p>
-        <p class="text-stone-600">
-          The source is on GitHub — you can read every line, including the
-          test suite that asserts no analytics keys ship in the install
-          defaults.
-        </p>
-      </section>
+          <header class="mb-6 flex items-center gap-3">
+            <span class="docs-section-icon">
+              <Rocket size={18} stroke-width={2} />
+            </span>
+            <h2
+              id="quick-start-title"
+              class="text-ink text-2xl font-medium tracking-tight md:text-3xl"
+            >
+              Quick start
+            </h2>
+          </header>
 
-      <!-- ─── Closing ─── -->
-      <footer class="reveal mt-20 text-center">
-        <p class="font-cursive text-leaf-deep text-3xl">
-          Quiet on, quiet off.
-        </p>
-        <p class="mt-2 text-sm text-stone-500">
-          Found something missing or wrong? <a
-            href="https://github.com/rheav/youzen"
-            class="footer-link text-stone-600 hover:text-ink">Open an issue.</a
-          >
-        </p>
-      </footer>
-    </article>
-  </main>
+          <p class="mb-5 max-w-2xl text-stone-600">
+            youZen is a Chrome extension that quiets YouTube. Install it,
+            open the side panel, and start flipping switches.
+          </p>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="docs-card">
+              <h3 class="docs-card-title">Install</h3>
+              <ol class="docs-list">
+                <li>Add youZen from the Chrome Web Store.</li>
+                <li>Pin it to your toolbar so the icon stays visible.</li>
+                <li>Click the leaf icon to open the side panel.</li>
+                <li>Defaults are sensible — flip what you want.</li>
+              </ol>
+            </div>
+            <div class="docs-card">
+              <h3 class="docs-card-title">Where things live</h3>
+              <ul class="docs-list">
+                <li>
+                  <strong class="text-ink">Feeds tab</strong> — homepage,
+                  search, sidebar, navigation chrome.
+                </li>
+                <li>
+                  <strong class="text-ink">Watch tab</strong> — comments,
+                  related, action buttons, description.
+                </li>
+                <li>
+                  <strong class="text-ink">Blocklist tab</strong> — keyword
+                  and channel rules.
+                </li>
+                <li>
+                  <strong class="text-ink">Header</strong> — global pause
+                  and theme.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Feature sections from registry -->
+        {
+          sections.map((s) => (
+            <section
+              id={s.id}
+              class="reveal mb-20 scroll-mt-28"
+              aria-labelledby={`${s.id}-title`}
+            >
+              <header class="mb-6 flex items-center gap-3 border-b border-stone-200/70 pb-4">
+                <span class="docs-section-icon">
+                  {s.id === "feeds" && <LayoutGrid size={18} stroke-width={2} />}
+                  {s.id === "watch" && <Tv size={18} stroke-width={2} />}
+                  {s.id === "blocklist" && (
+                    <ShieldOff size={18} stroke-width={2} />
+                  )}
+                  {s.id === "global" && <Pause size={18} stroke-width={2} />}
+                </span>
+                <h2
+                  id={`${s.id}-title`}
+                  class="text-ink text-2xl font-medium tracking-tight md:text-3xl"
+                >
+                  {s.tab}
+                </h2>
+              </header>
+
+              <p class="mb-8 max-w-2xl text-stone-600">{s.intro}</p>
+
+              {s.groups.map((g) => (
+                <section
+                  id={`${s.id}-${g.id}`}
+                  class="mb-10 scroll-mt-28"
+                  aria-labelledby={`${s.id}-${g.id}-title`}
+                >
+                  <header class="mb-4">
+                    <h3
+                      id={`${s.id}-${g.id}-title`}
+                      class="text-ink mb-1.5 text-lg font-medium tracking-tight md:text-xl"
+                    >
+                      {g.title}
+                      {g.master && (
+                        <span class="bg-sage ml-3 align-middle rounded-full px-2.5 py-0.5 text-[10px] font-medium tracking-wider text-stone-600 uppercase">
+                          master
+                        </span>
+                      )}
+                    </h3>
+                    <p class="max-w-2xl text-sm text-stone-500">{g.summary}</p>
+                  </header>
+
+                  <ul class="space-y-3">
+                    {g.features.map((f) => (
+                      <li class="docs-card">
+                        <div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                          <h4 class="text-ink text-base font-medium">
+                            {f.label}
+                          </h4>
+                          <code class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-500">
+                            {f.id}
+                          </code>
+                          <span
+                            class={`rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase ${kindBadge(f.kind)}`}
+                          >
+                            {f.kind}
+                          </span>
+                          <span class="ml-auto text-xs text-stone-400">
+                            Default:{" "}
+                            <span class="text-stone-600">{f.default}</span>
+                          </span>
+                        </div>
+                        <p class="text-sm leading-relaxed text-stone-600">
+                          {f.body}
+                        </p>
+                        {f.extras && (
+                          <ul class="mt-4 space-y-2 border-l-2 border-stone-200/80 pl-4">
+                            {f.extras.map((x) => (
+                              <li>
+                                <p class="text-ink text-sm font-medium">
+                                  {x.value}
+                                </p>
+                                <p class="text-sm text-stone-500">{x.body}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </section>
+          ))
+        }
+
+        <!-- Privacy -->
+        <section
+          id="privacy"
+          class="reveal mb-20 scroll-mt-28"
+          aria-labelledby="privacy-title"
+        >
+          <header class="mb-6 flex items-center gap-3 border-b border-stone-200/70 pb-4">
+            <span class="docs-section-icon">
+              <Lock size={18} stroke-width={2} />
+            </span>
+            <h2
+              id="privacy-title"
+              class="text-ink text-2xl font-medium tracking-tight md:text-3xl"
+            >
+              Privacy
+            </h2>
+          </header>
+
+          <div class="docs-card">
+            <h3 class="docs-card-title">Nothing leaves your browser.</h3>
+            <p class="mt-2 text-stone-600">
+              youZen makes zero external network requests. There is no
+              analytics, no telemetry, no remote configuration, no crash
+              reporter, no error beacon. The extension does not register an
+              account and does not sync settings across devices.
+            </p>
+            <p class="mt-3 text-stone-600">
+              Every toggle on this page is stored in <code
+                class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700"
+                >chrome.storage.local</code
+              >; per-tab pause lives in <code
+                class="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[11px] text-stone-700"
+                >chrome.storage.session</code
+              > and clears when the tab closes. Both are browser-local and
+              visible only to the extension itself.
+            </p>
+            <p class="mt-3 text-stone-600">
+              The source is on GitHub — you can read every line, including
+              the test that asserts no analytics keys ship in the install
+              defaults.
+            </p>
+          </div>
+        </section>
+
+        <!-- Changelog -->
+        <section
+          id="changelog"
+          class="reveal mb-12 scroll-mt-28"
+          aria-labelledby="changelog-title"
+        >
+          <header class="mb-6 flex items-center gap-3 border-b border-stone-200/70 pb-4">
+            <span class="docs-section-icon">
+              <ScrollText size={18} stroke-width={2} />
+            </span>
+            <h2
+              id="changelog-title"
+              class="text-ink text-2xl font-medium tracking-tight md:text-3xl"
+            >
+              Changelog
+            </h2>
+          </header>
+
+          <div class="docs-card">
+            <h3 class="docs-card-title">1.0.0 — first quiet</h3>
+            <p class="mt-2 text-stone-600">
+              Initial release. Hide Shorts everywhere, declutter the
+              homepage, watch surroundings, search results. Two-list
+              blocklist with substring / whole-word / regex rules. Per-tab
+              and global pause. Light / dark theme. Reset to defaults.
+            </p>
+            <p class="mt-3 text-xs text-stone-400">
+              Found something missing or wrong?
+              <a
+                href="https://github.com/rheav/youzen"
+                class="footer-link text-stone-500 hover:text-ink"
+                rel="noopener">Open an issue.</a
+              >
+            </p>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
 
   <Footer />
 </Layout>
 
-<style>
-  /* Local copy of the footer-link wipe so anchor links inside the docs
-     body match the rest of the site. Defined locally so the page works
-     even without the Footer component above it. */
+<style is:global>
+  /* ─── Layout ──────────────────────────────────────────────────────── */
+  .docs-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .docs-grid {
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 4rem;
+    }
+  }
+
+  .docs-sidebar {
+    /* On mobile the sidebar collapses to inline navigation (no sticky). */
+    position: relative;
+  }
+
+  @media (min-width: 1024px) {
+    .docs-sidebar-inner {
+      position: sticky;
+      top: 6.5rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+  }
+
+  .docs-main {
+    min-width: 0; /* Prevent code blocks from blowing out the grid. */
+  }
+
+  /* ─── Sidebar nav links ───────────────────────────────────────────── */
+  .docs-nav-link {
+    background-image: none;
+  }
+
+  .docs-nav-link:hover {
+    color: var(--color-ink);
+    background-color: rgba(168, 201, 160, 0.12);
+  }
+
+  .docs-nav-link[aria-current="true"] {
+    color: var(--color-leaf-deep);
+    background-color: rgba(168, 201, 160, 0.18);
+    font-weight: 500;
+  }
+
+  .docs-nav-link[aria-current="true"] .docs-nav-icon {
+    color: var(--color-leaf-deep);
+  }
+
+  /* ─── Section icons ──────────────────────────────────────────────── */
+  .docs-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background-color: rgba(168, 201, 160, 0.18);
+    color: var(--color-leaf-deep);
+  }
+
+  /* ─── Cards ──────────────────────────────────────────────────────── */
+  .docs-card {
+    border: 1px solid rgba(231, 229, 228, 0.8);
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    padding: 1.25rem 1.4rem;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+  }
+
+  .docs-card-title {
+    color: var(--color-ink);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .docs-list {
+    margin-top: 0.5rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+    color: rgb(87, 83, 78); /* stone-600 */
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .docs-list > li + li {
+    margin-top: 0.35rem;
+  }
+
+  /* ─── Footer-link wipe (used in the changelog open-issue link) ─── */
   .footer-link {
     position: relative;
     background-image: linear-gradient(
@@ -672,9 +867,82 @@ const kindBadge = (kind: string) => {
       color 300ms ease,
       background-size 350ms cubic-bezier(0.22, 1, 0.36, 1);
   }
+
   .footer-link:hover,
   .footer-link:focus-visible {
     background-size: 100% 1.5px;
     outline: none;
   }
 </style>
+
+<script is:inline>
+  // ─── Scroll-spy ────────────────────────────────────────────────────
+  // Highlight the sidebar link whose section is closest to the top of
+  // the viewport. We track all data-spy ids by querying their target
+  // sections and using IntersectionObserver with a top-anchored
+  // rootMargin so the active link flips when the section's top crosses
+  // ~120 px from the top of the viewport.
+  (function () {
+    const links = Array.from(
+      document.querySelectorAll(".docs-nav-link[data-spy]"),
+    );
+    if (!links.length) return;
+
+    const byId = new Map();
+    const ids = links
+      .map((a) => {
+        const id = a.getAttribute("data-spy");
+        const section = id ? document.getElementById(id) : null;
+        if (id && section) {
+          byId.set(id, a);
+          return id;
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    function setActive(id) {
+      for (const a of links) a.removeAttribute("aria-current");
+      const active = byId.get(id);
+      if (active) active.setAttribute("aria-current", "true");
+    }
+
+    // Track which sections are currently intersecting the activation band.
+    const visible = new Set();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        }
+        // Of the visible ones, pick the topmost in document order.
+        for (const id of ids) {
+          if (visible.has(id)) {
+            setActive(id);
+            return;
+          }
+        }
+        // Nothing in the band: keep last-active (or fall back to first).
+      },
+      {
+        // Activation band: top 35 % of the viewport. Sections above the
+        // band count as "passed"; below the band don't count yet.
+        rootMargin: "-15% 0px -65% 0px",
+        threshold: 0,
+      },
+    );
+
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+
+    // First-paint default: highlight whatever is at the current scroll
+    // position (deep-link case).
+    requestAnimationFrame(() => {
+      if (!document.querySelector(".docs-nav-link[aria-current='true']")) {
+        setActive(ids[0]);
+      }
+    });
+  })();
+</script>

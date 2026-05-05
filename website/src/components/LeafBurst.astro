@@ -33,55 +33,59 @@
     pointer-events: none;
     z-index: 60;
     border-radius: 70% 25% 65% 30%;
+    /* Softer interior — less plasticky than the previous deep inset shadow. */
     box-shadow:
-      inset 5px 6px 10px rgba(255, 255, 255, 0.45),
-      inset -3px -3px 6px rgba(0, 0, 0, 0.12);
+      inset 3px 4px 7px rgba(255, 255, 255, 0.32),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.06);
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
-    animation: leaf-fly var(--duration, 2.6s) cubic-bezier(0.22, 1, 0.36, 1)
+    animation: leaf-fly var(--duration, 3.4s) cubic-bezier(0.22, 1, 0.36, 1)
       forwards;
     will-change: transform, opacity;
   }
 
-  /* Stem — a thin dark-green bar rotated through the leaf */
+  /* Stem — a thin dark-green bar rotated through the leaf. Lower contrast
+     than before so the leaf reads as a soft tint, not a sticker. */
   .leaf-particle::before {
     content: "";
     position: absolute;
     top: 50%;
     left: 48%;
-    width: 2.5px;
-    height: 60%;
-    background: #3e7a42;
+    width: 1.8px;
+    height: 56%;
+    background: #5c8a60;
     transform: translate(-50%, -50%) rotate(38deg);
-    border-radius: 3px;
-    opacity: 0.85;
+    border-radius: 2px;
+    opacity: 0.55;
   }
 
-  /* Midrib highlight — a pale diagonal vein for detail */
+  /* Midrib highlight — barely-there pale diagonal vein. */
   .leaf-particle::after {
     content: "";
     position: absolute;
     top: 28%;
     left: 32%;
     width: 1px;
-    height: 62%;
-    background: rgba(255, 255, 255, 0.7);
+    height: 60%;
+    background: rgba(255, 255, 255, 0.55);
     transform: rotate(25deg);
-    opacity: 0.55;
+    opacity: 0.35;
   }
 
+  /* Slower, lower-amplitude fade. Peak opacity ~0.45 (was 0.55) and
+     reached more gradually so the burst feels like a breath, not a pop. */
   @keyframes leaf-fly {
     0% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.35) rotate(0deg);
+      transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
     }
-    18% {
-      opacity: 0.55;
+    30% {
+      opacity: 0.45;
     }
     100% {
       opacity: 0;
       transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
-        scale(0.95) rotate(var(--rot));
+        scale(0.85) rotate(var(--rot));
     }
   }
 
@@ -111,7 +115,9 @@
     }
 
     const LAST_BURST = new WeakMap();
-    const THROTTLE_MS = 380;
+    // Tighter throttle — moving the cursor across a row of nav links
+    // should produce one drifting leaf per visited link, not a swarm.
+    const THROTTLE_MS = 700;
 
     /**
      * Spawns `count` leaf particles centered on the element's bounding box.
@@ -153,9 +159,9 @@
         setTimeout(() => host.remove(), 3200);
       }
 
-      // Fewer leaves than before — the burst should feel like a breath,
-      // not a handful of confetti.
-      const leafCount = 5 + Math.floor(Math.random() * 3); // 5..7
+      // One or two leaves only. The previous 5–7 felt like confetti;
+      // the brief is "a leaf settled here", not "a tree exploded".
+      const leafCount = 1 + Math.floor(Math.random() * 2); // 1..2
       for (let i = 0; i < leafCount; i++) {
         spawnLeaf(host, overflowHidden);
       }
@@ -165,12 +171,12 @@
       const leaf = document.createElement("span");
       leaf.className = "leaf-particle";
 
-      const size = 9 + Math.random() * 5; // 9..14 px — smaller, daintier
+      // Smaller, daintier leaves — 7..10 px wide. Anything bigger looks
+      // like a sticker on top of the link rather than a hint of motion.
+      const size = 7 + Math.random() * 3;
       leaf.style.width = size + "px";
-      leaf.style.height = size * 1.48 + "px";
+      leaf.style.height = size * 1.45 + "px";
 
-      // Position: centered on host for overflow-hidden elements,
-      // centered on host's bounding box for regular triggers.
       if (centered) {
         leaf.style.left = "0px";
         leaf.style.top = "0px";
@@ -180,33 +186,35 @@
         leaf.style.top = hostRect.height / 2 + "px";
       }
 
-      // Outward vector: random angle, distance 50..110 px, upward bias.
-      // Shorter throw so leaves settle near the trigger instead of
-      // scattering across the page.
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 50 + Math.random() * 60;
+      // Short, mostly-upward drift. The leaf should look like it just
+      // detached and is settling — not flying across the page.
+      // Angle is constrained to the upper half (π..2π) so leaves never
+      // travel downward, with a small horizontal jitter.
+      const angle = Math.PI + Math.random() * Math.PI;
+      const distance = 18 + Math.random() * 22; // 18..40 px (was 50..110)
       const tx = Math.cos(angle) * distance;
-      const ty = Math.sin(angle) * distance - 50; // gentle upward bias
+      const ty = Math.sin(angle) * distance - 18; // gentle upward bias
       leaf.style.setProperty("--x", tx.toFixed(1) + "px");
       leaf.style.setProperty("--y", ty.toFixed(1) + "px");
+      // Tiny rotation — was ±120°, now ±45°.
       leaf.style.setProperty(
         "--rot",
-        ((Math.random() - 0.5) * 240).toFixed(0) + "deg",
+        ((Math.random() - 0.5) * 90).toFixed(0) + "deg",
       );
 
-      // Palette: softly-leaf family via HSL so each particle is a slightly
-      // different shade without straying from brand.
-      const lightness = 60 + Math.random() * 14; // 60..74
-      const hue = 108 + Math.random() * 16; // 108..124
-      leaf.style.background = `radial-gradient(circle at 35% 25%, hsl(${hue}, 55%, ${lightness}%), hsl(${hue - 4}, 60%, ${lightness - 16}%))`;
+      // Palette: muted leaf family. Lower saturation than before so the
+      // particle blends with the page rather than punching through it.
+      const lightness = 66 + Math.random() * 10; // 66..76
+      const hue = 110 + Math.random() * 14; // 110..124
+      leaf.style.background = `radial-gradient(circle at 35% 25%, hsl(${hue}, 38%, ${lightness}%), hsl(${hue - 4}, 42%, ${lightness - 12}%))`;
 
-      // Gentle timing — slightly longer so fades overlap rather than pop.
-      const duration = (2.4 + Math.random() * 1.0).toFixed(2) + "s";
+      // Longer, gentler timing.
+      const duration = (3.0 + Math.random() * 1.0).toFixed(2) + "s";
       leaf.style.setProperty("--duration", duration);
-      leaf.style.animationDelay = (Math.random() * 0.18).toFixed(2) + "s";
+      leaf.style.animationDelay = (Math.random() * 0.12).toFixed(2) + "s";
 
       host.appendChild(leaf);
-      setTimeout(() => leaf.remove(), 3200);
+      setTimeout(() => leaf.remove(), 4400);
     }
 
     // Delegate on document so newly-added .leaf-burst nodes still work
