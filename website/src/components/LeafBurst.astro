@@ -72,14 +72,18 @@
     opacity: 0.35;
   }
 
-  /* Slower, lower-amplitude fade. Peak opacity ~0.45 (was 0.55) and
-     reached more gradually so the burst feels like a breath, not a pop. */
+  /* Smooth in / smooth out. Peak opacity ~0.6 reached around 25 % of the
+     duration and held briefly before fading out — gives the leaf time to
+     register without ever popping. */
   @keyframes leaf-fly {
     0% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+      transform: translate(-50%, -50%) scale(0.45) rotate(0deg);
     }
-    30% {
+    25% {
+      opacity: 0.6;
+    }
+    75% {
       opacity: 0.45;
     }
     100% {
@@ -115,9 +119,9 @@
     }
 
     const LAST_BURST = new WeakMap();
-    // Tighter throttle — moving the cursor across a row of nav links
-    // should produce one drifting leaf per visited link, not a swarm.
-    const THROTTLE_MS = 700;
+    // Throttle: enough that scanning a nav row doesn't spawn dozens, but
+    // short enough that a deliberate hover always feels responsive.
+    const THROTTLE_MS = 500;
 
     /**
      * Spawns `count` leaf particles centered on the element's bounding box.
@@ -159,9 +163,9 @@
         setTimeout(() => host.remove(), 3200);
       }
 
-      // One or two leaves only. The previous 5–7 felt like confetti;
-      // the brief is "a leaf settled here", not "a tree exploded".
-      const leafCount = 1 + Math.floor(Math.random() * 2); // 1..2
+      // 3–4 leaves: enough to read as a small gust, not so many that it
+      // tips back into confetti territory.
+      const leafCount = 3 + Math.floor(Math.random() * 2); // 3..4
       for (let i = 0; i < leafCount; i++) {
         spawnLeaf(host, overflowHidden);
       }
@@ -186,20 +190,19 @@
         leaf.style.top = hostRect.height / 2 + "px";
       }
 
-      // Short, mostly-upward drift. The leaf should look like it just
-      // detached and is settling — not flying across the page.
-      // Angle is constrained to the upper half (π..2π) so leaves never
-      // travel downward, with a small horizontal jitter.
+      // Mostly-upward drift, but with more reach than the previous
+      // 18–40 px so the gust is actually visible. Angle still constrained
+      // to the upper hemisphere so leaves never fall down toward the page.
       const angle = Math.PI + Math.random() * Math.PI;
-      const distance = 18 + Math.random() * 22; // 18..40 px (was 50..110)
+      const distance = 28 + Math.random() * 30; // 28..58 px
       const tx = Math.cos(angle) * distance;
-      const ty = Math.sin(angle) * distance - 18; // gentle upward bias
+      const ty = Math.sin(angle) * distance - 24; // upward bias
       leaf.style.setProperty("--x", tx.toFixed(1) + "px");
       leaf.style.setProperty("--y", ty.toFixed(1) + "px");
-      // Tiny rotation — was ±120°, now ±45°.
+      // ±70°: enough rotation to feel airborne, not enough to look chaotic.
       leaf.style.setProperty(
         "--rot",
-        ((Math.random() - 0.5) * 90).toFixed(0) + "deg",
+        ((Math.random() - 0.5) * 140).toFixed(0) + "deg",
       );
 
       // Palette: muted leaf family. Lower saturation than before so the
