@@ -1,0 +1,194 @@
+---
+/**
+ * Privacy Policy — youZen.
+ *
+ * Structure mirrors the unFunnelizer privacy page, rewritten for youZen:
+ * a free, open-source extension that makes zero external network requests.
+ * Nothing leaves the browser — there is no account, telemetry, or sync.
+ */
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+
+const lastUpdated = "Last updated: June 2, 2026";
+const repo = "https://github.com/rheav/youzen";
+---
+
+<Layout
+  title="Privacy Policy — youZen"
+  description="Privacy Policy for the youZen Chrome extension. Nothing leaves your browser — no tracking, no accounts, no telemetry."
+>
+  <Navbar />
+  <main class="relative z-10 min-h-screen px-4 pt-32 pb-20 md:px-6">
+    <div class="mx-auto max-w-3xl">
+      <h1 class="text-4xl font-medium tracking-tight md:text-5xl">
+        Privacy <span class="legal-accent">Policy</span>
+      </h1>
+      <p class="mt-4 text-stone-500">{lastUpdated}</p>
+
+      <div class="mt-10 space-y-6">
+        <section class="legal-card">
+          <h2 class="legal-h2">1. The short version</h2>
+          <p class="legal-p">
+            Nothing leaves your browser. youZen is a free, open-source Chrome
+            extension that quiets YouTube. It makes zero external network
+            requests — there is no analytics, no telemetry, no crash reporter,
+            no account, and no sync across devices.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">2. What we collect</h2>
+          <p class="legal-p">
+            Nothing. youZen does not collect, transmit, or store any of your
+            data on any server. We never see how you use it, what you watch, or
+            anything else.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">3. What stays on your device</h2>
+          <p class="legal-p">
+            Your settings live entirely in your own browser, visible only to
+            the extension:
+          </p>
+          <ul class="legal-ul">
+            <li>Your toggle choices (what to hide on YouTube), in <code class="legal-code">chrome.storage.local</code></li>
+            <li>Your keyword and channel block lists</li>
+            <li>Per-tab pause state, in <code class="legal-code">chrome.storage.session</code>, which clears when the tab closes</li>
+            <li>Your light / dark theme choice</li>
+          </ul>
+          <p class="legal-p mt-3">
+            None of this is ever sent anywhere.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">4. What we never collect</h2>
+          <p class="legal-p">We do <strong class="text-ink">not</strong> collect:</p>
+          <ul class="legal-ul">
+            <li>Your browsing or watch history</li>
+            <li>The videos, channels, or searches you interact with</li>
+            <li>Any account, email, or personal information</li>
+            <li>Keystrokes, screenshots, or screen recordings</li>
+            <li>Analytics, usage metrics, or crash reports</li>
+          </ul>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">5. Permissions</h2>
+          <p class="legal-p">
+            youZen only runs on YouTube. Its single site permission is
+            <code class="legal-code">*://www.youtube.com/*</code>, so it cannot
+            see or act on any other website you visit.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">6. Verify it yourself</h2>
+          <p class="legal-p">
+            Because youZen is open source, you don't have to take our word for
+            it. The full source is on
+            <a href={repo} class="legal-link" rel="noopener">GitHub</a>,
+            including a test that confirms it ships no analytics. You can search
+            the code for any network call and find none beyond loading its own
+            bundled files.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">7. Children's privacy</h2>
+          <p class="legal-p">
+            youZen collects no data from anyone, including children. It is safe
+            to use at any age.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">8. Changes to this policy</h2>
+          <p class="legal-p">
+            We may update this Privacy Policy from time to time. Any changes
+            will be posted on this page with an updated date above.
+          </p>
+        </section>
+
+        <section class="legal-card">
+          <h2 class="legal-h2">9. Contact</h2>
+          <p class="legal-p">
+            Questions about privacy are best raised in the open — please
+            <a href={`${repo}/issues/new`} class="legal-link" rel="noopener">
+              open an issue on GitHub</a
+            >.
+          </p>
+        </section>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="/" class="legal-link text-stone-500">← Back to home</a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style is:global>
+  .legal-accent {
+    color: var(--color-leaf-deep);
+  }
+  .legal-card {
+    border: 1px solid rgba(231, 229, 228, 0.8);
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    padding: 1.5rem 1.6rem;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+  }
+  .legal-h2 {
+    color: var(--color-ink);
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+  .legal-p {
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+  .legal-ul {
+    margin-top: 0.75rem;
+    padding-left: 1.2rem;
+    list-style: disc;
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+  .legal-ul > li + li {
+    margin-top: 0.4rem;
+  }
+  .legal-code {
+    border-radius: 4px;
+    background-color: var(--color-stone-100);
+    padding: 0.1rem 0.35rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    color: var(--color-ink);
+  }
+  .legal-link {
+    color: var(--color-leaf-deep);
+    background-image: linear-gradient(
+      to right,
+      var(--color-leaf-deep),
+      var(--color-leaf)
+    );
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    background-position: 0 100%;
+    transition:
+      color 300ms ease,
+      background-size 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .legal-link:hover,
+  .legal-link:focus-visible {
+    background-size: 100% 1.5px;
+    outline: none;
+  }
+</style>

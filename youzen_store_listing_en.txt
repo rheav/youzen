@@ -1,0 +1,61 @@
+youZen - Your YouTube, But Softer
+
+youZen is a free Chrome extension that quiets YouTube. Hide Shorts, silence
+comments, and switch off the endless "up next" pull — so you watch what you
+came for and nothing else fights for your attention.
+
+One side panel. A small pile of switches. Flip what you want quiet.
+
+🎯 WHAT IT DOES:
+
+  🙈 Hide Shorts Everywhere
+     Remove Shorts from the homepage, sidebar, search, channel pages, and
+     your Subscriptions feed. One master switch, or pick surface by surface.
+
+  🧹 Declutter the Homepage
+     Replace the endless algorithmic feed with a tidy quick-links card,
+     send yourself straight to Subscriptions, or leave it calmly empty.
+
+  📺 Calm the Watch Page
+     Hide comments, the related-videos sidebar, end-screen cards, autoplay,
+     merch shelves, and like / dislike counts — each its own simple switch.
+
+  ↩️ Skip the Shorts Player
+     Open a Shorts link and land on the normal video page instead, with
+     full controls and no vertical-scroll trap.
+
+  🚫 Block Keywords & Channels
+     Two simple block lists hide videos by keyword or by channel. Just
+     right-click any text on YouTube to block it instantly.
+
+  ⏸️ Pause Anytime
+     Switch youZen off for one tab or everywhere at once. Your settings
+     stay exactly as you left them.
+
+  🌙 Light & Dark Theme
+     Follows your system by default, and remembers your choice.
+
+  🔒 Truly Private
+     No tracking, no accounts, no sign-up. Nothing ever leaves your browser.
+     Free and open source — every line is public.
+
+✅ SIMPLE TO USE:
+  1. Install youZen and open the side panel.
+  2. Flip the switches for what you want gone.
+  3. Enjoy a quieter YouTube.
+
+No account. No setup. No cost.
+
+---
+
+🆕 v1.0.0 - First Release:
+
+NEW:
+- Hide Shorts across every YouTube surface.
+- Declutter the homepage (quick-links card, redirect, or empty).
+- Calm the watch page — comments, related videos, autoplay, and more.
+- Redirect Shorts links to the normal video player.
+- Two block lists for keywords and channels, with right-click to add.
+- Per-tab and global pause, with all your settings kept intact.
+- Light and dark theme.
+- One-click reset to defaults.
