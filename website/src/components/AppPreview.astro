@@ -260,7 +260,28 @@ import { Leaf, Lock, Search, Bell, Menu } from "@lucide/astro";
             <!-- Header -->
             <div class="sp-header">
               <div class="sp-logo" aria-hidden="true">
-                <Leaf size={14} color="#faf9f5" strokeWidth={2.25} />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 128 128"
+                  width="28"
+                  height="28"
+                >
+                  <defs>
+                    <linearGradient id="sp-yz-bg" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#C6D8A9" />
+                      <stop offset="100%" stop-color="#A8C9A0" />
+                    </linearGradient>
+                  </defs>
+                  <rect width="128" height="128" rx="28" ry="28" fill="url(#sp-yz-bg)" />
+                  <g
+                    transform="translate(64 64) rotate(-20) scale(3.9) translate(-12 -12)"
+                  >
+                    <path
+                      d="M12 2C8 2 4 5 4 11c0 4 2 7 5 9 1-4 3-7 6-9-2 3-3 6-4 9 4-1 8-4 9-10 0-5-4-8-8-8z"
+                      fill="#FDFCF8"
+                    />
+                  </g>
+                </svg>
               </div>
               <div class="sp-brand">
                 <span class="sp-wordmark">youZen</span>
@@ -754,8 +775,7 @@ import { Leaf, Lock, Search, Bell, Menu } from "@lucide/astro";
   .sp-logo {
     width: 28px;
     height: 28px;
-    border-radius: 9999px;
-    background: linear-gradient(135deg, #7fa87f 0%, #c6d8a9 100%);
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;

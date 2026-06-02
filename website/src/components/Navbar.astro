@@ -23,13 +23,29 @@ import ChromeButton from "./ChromeButton.astro";
   aria-label="Main"
 >
   <a href="/" class="group flex items-center gap-2" aria-label="youZen home">
-    <span
-      class="nav-logo-chip relative flex h-7 w-7 items-center justify-center rounded-full"
-      style="background-color: #A8C9A0;"
+    <svg
+      class="nav-logo-chip"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 128 128"
+      width="28"
+      height="28"
+      style="border-radius: 6px; box-shadow: 0 0 0 1px rgba(127, 168, 127, 0.28), 0 4px 10px rgba(127, 168, 127, 0.28); flex-shrink: 0;"
       aria-hidden="true"
     >
-      <span class="block h-2 w-2 rounded-full bg-white"></span>
-    </span>
+      <defs>
+        <linearGradient id="nav-yz-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C6D8A9" />
+          <stop offset="100%" stop-color="#A8C9A0" />
+        </linearGradient>
+      </defs>
+      <rect width="128" height="128" rx="28" ry="28" fill="url(#nav-yz-bg)" />
+      <g transform="translate(64 64) rotate(-20) scale(3.9) translate(-12 -12)">
+        <path
+          d="M12 2C8 2 4 5 4 11c0 4 2 7 5 9 1-4 3-7 6-9-2 3-3 6-4 9 4-1 8-4 9-10 0-5-4-8-8-8z"
+          fill="#FDFCF8"
+        />
+      </g>
+    </svg>
     <span class="text-ink text-base font-medium tracking-tight">youZen</span>
   </a>
 
