@@ -181,6 +181,19 @@ html[data-ytc-related] ytd-watch-flexy[flexy][is-two-columns_] #primary.ytd-watc
   max-width: none !important;
   width: 100% !important;
 }
+/* Grow the player into the reclaimed sidebar width instead of leaving a blank
+ * band beside a height-pinned 16:9 video. YouTube computes the watch-player
+ * size in JS from these custom props: by default the wide-screen width is
+ * capped and ~92px is reserved below the player, so on a 16:9 window the video
+ * is height-limited and can't use the freed horizontal space. Lifting the cap
+ * and shrinking the reserve lets the video scale up until it is window-height-
+ * limited. These props only feed the next layout recompute, so the content
+ * script (attribute-applier) fires a synthetic 'resize' when this attribute is
+ * toggled — otherwise the fill would not apply until the next manual resize. */
+html[data-ytc-related] ytd-watch-flexy {
+  --ytd-watch-flexy-max-player-width-wide-screen: 100% !important;
+  --ytd-watch-flexy-space-below-player: 16px !important;
+}
 
 /* ───────────────────────────────────────────────────────────
  * #14 Hide end-screen cards (the video overlay "up next" cards)

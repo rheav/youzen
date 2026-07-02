@@ -91,13 +91,39 @@ export async function applyAttributesWith({ chrome: ch, document: doc, tabId }) 
   }
 }
 
+/** Layout attribute whose toggle changes the watch-player width. */
+const RELATED_ATTR = 'data-ytc-related';
+
+/**
+ * Nudge YouTube to recompute the watch-player size.
+ *
+ * YouTube sizes the watch player imperatively in JS, reading the layout custom
+ * props that youtube.css overrides under [data-ytc-related]. Those overrides
+ * only take effect on the next layout recompute, so toggling the related
+ * sidebar needs a synthetic 'resize' — otherwise the player won't grow to fill
+ * the reclaimed width until the user next resizes the window. rAF lets the CSS
+ * apply first; the delayed second fire covers YouTube's own debounce.
+ */
+function nudgePlayerResize() {
+  if (typeof window === 'undefined') return;
+  const fire = () => window.dispatchEvent(new Event('resize'));
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fire);
+  else fire();
+  setTimeout(fire, 250);
+}
+
 /**
  * Production wrapper — called at document_start and on every storage.onChanged
  * / YTC_PAUSE_CHANGED message.
  */
 export async function applyAttributes() {
   const tabId = await getCurrentTabId();
-  return applyAttributesWith({ chrome, document, tabId });
+  const html = document.documentElement;
+  const relatedBefore = !!html?.hasAttribute(RELATED_ATTR);
+  await applyAttributesWith({ chrome, document, tabId });
+  if (html && html.hasAttribute(RELATED_ATTR) !== relatedBefore) {
+    nudgePlayerResize();
+  }
 }
 
 /**
