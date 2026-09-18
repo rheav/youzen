@@ -73,7 +73,8 @@ FIXED - Player layout:
   1177px -> 1481px on a 1512px window).
 - Ambient-mode glow canvas is drawn wider than the player and relied on the
   sidebar for slack; with the player widened it pushed a horizontal scrollbar
-  onto the page. Clipped to its container.
+  onto the page. Clipped now — the container is also made a containing block,
+  since clip on a static ancestor never applied to the positioned canvas.
 - Entering/leaving theater mode now re-measures the player, so the reclaimed
   width applies without waiting for a window resize.
 

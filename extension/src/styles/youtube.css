@@ -223,9 +223,20 @@ html[data-ytc-related] ytd-watch-flexy {
 /* The ambient-mode glow is a canvas drawn wider than the player; it normally
  * bleeds into the sidebar's slack. With the player widened there is no slack
  * left, so the canvas pushed a horizontal scrollbar onto the whole page.
- * Clip it to its container — the glow still renders, it just stops overflowing. */
+ *
+ * `overflow: clip` on #cinematics-container alone is not enough: the canvas is
+ * absolutely positioned and the container is static, so the container is not
+ * its containing block and never clips it. Make the container a containing
+ * block (position: relative) and clip #cinematics too — that one is already
+ * positioned, so it does clip its own descendants. The glow still renders; it
+ * just stops overflowing the page. */
 html[data-ytc-related] #cinematics-container,
 html[data-ytc-live-chat] #cinematics-container {
+  position: relative !important;
+  overflow: clip !important;
+}
+html[data-ytc-related] #cinematics,
+html[data-ytc-live-chat] #cinematics {
   overflow: clip !important;
 }
 
