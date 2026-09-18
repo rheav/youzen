@@ -12,8 +12,37 @@
  */
 
 import { isPausedNow, onPauseChange } from '../modules/pause-state.js';
+import { nudgePlayerResize } from '../modules/attribute-applier.js';
 
 const EXPANDER_SELECTOR = 'ytd-watch-metadata ytd-text-inline-expander';
+
+/** Layout attributes that make youtube.css hand the player extra width. */
+const LAYOUT_ATTRS = ['data-ytc-related', 'data-ytc-live-chat'];
+
+/**
+ * Watch ytd-watch-flexy's `theater` attribute and re-measure the player when
+ * it flips.
+ *
+ * Entering or leaving theater mode makes YouTube size the player from its own
+ * numbers, which still count the sidebar / chat column we removed. The CSS
+ * reclaim lands after that measurement, so without a nudge the video keeps the
+ * narrow width until the next real window resize.
+ *
+ * @param {Document} doc
+ * @returns {() => void} disposer
+ */
+export function observeTheaterToggle(doc = document) {
+  const flexy = doc.querySelector('ytd-watch-flexy');
+  if (!flexy) return () => {};
+
+  const observer = new MutationObserver(() => {
+    const html = doc.documentElement;
+    if (LAYOUT_ATTRS.some((attr) => html?.hasAttribute(attr))) nudgePlayerResize();
+  });
+  observer.observe(flexy, { attributes: true, attributeFilter: ['theater'] });
+
+  return () => observer.disconnect();
+}
 
 /**
  * Clicks the collapse button if the expander is currently expanded.
@@ -46,6 +75,7 @@ export function collapseDescriptionIfExpanded(doc) {
  */
 export function makeWatchHandler(ch = chrome) {
   let observer = null;
+  let disposeTheaterObserver = null;
 
   const maybeCollapse = async () => {
     if (await isPausedNow(ch)) return;
@@ -73,8 +103,12 @@ export function makeWatchHandler(ch = chrome) {
         void maybeCollapse();
       });
 
-      // Wait for the description expander to hydrate.
+      // Wait for the description expander and ytd-watch-flexy to hydrate.
+      // Both land in the same pass; once we have them the observer is done.
       observer = new MutationObserver(() => {
+        if (!disposeTheaterObserver && document.querySelector('ytd-watch-flexy')) {
+          disposeTheaterObserver = observeTheaterToggle(document);
+        }
         if (document.querySelector(EXPANDER_SELECTOR)) {
           observer?.disconnect();
           observer = null;
@@ -86,11 +120,16 @@ export function makeWatchHandler(ch = chrome) {
         subtree: true,
       });
 
+      if (document.querySelector('ytd-watch-flexy')) {
+        disposeTheaterObserver = observeTheaterToggle(document);
+      }
       void maybeCollapse();
 
       return function cleanup() {
         observer?.disconnect();
         observer = null;
+        disposeTheaterObserver?.();
+        disposeTheaterObserver = null;
         ch.storage.onChanged.removeListener(onStorageChange);
         disposePauseListener();
       };

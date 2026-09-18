@@ -140,11 +140,15 @@ html[data-ytc-notif-bell] #notification-topbar-button {
 /* ───────────────────────────────────────────────────────────
  * #10 Hide trending / explore entries in the sidebar
  * data-ytc-trending
+ * Keyed on href, not the link title: the label is localized ("Em alta",
+ * "Explorar", …) so a title match only ever worked in English. Hiding the
+ * whole entry renderer also removes the icon and hover target, not just
+ * the anchor.
  * ─────────────────────────────────────────────────────────── */
-html[data-ytc-trending] ytd-guide-entry-renderer a[title='Trending'],
-html[data-ytc-trending] ytd-guide-entry-renderer a[title='Explore'],
-html[data-ytc-trending] ytd-mini-guide-entry-renderer[aria-label='Trending'],
-html[data-ytc-trending] ytd-mini-guide-entry-renderer[aria-label='Explore'] {
+html[data-ytc-trending] ytd-guide-entry-renderer:has(a[href^='/feed/trending']),
+html[data-ytc-trending] ytd-guide-entry-renderer:has(a[href^='/feed/explore']),
+html[data-ytc-trending] ytd-mini-guide-entry-renderer:has(a[href^='/feed/trending']),
+html[data-ytc-trending] ytd-mini-guide-entry-renderer:has(a[href^='/feed/explore']) {
   display: none !important;
 }
 
@@ -166,6 +170,25 @@ html[data-ytc-live-chat] #chat,
 html[data-ytc-live-chat] #chat-container {
   display: none !important;
 }
+/* Reclaim the space the chat used to fill.
+ *
+ * In theater mode the chat lives in #panels-full-bleed-container, a flex
+ * sibling of the player sized from the sidebar width. Hiding the chat inside
+ * it leaves that column laid out and empty — a ~410px black band beside the
+ * video. Collapse the column and let the player take the whole row. The
+ * :not(:has(…)) guard keeps a genuinely-open engagement panel (transcript,
+ * description, playlist) working: those live in the same container. */
+html[data-ytc-live-chat]
+  ytd-watch-flexy[theater]
+  #panels-full-bleed-container:not(
+    :has(ytd-engagement-panel-section-list-renderer[visibility='ENGAGEMENT_PANEL_VISIBILITY_EXPANDED'])
+  ) {
+  display: none !important;
+}
+html[data-ytc-live-chat] ytd-watch-flexy[theater] #player-full-bleed-container {
+  width: 100% !important;
+  max-width: none !important;
+}
 
 /* ───────────────────────────────────────────────────────────
  * #13 Hide related videos sidebar
@@ -176,8 +199,11 @@ html[data-ytc-related] #secondary.ytd-watch-flexy,
 html[data-ytc-related] #related {
   display: none !important;
 }
-/* Widen the primary column when the sidebar is gone. */
-html[data-ytc-related] ytd-watch-flexy[flexy][is-two-columns_] #primary.ytd-watch-flexy {
+/* Widen the primary column when the sidebar is gone.
+ * YouTube dropped the legacy [flexy] attribute from ytd-watch-flexy, so the
+ * old selector stopped matching and the column kept its sidebar-sized
+ * max-width. Key on the layout attribute that is actually present. */
+html[data-ytc-related] ytd-watch-flexy[is-two-columns_] #primary.ytd-watch-flexy {
   max-width: none !important;
   width: 100% !important;
 }
@@ -194,6 +220,14 @@ html[data-ytc-related] ytd-watch-flexy {
   --ytd-watch-flexy-max-player-width-wide-screen: 100% !important;
   --ytd-watch-flexy-space-below-player: 16px !important;
 }
+/* The ambient-mode glow is a canvas drawn wider than the player; it normally
+ * bleeds into the sidebar's slack. With the player widened there is no slack
+ * left, so the canvas pushed a horizontal scrollbar onto the whole page.
+ * Clip it to its container — the glow still renders, it just stops overflowing. */
+html[data-ytc-related] #cinematics-container,
+html[data-ytc-live-chat] #cinematics-container {
+  overflow: clip !important;
+}
 
 /* ───────────────────────────────────────────────────────────
  * #14 Hide end-screen cards (the video overlay "up next" cards)
@@ -203,6 +237,14 @@ html[data-ytc-end-cards] .ytp-ce-element,
 html[data-ytc-end-cards] .ytp-endscreen-content,
 html[data-ytc-end-cards] .html5-endscreen,
 html[data-ytc-end-cards] .ytp-cards-teaser {
+  display: none !important;
+}
+/* The "delhi" player replaced the legacy videowall with a grid that fills the
+ * whole player once the video ends — the rules above hide .html5-endscreen but
+ * not this one, so the end of every video still turned into a wall of
+ * recommendations. Scoped to .ended-mode so the grid you can open on purpose
+ * while browsing in fullscreen is left alone. */
+html[data-ytc-end-cards] .html5-video-player.ended-mode .ytp-fullscreen-grid {
   display: none !important;
 }
 
@@ -264,14 +306,34 @@ html[data-ytc-create-button]
 /* ───────────────────────────────────────────────────────────
  * Hide watch-page action buttons (Share, Save, Ask/Perguntar)
  * data-ytc-watch-actions
- * Keeps the like/dislike segmented button visible. #actions-inner
- * holds the like cluster plus a <yt-flexible-actions-view-model>
- * and a menu button — hide those two siblings, leave the like
- * cluster alone.
+ * Keeps the like/dislike segmented button visible.
+ *
+ * The old rules hid #actions-inner #menu and ytd-menu-renderer wholesale.
+ * YouTube since moved the like cluster *inside* ytd-menu-renderer, so those
+ * rules took like/dislike down with Share — the opposite of what the toggle
+ * promises. Today's tree is:
+ *
+ *   #actions-inner > #menu > ytd-menu-renderer
+ *     ├─ #top-level-buttons-computed
+ *     │    ├─ segmented-like-dislike-button-view-model   ← keep
+ *     │    └─ yt-button-view-model (Share)               ← hide
+ *     ├─ #flexible-item-buttons (Ask, Save to playlist)  ← hide
+ *     ├─ yt-icon-button#button (More actions)            ← hide
+ *     └─ yt-button-shape (More actions)                  ← hide
+ *
+ * So: everything in the top-level row except the like cluster, plus the
+ * flexible row and both overflow-menu triggers.
  * ─────────────────────────────────────────────────────────── */
+html[data-ytc-watch-actions]
+  ytd-watch-metadata
+  #top-level-buttons-computed
+  > *:not(segmented-like-dislike-button-view-model):not(like-button-view-model):not(
+    dislike-button-view-model
+  ),
+html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner #flexible-item-buttons,
 html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner yt-flexible-actions-view-model,
-html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner #menu,
-html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner ytd-menu-renderer {
+html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner ytd-menu-renderer > yt-icon-button,
+html[data-ytc-watch-actions] ytd-watch-metadata #actions-inner ytd-menu-renderer > yt-button-shape {
   display: none !important;
 }
 

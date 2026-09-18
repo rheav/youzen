@@ -102,29 +102,53 @@ describe('youtube.css — hideCreateButton', () => {
 });
 
 describe('youtube.css — hideWatchActions', () => {
+  // Mirrors the live tree: the like cluster now lives *inside*
+  // ytd-menu-renderer, alongside Share/Ask/Save and the overflow triggers.
   const snippet = `
     <ytd-watch-metadata>
       <div id="actions-inner">
-        <div id="top-level-buttons-computed">
-          <segmented-like-dislike-button-view-model>
-            <like-button-view-model></like-button-view-model>
-            <dislike-button-view-model></dislike-button-view-model>
-          </segmented-like-dislike-button-view-model>
-          <yt-flexible-actions-view-model>
-            <button>Share</button>
-            <button>Save</button>
-          </yt-flexible-actions-view-model>
-          <ytd-menu-renderer id="menu"><button>Menu</button></ytd-menu-renderer>
+        <div id="menu">
+          <ytd-menu-renderer>
+            <div id="top-level-buttons-computed">
+              <segmented-like-dislike-button-view-model>
+                <like-button-view-model></like-button-view-model>
+                <dislike-button-view-model></dislike-button-view-model>
+              </segmented-like-dislike-button-view-model>
+              <yt-button-view-model id="share"><button>Share</button></yt-button-view-model>
+            </div>
+            <div id="flexible-item-buttons">
+              <yt-button-view-model id="ask"><button>Ask</button></yt-button-view-model>
+              <yt-button-view-model id="save"><button>Save</button></yt-button-view-model>
+            </div>
+            <yt-icon-button id="overflow-icon"><button>More</button></yt-icon-button>
+            <yt-button-shape id="overflow-shape"><button>More</button></yt-button-shape>
+          </ytd-menu-renderer>
         </div>
       </div>
     </ytd-watch-metadata>
   `;
 
-  it('attr set → Share/Save/menu hidden; like/dislike preserved', () => {
+  it('attr set → Share/Ask/Save/overflow hidden; like/dislike preserved', () => {
     mountSnippet(document, snippet);
     setAttr(document, 'data-ytc-watch-actions');
-    expect(isHidden(document.querySelector('yt-flexible-actions-view-model'))).toBe(true);
-    expect(isHidden(document.querySelector('#menu'))).toBe(true);
+
+    expect(isHidden(document.querySelector('#share'))).toBe(true);
+    expect(isHidden(document.querySelector('#flexible-item-buttons'))).toBe(true);
+    expect(isHidden(document.querySelector('#ask'))).toBe(true);
+    expect(isHidden(document.querySelector('#save'))).toBe(true);
+    expect(isHidden(document.querySelector('#overflow-icon'))).toBe(true);
+    expect(isHidden(document.querySelector('#overflow-shape'))).toBe(true);
+
+    // The whole point of the toggle: like/dislike survive.
+    expect(isHidden(document.querySelector('segmented-like-dislike-button-view-model'))).toBe(false);
+    expect(isHidden(document.querySelector('like-button-view-model'))).toBe(false);
+    expect(isHidden(document.querySelector('dislike-button-view-model'))).toBe(false);
+  });
+
+  it('attr unset → every action stays visible', () => {
+    mountSnippet(document, snippet);
+    expect(isHidden(document.querySelector('#share'))).toBe(false);
+    expect(isHidden(document.querySelector('#ask'))).toBe(false);
     expect(isHidden(document.querySelector('segmented-like-dislike-button-view-model'))).toBe(false);
   });
 });
@@ -178,9 +202,11 @@ describe('youtube.css — sampler: existing rules still work', () => {
   });
 
   it('hideRelatedVideos hides #secondary, widens primary', () => {
+    // No [flexy] attribute: YouTube dropped it, and the widening rule has to
+    // key on [is-two-columns_] alone or the player never reclaims the width.
     mountSnippet(
       document,
-      `<ytd-watch-flexy flexy is-two-columns_>
+      `<ytd-watch-flexy is-two-columns_ default-two-column-layout>
          <div id="primary" class="ytd-watch-flexy"></div>
          <div id="secondary" class="ytd-watch-flexy"></div>
        </ytd-watch-flexy>`,
@@ -188,6 +214,10 @@ describe('youtube.css — sampler: existing rules still work', () => {
     setAttr(document, 'data-ytc-related');
     expect(isHidden(document.querySelector('#secondary'))).toBe(true);
     expect(isHidden(document.querySelector('#primary'))).toBe(false);
+
+    const primary = window.getComputedStyle(document.querySelector('#primary'));
+    expect(primary.maxWidth).toBe('none');
+    expect(primary.width).toBe('100%');
   });
 });
 
@@ -340,14 +370,29 @@ describe('youtube.css — nav chrome coverage', () => {
   it('hideTrending hides Trending/Explore sidebar entries', () => {
     mountSnippet(
       document,
-      `<ytd-guide-entry-renderer id="trending"><a title="Trending"></a></ytd-guide-entry-renderer>
-       <ytd-guide-entry-renderer id="explore"><a title="Explore"></a></ytd-guide-entry-renderer>
-       <ytd-guide-entry-renderer id="home"><a title="Home"></a></ytd-guide-entry-renderer>`,
+      `<ytd-guide-entry-renderer id="trending"><a href="/feed/trending" title="Trending"></a></ytd-guide-entry-renderer>
+       <ytd-guide-entry-renderer id="explore"><a href="/feed/explore" title="Explore"></a></ytd-guide-entry-renderer>
+       <ytd-guide-entry-renderer id="home"><a href="/" title="Home"></a></ytd-guide-entry-renderer>`,
     );
     setAttr(document, 'data-ytc-trending');
-    expect(isHidden(document.querySelector('#trending a'))).toBe(true);
-    expect(isHidden(document.querySelector('#explore a'))).toBe(true);
-    expect(isHidden(document.querySelector('#home a'))).toBe(false);
+    expect(isHidden(document.querySelector('#trending'))).toBe(true);
+    expect(isHidden(document.querySelector('#explore'))).toBe(true);
+    expect(isHidden(document.querySelector('#home'))).toBe(false);
+  });
+
+  it('hideTrending works with localized labels (href-keyed, not title-keyed)', () => {
+    mountSnippet(
+      document,
+      `<ytd-guide-entry-renderer id="trending"><a href="/feed/trending" title="Em alta"></a></ytd-guide-entry-renderer>
+       <ytd-guide-entry-renderer id="explore"><a href="/feed/explore" title="Explorar"></a></ytd-guide-entry-renderer>
+       <ytd-mini-guide-entry-renderer id="mini-trending"><a href="/feed/trending"></a></ytd-mini-guide-entry-renderer>
+       <ytd-guide-entry-renderer id="subs"><a href="/feed/subscriptions" title="Inscrições"></a></ytd-guide-entry-renderer>`,
+    );
+    setAttr(document, 'data-ytc-trending');
+    expect(isHidden(document.querySelector('#trending'))).toBe(true);
+    expect(isHidden(document.querySelector('#explore'))).toBe(true);
+    expect(isHidden(document.querySelector('#mini-trending'))).toBe(true);
+    expect(isHidden(document.querySelector('#subs'))).toBe(false);
   });
 });
 
@@ -363,6 +408,56 @@ describe('youtube.css — watch declutter coverage', () => {
     expect(isHidden(document.querySelector('#other'))).toBe(false);
   });
 
+  // In theater mode the chat sits in #panels-full-bleed-container, a flex
+  // sibling of the player. Hiding only the chat leaves that column laid out
+  // and empty — the black band beside the video.
+  const theaterSnippet = (panelsInner = '') => `
+    <ytd-watch-flexy theater>
+      <div id="full-bleed-container">
+        <div id="player-full-bleed-container"></div>
+        <div id="panels-full-bleed-container">
+          <div id="chat-container"><ytd-live-chat-frame></ytd-live-chat-frame></div>
+          ${panelsInner}
+        </div>
+      </div>
+    </ytd-watch-flexy>`;
+
+  it('hideLiveChat collapses the theater panel column so the player fills the row', () => {
+    mountSnippet(document, theaterSnippet());
+    setAttr(document, 'data-ytc-live-chat');
+
+    expect(isHidden(document.querySelector('#panels-full-bleed-container'))).toBe(true);
+    expect(isHidden(document.querySelector('#player-full-bleed-container'))).toBe(false);
+
+    const player = window.getComputedStyle(document.querySelector('#player-full-bleed-container'));
+    expect(player.width).toBe('100%');
+    expect(player.maxWidth).toBe('none');
+  });
+
+  it('hideLiveChat keeps the theater panel column when another panel is expanded', () => {
+    mountSnippet(
+      document,
+      theaterSnippet(
+        `<ytd-engagement-panel-section-list-renderer
+           id="transcript"
+           visibility="ENGAGEMENT_PANEL_VISIBILITY_EXPANDED"
+         ></ytd-engagement-panel-section-list-renderer>`,
+      ),
+    );
+    setAttr(document, 'data-ytc-live-chat');
+
+    expect(isHidden(document.querySelector('#panels-full-bleed-container'))).toBe(false);
+    expect(isHidden(document.querySelector('#transcript'))).toBe(false);
+    // The chat itself is still gone.
+    expect(isHidden(document.querySelector('#chat-container'))).toBe(true);
+  });
+
+  it('hideLiveChat leaves the theater column alone when the feature is off', () => {
+    mountSnippet(document, theaterSnippet());
+    expect(isHidden(document.querySelector('#panels-full-bleed-container'))).toBe(false);
+    expect(isHidden(document.querySelector('#chat-container'))).toBe(false);
+  });
+
   it('hideEndScreenCards hides end-screen overlays', () => {
     mountSnippet(
       document,
@@ -376,6 +471,30 @@ describe('youtube.css — watch declutter coverage', () => {
     expect(isHidden(document.querySelector('#es'))).toBe(true);
     expect(isHidden(document.querySelector('#teaser'))).toBe(true);
     expect(isHidden(document.querySelector('#chrome'))).toBe(false);
+  });
+
+  it('hideEndScreenCards hides the delhi-player end-of-video grid', () => {
+    mountSnippet(
+      document,
+      `<div class="html5-video-player ended-mode" id="player">
+         <div class="ytp-fullscreen-grid" id="grid"></div>
+         <div class="ytp-chrome-bottom" id="chrome"></div>
+       </div>`,
+    );
+    setAttr(document, 'data-ytc-end-cards');
+    expect(isHidden(document.querySelector('#grid'))).toBe(true);
+    expect(isHidden(document.querySelector('#chrome'))).toBe(false);
+  });
+
+  it('hideEndScreenCards leaves the fullscreen browse grid alone mid-playback', () => {
+    mountSnippet(
+      document,
+      `<div class="html5-video-player playing-mode" id="player">
+         <div class="ytp-fullscreen-grid" id="grid"></div>
+       </div>`,
+    );
+    setAttr(document, 'data-ytc-end-cards');
+    expect(isHidden(document.querySelector('#grid'))).toBe(false);
   });
 
   it('hideAutoplayToggle hides the autonav toggle', () => {

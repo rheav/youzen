@@ -16,6 +16,38 @@ const PAUSE_ATTR = 'data-ytc-paused';
 /** Cached after the first successful YTC_WHO_AM_I round-trip. */
 let cachedTabId = null;
 
+/**
+ * Every storage.local key the applier reads. Built once from the registry so
+ * we can do a targeted `storage.local.get(KEYS)` instead of `get(null)` —
+ * reading the whole store (blocklists included) on every change was pure
+ * waste, and the blocklists are the largest values we keep.
+ */
+const READ_KEYS = (() => {
+  const keys = ['globallyPaused'];
+  for (const entry of FEATURES) {
+    if (entry.isMaster) continue;
+    keys.push(entry.id);
+    if (entry.extra?.kind === 'select') keys.push(entry.extra.key);
+  }
+  return keys;
+})();
+
+/** Same set as a Set, for the storage.onChanged relevance test. */
+const READ_KEY_SET = new Set(READ_KEYS);
+
+/**
+ * Set or remove an attribute only when it would actually change.
+ * Re-writing an attribute that is already in the desired state still
+ * invalidates style for the whole subtree, and <html> is the whole document.
+ */
+function setAttr(el, name, present, value = '') {
+  if (present) {
+    if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  } else if (el.hasAttribute(name)) {
+    el.removeAttribute(name);
+  }
+}
+
 /** Returns the extension's own tab id, asking the background for it once. */
 async function getCurrentTabId() {
   if (cachedTabId !== null) return cachedTabId;
@@ -45,7 +77,7 @@ export async function applyAttributesWith({ chrome: ch, document: doc, tabId }) 
   if (!html) return;
 
   const local = await new Promise((resolve) => {
-    ch.storage.local.get(null, (result) => resolve(result ?? {}));
+    ch.storage.local.get(READ_KEYS, (result) => resolve(result ?? {}));
   });
 
   let sessionPaused = false;
@@ -61,38 +93,36 @@ export async function applyAttributesWith({ chrome: ch, document: doc, tabId }) 
   if (paused) {
     for (const entry of FEATURES) {
       if (entry.isMaster) continue;
-      if (entry.attr) html.removeAttribute(entry.attr);
+      if (entry.attr) setAttr(html, entry.attr, false);
       if (entry.extra?.kind === 'select') {
-        html.removeAttribute(`${entry.attr}-mode`);
+        setAttr(html, `${entry.attr}-mode`, false);
       }
     }
-    html.setAttribute(PAUSE_ATTR, '');
+    setAttr(html, PAUSE_ATTR, true);
     return;
   }
 
-  html.removeAttribute(PAUSE_ATTR);
+  setAttr(html, PAUSE_ATTR, false);
 
   for (const entry of FEATURES) {
     if (entry.isMaster) continue;
-    if (entry.kind === 'js') {
-      // JS-kind features still set their attr so CSS/other readers can detect state,
-      // but they don't have a CSS rule themselves.
-      if (local[entry.id]) html.setAttribute(entry.attr, '');
-      else html.removeAttribute(entry.attr);
-      continue;
-    }
-    if (local[entry.id]) html.setAttribute(entry.attr, '');
-    else html.removeAttribute(entry.attr);
+    // JS-kind features still set their attr so CSS/other readers can detect
+    // state, but they don't have a CSS rule themselves.
+    setAttr(html, entry.attr, !!local[entry.id]);
 
     if (entry.extra?.kind === 'select') {
       const value = local[entry.extra.key] ?? entry.extra.default;
-      html.setAttribute(`${entry.attr}-mode`, value);
+      setAttr(html, `${entry.attr}-mode`, true, value);
     }
   }
 }
 
-/** Layout attribute whose toggle changes the watch-player width. */
-const RELATED_ATTR = 'data-ytc-related';
+/**
+ * Attributes whose toggle changes how much horizontal room the watch player
+ * has: the related sidebar (two-column mode) and live chat (theater mode's
+ * panel column). Flipping either needs a resize nudge.
+ */
+const LAYOUT_ATTRS = ['data-ytc-related', 'data-ytc-live-chat'];
 
 /**
  * Nudge YouTube to recompute the watch-player size.
@@ -104,7 +134,7 @@ const RELATED_ATTR = 'data-ytc-related';
  * the reclaimed width until the user next resizes the window. rAF lets the CSS
  * apply first; the delayed second fire covers YouTube's own debounce.
  */
-function nudgePlayerResize() {
+export function nudgePlayerResize() {
   if (typeof window === 'undefined') return;
   const fire = () => window.dispatchEvent(new Event('resize'));
   if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fire);
@@ -119,9 +149,9 @@ function nudgePlayerResize() {
 export async function applyAttributes() {
   const tabId = await getCurrentTabId();
   const html = document.documentElement;
-  const relatedBefore = !!html?.hasAttribute(RELATED_ATTR);
+  const before = LAYOUT_ATTRS.map((attr) => !!html?.hasAttribute(attr));
   await applyAttributesWith({ chrome, document, tabId });
-  if (html && html.hasAttribute(RELATED_ATTR) !== relatedBefore) {
+  if (html && LAYOUT_ATTRS.some((attr, i) => html.hasAttribute(attr) !== before[i])) {
     nudgePlayerResize();
   }
 }
@@ -134,9 +164,20 @@ export function initAttributeApplier() {
   // Fire once synchronously on boot.
   void applyAttributes();
 
-  const onStorageChange = (_changes, area) => {
-    if (area === 'local' || area === 'session') {
+  const onStorageChange = (changes, area) => {
+    // Session writes are per-tab pause keys; always relevant.
+    if (area === 'session') {
       void applyAttributes();
+      return;
+    }
+    if (area !== 'local') return;
+    // Blocklist edits and UI prefs (theme, language, compactMode…) live in the
+    // same area but change no attribute — skip the whole storage round-trip.
+    for (const key of Object.keys(changes)) {
+      if (READ_KEY_SET.has(key)) {
+        void applyAttributes();
+        return;
+      }
     }
   };
   const onMessage = (msg) => {

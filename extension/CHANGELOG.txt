@@ -60,6 +60,52 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 17/09/2026 - v1.0.1 Released:
+
+FIXED - Player layout:
+- Live chat: hiding it in theater mode left the ~410px panel column laid out
+  and empty — a black band beside the video. The column now collapses and the
+  player takes the full row. An engagement panel you open on purpose
+  (transcript, description, playlist) still keeps the column.
+- Related sidebar: the rule that widens the primary column keyed on
+  ytd-watch-flexy[flexy], an attribute YouTube removed, so the player never
+  reclaimed the freed width. Now keyed on [is-two-columns_] (#primary
+  1177px -> 1481px on a 1512px window).
+- Ambient-mode glow canvas is drawn wider than the player and relied on the
+  sidebar for slack; with the player widened it pushed a horizontal scrollbar
+  onto the page. Clipped to its container.
+- Entering/leaving theater mode now re-measures the player, so the reclaimed
+  width applies without waiting for a window resize.
+
+FIXED - Removals:
+- "Hide action buttons" promised to keep like/dislike but hid #actions-inner
+  #menu wholesale — and YouTube had since moved the like cluster inside it, so
+  the toggle took like/dislike down with Share. It now hides exactly Share,
+  Ask, Save and the two overflow triggers.
+- End of video: the current player replaced the legacy videowall with
+  .ytp-fullscreen-grid, which no rule covered, so every video ended on a wall
+  of recommendations. Covered now, scoped to ended-mode so the fullscreen
+  browse grid still works.
+- Trending / Explore matched the English link titles only, so the toggle did
+  nothing in any other language. Keyed on href (/feed/trending,
+  /feed/explore) instead.
+
+PERFORMANCE - Content script:
+- The blocklist observer now detaches entirely when you have no rules, so a
+  default install costs nothing per YouTube DOM mutation.
+- Scans are incremental: only cards not yet marked data-ytc-scanned are read,
+  instead of re-reading every card in the document on every mutation.
+- The hot path reads the cached pause state instead of making two async
+  chrome.storage round-trips per scan.
+- Mutations inside the player (progress bar, captions, tooltips) are dropped
+  before any scan is scheduled, and scans coalesce per animation frame
+  instead of per mutation batch.
+- The attribute applier reads only the keys it needs instead of the whole
+  store, ignores storage changes that touch no attribute, and skips writing
+  attributes that are already in the right state.
+
+--------------------------------------------------------------------------------
+
 🆕 19/04/2026 - v1.0.0j Released:
 
 INITIAL RELEASE.

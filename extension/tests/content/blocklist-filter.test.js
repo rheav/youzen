@@ -3,6 +3,7 @@ import {
   extractTitle,
   extractChannel,
   scanRoot,
+  scanNew,
   rescanAll,
 } from '@/content/modules/blocklist-filter';
 import { compileRules } from '@/utils/blocklist-matcher';
@@ -145,6 +146,41 @@ describe('scanRoot', () => {
     const result = scanRoot(document, matchers);
     expect(result.scanned).toBe(tags.length);
     expect(result.blocked).toBe(tags.length);
+  });
+});
+
+describe('scanNew', () => {
+  const matchers = () => ({
+    keyword: compileRules([{ id: '1', text: 'unbox' }]),
+    channel: [],
+  });
+
+  it('only visits cards that have not been scanned yet', () => {
+    const old = makeCard({ title: 'unbox one', channel: 'A' });
+    document.body.appendChild(old);
+    scanRoot(document, matchers());
+    expect(old.hasAttribute('data-ytc-blocked')).toBe(true);
+
+    const fresh = makeCard({ title: 'unbox two', channel: 'B' });
+    document.body.appendChild(fresh);
+
+    const result = scanNew(document, matchers());
+    expect(result.scanned).toBe(1);
+    expect(result.blocked).toBe(1);
+    expect(fresh.hasAttribute('data-ytc-blocked')).toBe(true);
+  });
+
+  it('does nothing when every card is already scanned', () => {
+    document.body.appendChild(makeCard({ title: 'safe', channel: 'A' }));
+    scanRoot(document, matchers());
+    expect(scanNew(document, matchers())).toEqual({ scanned: 0, blocked: 0 });
+  });
+
+  it('returns { scanned: 0, blocked: 0 } for null/invalid root', () => {
+    expect(scanNew(null, { keyword: [], channel: [] })).toEqual({
+      scanned: 0,
+      blocked: 0,
+    });
   });
 });
 

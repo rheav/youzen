@@ -13,7 +13,7 @@
  */
 
 import { compileRules, evaluateText } from '@/utils/blocklist-matcher';
-import { isPausedNow, onPauseChange } from './pause-state.js';
+import { isPaused, isPausedNow, onPauseChange } from './pause-state.js';
 
 /**
  * Broad CSS selector for "a card representing a single video or shelf item".
@@ -97,7 +97,17 @@ export function scanRoot(root, matchers) {
   if (!root || typeof root.querySelectorAll !== 'function') {
     return { scanned: 0, blocked: 0 };
   }
-  const cards = root.querySelectorAll(CARD_SELECTORS);
+  return scanCards(root.querySelectorAll(CARD_SELECTORS), matchers);
+}
+
+/**
+ * Evaluate an already-selected set of cards. Shared by scanRoot and scanNew.
+ *
+ * @param {ArrayLike<Element>} cards
+ * @param {{keyword: ReturnType<typeof compileRules>, channel: ReturnType<typeof compileRules>}} matchers
+ * @returns {{ scanned: number, blocked: number }}
+ */
+function scanCards(cards, matchers) {
   let blocked = 0;
 
   for (const card of cards) {
@@ -118,6 +128,29 @@ export function scanRoot(root, matchers) {
   }
 
   return { scanned: cards.length, blocked };
+}
+
+/**
+ * Scan only cards we have not looked at yet.
+ *
+ * This is the hot path: YouTube mutates the watch page continuously (progress
+ * bar, captions, tooltips), so a full-document re-read per mutation burned
+ * time proportional to the whole feed for no new information. Cards are
+ * immutable once rendered, so `[data-ytc-scanned]` is a reliable skip marker —
+ * rule edits go through rescanAll(), which clears it.
+ *
+ * @param {ParentNode} root
+ * @param {{keyword: ReturnType<typeof compileRules>, channel: ReturnType<typeof compileRules>}} matchers
+ * @returns {{ scanned: number, blocked: number }}
+ */
+export function scanNew(root, matchers) {
+  if (!root || typeof root.querySelectorAll !== 'function') {
+    return { scanned: 0, blocked: 0 };
+  }
+  const selector = CARD_SELECTORS.split(',')
+    .map((sel) => `${sel}:not([${SEEN_ATTR}])`)
+    .join(',');
+  return scanCards(root.querySelectorAll(selector), matchers);
 }
 
 /**
@@ -143,7 +176,15 @@ export function rescanAll(root, matchers) {
  */
 export function initBlocklistFilter({ chrome: ch = chrome, document: doc = document } = {}) {
   let matchers = { keyword: [], channel: [] };
-  let scheduled = false;
+  let scheduled = 0;
+  let observing = false;
+
+  const observer = new MutationObserver(onMutations);
+
+  /** True when the user has at least one rule; otherwise we do nothing at all. */
+  function hasRules() {
+    return matchers.keyword.length > 0 || matchers.channel.length > 0;
+  }
 
   /**
    * Remove every `data-ytc-blocked` attribute from the document. Used
@@ -155,16 +196,47 @@ export function initBlocklistFilter({ chrome: ch = chrome, document: doc = docum
     }
   }
 
+  /**
+   * Start/stop observing to match the current rule set.
+   *
+   * With no rules there is nothing a scan could ever hide, so we detach the
+   * observer entirely — the default install (empty blocklists) then costs
+   * exactly zero per YouTube mutation.
+   */
+  function syncObserver() {
+    const want = hasRules();
+    if (want === observing) return;
+    observing = want;
+    if (want) observer.observe(doc.documentElement, { childList: true, subtree: true });
+    else observer.disconnect();
+  }
+
+  /**
+   * Mutation callback. YouTube's player rewrites its own subtree many times a
+   * second (progress bar, caption lines, tooltips) and never mounts a video
+   * card there, so those records are dropped before any work is scheduled.
+   */
+  function onMutations(records) {
+    for (const record of records) {
+      const target = record.target;
+      if (target instanceof Element && target.closest?.('#movie_player')) continue;
+      scheduleScan();
+      return;
+    }
+  }
+
   function scheduleScan() {
     if (scheduled) return;
-    scheduled = true;
-    // Batch multiple mutations into one scan per microtask.
-    queueMicrotask(async () => {
-      scheduled = false;
-      // Skip scanning while paused; any leftover `data-ytc-blocked` was
-      // already cleared by the pause-change listener below.
-      if (await isPausedNow(ch)) return;
-      scanRoot(doc, matchers);
+    // Coalesce a burst of mutations into one scan per frame. A microtask fired
+    // once per mutation batch, which on an infinite-scrolling feed meant many
+    // scans inside a single frame with identical results.
+    scheduled = requestAnimationFrame(() => {
+      scheduled = 0;
+      // Cached pause state, not a storage round-trip: the hot path ran two
+      // async chrome.storage reads per scan. pause-state keeps this value
+      // fresh from storage.onChanged and the YTC_PAUSE_CHANGED message.
+      if (isPaused()) return;
+      scanNew(doc, matchers);
     });
   }
 
@@ -176,6 +248,7 @@ export function initBlocklistFilter({ chrome: ch = chrome, document: doc = docum
       keyword: compileRules(blocklistKeywords ?? []),
       channel: compileRules(blocklistChannels ?? []),
     };
+    syncObserver();
     if (await isPausedNow(ch)) {
       // Rules may have changed, but we must not re-hide while paused.
       clearBlocked();
@@ -201,14 +274,14 @@ export function initBlocklistFilter({ chrome: ch = chrome, document: doc = docum
     }
   });
 
-  const observer = new MutationObserver(() => scheduleScan());
-  observer.observe(doc.documentElement, { childList: true, subtree: true });
-
-  // Initial load + first scan.
+  // Initial load + first scan (attaches the observer if rules exist).
   void reloadRules();
 
   return function dispose() {
+    if (scheduled) cancelAnimationFrame(scheduled);
+    scheduled = 0;
     observer.disconnect();
+    observing = false;
     ch.storage.onChanged.removeListener(onStorageChange);
     disposePauseListener();
   };
