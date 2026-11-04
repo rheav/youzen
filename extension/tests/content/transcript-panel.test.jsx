@@ -20,6 +20,7 @@ function setup({ tracks = [track] } = {}) {
     getPlayer: vi.fn(async (id) => ({ videoId: id, title: 'My: video', tracks, translations: [{ code: 'pt', label: 'Portuguese' }] })),
     loadTrack: vi.fn(async (id) => ({ cues: CUES[id] })),
     isAdShowing: () => false,
+    resetAttempts: vi.fn(),
   };
   const ch = {
     storage: { local: { get: (_k, cb) => cb({}), set: vi.fn(), remove: (_k, cb) => cb?.() } },
@@ -90,6 +91,8 @@ describe('transcript panel', () => {
     expect(await screen.findByText('Brand new video.')).toBeTruthy();
     expect(screen.queryByText('Hello there.')).toBeNull();
     await waitFor(() => expect(source.getPlayer).toHaveBeenCalledWith('v2'));
+    // Never asks for the new video with the old video's track.
+    for (const [id, t] of source.loadTrack.mock.calls) expect(t.videoId).toBe(id);
   });
 
   it('shows No transcript for this video on noCaptions', async () => {

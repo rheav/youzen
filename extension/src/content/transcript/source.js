@@ -122,10 +122,13 @@ export function createCaptionSource({
     return link && isLinkFresh(link) ? link : null;
   };
 
+  // Pokes only make sense while that video is the one in the player.
+  const onVideo = (videoId) => new URLSearchParams(win.location.search ?? '').get('v') === videoId;
+
   /** Makes the player request captions by toggling CC, then restores CC. */
   async function poke(videoId) {
     for (let waited = 0; isAdShowing(); waited += 500) {
-      if (waited >= AD_WAIT_MS) return;
+      if (waited >= AD_WAIT_MS || !onVideo(videoId)) return;
       await sleep(500);
     }
     // While the player starts up it applies the user's own caption setting; reading the
@@ -138,24 +141,33 @@ export function createCaptionSource({
       if (freshLink(videoId)) return;
     }
     const btn = ccButton();
-    if (!btn) return;
+    if (!btn || !onVideo(videoId)) return;
     attempts.set(videoId, (attempts.get(videoId) ?? 0) + 1);
     const wasOn = ccOn(btn);
     if (wasOn) await setCc(btn, false);
     await setCc(btn, true);
-    for (let waited = 0; !freshLink(videoId) && waited < LINK_WAIT_MS; waited += POLL_MS) {
+    for (let waited = 0; !freshLink(videoId) && waited < LINK_WAIT_MS && onVideo(videoId); waited += POLL_MS) {
       await sleep(POLL_MS);
     }
-    await setCc(btn, wasOn);
+    await setCc(btn, wasOn); // even if the user moved on: CC must end as it started
   }
 
-  async function ensureLink(videoId) {
-    while (!freshLink(videoId) && (attempts.get(videoId) ?? 0) < MAX_ATTEMPTS) {
-      const before = attempts.get(videoId) ?? 0;
-      await poke(videoId);
-      if ((attempts.get(videoId) ?? 0) === before) break; // ad never ended or no CC button
+  const pending = new Map(); // videoId → the one ensureLink run in flight
+
+  /** One run per video at a time, so two pokes never fight over the CC button. */
+  function ensureLink(videoId) {
+    if (!pending.has(videoId)) {
+      const run = (async () => {
+        while (!freshLink(videoId) && (attempts.get(videoId) ?? 0) < MAX_ATTEMPTS && onVideo(videoId)) {
+          const before = attempts.get(videoId) ?? 0;
+          await poke(videoId);
+          if ((attempts.get(videoId) ?? 0) === before) break; // ad never ended, no CC button, or user left
+        }
+        return freshLink(videoId);
+      })().finally(() => pending.delete(videoId));
+      pending.set(videoId, run);
     }
-    return freshLink(videoId);
+    return pending.get(videoId);
   }
 
   /**
@@ -196,6 +208,8 @@ export function createCaptionSource({
     getPlayer,
     loadTrack,
     isAdShowing,
+    /** A fresh load (new visit, "Try again") gets a fresh CC budget. */
+    resetAttempts: (videoId) => attempts.delete(videoId),
     dispose: () => win.removeEventListener('message', onMessage),
   };
 }

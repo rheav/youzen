@@ -67,6 +67,23 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 04/11/2026 - v1.1.1 Released:
+
+FIXED - Transcript panel:
+- Moving to the next video could ask YouTube for the previous video's caption
+  track on the new video, and start several CC toggles at once that fought
+  over the button. Each load now uses the new video's own track, and only
+  one CC toggle runs per video at a time.
+- A CC toggle waiting through an ad kept going after you moved to another
+  video. It now stops as soon as the video changes (CC still ends the way it
+  started).
+- The panel did not hide in fullscreen once it was showing (its own style
+  overrode the hidden state). Fixed.
+- "Try again" did nothing after a failed load, until the page was reloaded.
+  Each fresh load and each retry now gets a new budget.
+
+--------------------------------------------------------------------------------
+
 🆕 04/11/2026 - v1.1.0 Released:
 
 NEW - Transcript panel next to the video:

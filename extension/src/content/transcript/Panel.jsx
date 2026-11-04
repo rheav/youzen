@@ -100,12 +100,14 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
     setEditing(false);
     setMenu(null);
     setFollowing(settings.autoScroll);
+    source.resetAttempts(videoId);
     source.getPlayer(videoId).then((p) => {
       if (stale) return;
       if (!p) return setStatus('error');
       setPlayer(p);
       if (!p.tracks.length) return setStatus('none');
-      setTrack(p.tracks.find((t) => t.lang === settings.lang) ?? p.tracks.find((t) => t.spoken) ?? p.tracks[0]);
+      const t = p.tracks.find((x) => x.lang === settings.lang) ?? p.tracks.find((x) => x.spoken) ?? p.tracks[0];
+      setTrack({ ...t, videoId });
     });
     return () => {
       stale = true;
@@ -114,9 +116,10 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId, nonce, settings === null, source]);
 
-  // Load the chosen track.
+  // Load the chosen track. `track.videoId` guards the commit where the video changed but
+  // `track` still holds the previous video's track.
   useEffect(() => {
-    if (!track || !videoId) return undefined;
+    if (!track || track.videoId !== videoId) return undefined;
     let stale = false;
     setStatus('loading');
     setCues([]);
@@ -139,7 +142,8 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
   const translateLang = settings?.translateLang ?? null;
   useEffect(() => {
     setTranslated(null);
-    if (!translateLang || !track || !cues.length || baseLang(translateLang) === baseLang(track.lang)) return undefined;
+    if (!translateLang || !track || track.videoId !== videoId || !cues.length) return undefined;
+    if (baseLang(translateLang) === baseLang(track.lang)) return undefined;
     let stale = false;
     source.loadTrack(videoId, track, translateLang).then((r) => {
       if (stale) return;
@@ -308,7 +312,7 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
   const toggleMenu = (name) => setMenu((m) => (m === name ? null : name));
   const pickTrack = (t) => {
     setMenu(null);
-    if (t.lang !== track?.lang) setTrack(t);
+    if (t.lang !== track?.lang) setTrack({ ...t, videoId });
     updateSettings({ lang: t.lang });
   };
   const pickTranslation = (code) => {

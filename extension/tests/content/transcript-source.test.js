@@ -9,7 +9,7 @@ const enAsr = { lang: 'en', label: 'English', auto: true, params: { kind: 'asr',
 function setup({ tracks = [{ languageCode: 'en', kind: 'asr', baseUrl: '/api/timedtext?lang=en&kind=asr' }], ccOn = false, ad = false, playerSendsLink = true } = {}) {
   const listeners = new Set();
   const win = {
-    location: { origin: 'https://www.youtube.com' },
+    location: { origin: 'https://www.youtube.com', search: '?v=vid1' },
     addEventListener: (_t, fn) => listeners.add(fn),
     removeEventListener: (_t, fn) => listeners.delete(fn),
     postMessage: (data) => {
@@ -34,7 +34,7 @@ function setup({ tracks = [{ languageCode: 'en', kind: 'asr', baseUrl: '/api/tim
 
   const fetchFn = vi.fn(async () => ({ ok: true, status: 200, text: async () => json3('fetched') }));
   const source = createCaptionSource({ win, doc: document, fetchFn, sleep: () => Promise.resolve() });
-  return { source, emit, fetchFn, button, clicks };
+  return { source, emit, fetchFn, button, clicks, win };
 }
 
 describe('caption source', () => {
@@ -123,5 +123,26 @@ describe('caption source', () => {
     const result = await source.loadTrack('vid1', enAsr, null);
     expect(clicks.length).toBeGreaterThan(0);
     expect(result.cues[0].text).toBe('from player');
+  });
+
+  it('runs one CC poke at a time per video', async () => {
+    const { source, clicks } = setup({ playerSendsLink: false });
+    await Promise.all([source.loadTrack('vid1', enAsr, null), source.loadTrack('vid1', enAsr, 'pt')]);
+    expect(clicks.filter((on) => on)).toHaveLength(5);
+  });
+
+  it('stops poking once the user is on another video', async () => {
+    const { source, clicks, win } = setup({ playerSendsLink: false });
+    win.location.search = '?v=other';
+    expect(await source.loadTrack('vid1', enAsr, null)).toEqual({ error: 'noLink' });
+    expect(clicks).toEqual([]);
+  });
+
+  it('resetAttempts gives the video a fresh budget', async () => {
+    const { source, clicks } = setup({ playerSendsLink: false });
+    await source.loadTrack('vid1', enAsr, null);
+    source.resetAttempts('vid1');
+    await source.loadTrack('vid1', enAsr, null);
+    expect(clicks.filter((on) => on)).toHaveLength(10);
   });
 });
