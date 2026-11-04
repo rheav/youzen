@@ -71,7 +71,7 @@ export default function AddRuleDialog({
         position: 'fixed',
         inset: 0,
         zIndex: 100,
-        background: 'rgba(20, 32, 50, 0.35)',
+        background: 'rgb(10 12 18 / 0.55)',
         backdropFilter: 'blur(3px)',
         WebkitBackdropFilter: 'blur(3px)',
         display: 'flex',
@@ -149,7 +149,7 @@ export default function AddRuleDialog({
               fontFamily: 'inherit',
               fontSize: 13,
               color: 'var(--text-primary)',
-              background: 'rgba(255,255,255,0.5)',
+              background: 'var(--field-bg)',
               border: `1px solid ${invalid ? 'var(--color-brute-red)' : 'var(--border)'}`,
               borderRadius: 'var(--radius)',
               padding: '8px 10px',
@@ -199,9 +199,9 @@ export default function AddRuleDialog({
                 padding: '6px 8px',
                 background:
                   mode === m.value
-                    ? 'rgba(255,77,77,0.08)'
-                    : 'rgba(255,255,255,0.4)',
-                border: `1px solid ${mode === m.value ? 'rgba(255,77,77,0.5)' : 'var(--border)'}`,
+                    ? 'var(--error-subtle)'
+                    : 'var(--surface)',
+                border: `1px solid ${mode === m.value ? 'var(--error)' : 'var(--border)'}`,
                 borderRadius: 'var(--radius)',
                 cursor: 'pointer',
                 userSelect: 'none',
@@ -270,8 +270,8 @@ export default function AddRuleDialog({
               padding: '8px 14px',
               fontSize: 12,
               fontWeight: 600,
-              background: canSave ? 'var(--color-accent-from)' : 'var(--border)',
-              color: canSave ? '#fff' : 'var(--text-muted)',
+              background: canSave ? 'var(--accent)' : 'var(--border)',
+              color: canSave ? 'var(--accent-text)' : 'var(--text-muted)',
               border: 'none',
               borderRadius: 'var(--radius)',
               cursor: canSave ? 'pointer' : 'not-allowed',

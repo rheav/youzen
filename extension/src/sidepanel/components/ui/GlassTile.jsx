@@ -65,7 +65,7 @@ export default function GlassTile({
         gap: 4,
         padding: 8,
         borderRadius: 'var(--radius)',
-        background: 'rgba(255, 255, 255, 0.4)',
+        background: 'var(--surface)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         border: '1px solid var(--border)',
@@ -78,13 +78,13 @@ export default function GlassTile({
       }}
       onMouseEnter={(e) => {
         if (!canCopy) return;
-        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.7)';
-        e.currentTarget.style.borderColor = 'rgba(3, 102, 214, 0.5)';
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(3, 102, 214, 0.2)';
+        e.currentTarget.style.background = 'var(--surface-hover)';
+        e.currentTarget.style.borderColor = 'var(--accent)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-hover)';
       }}
       onMouseLeave={(e) => {
         if (!canCopy) return;
-        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.4)';
+        e.currentTarget.style.background = 'var(--surface)';
         e.currentTarget.style.borderColor = 'var(--border)';
         e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
       }}

@@ -32,10 +32,10 @@ export default function Toggle({
 
   const trackBackground = indeterminate
     ? // Diagonal stripes at low alpha over the border token — reads as "mixed".
-      'repeating-linear-gradient(45deg, rgba(201,100,66,0.55) 0 4px, rgba(135,134,127,0.35) 4px 8px)'
+      'repeating-linear-gradient(45deg, color-mix(in oklab, var(--accent) 60%, transparent) 0 4px, var(--track-off) 4px 8px)'
     : checked
       ? 'var(--accent)'
-      : 'var(--border)';
+      : 'var(--track-off)';
 
   const ariaChecked = indeterminate ? 'mixed' : checked ? 'true' : 'false';
 
@@ -78,9 +78,9 @@ export default function Toggle({
             width: 16,
             height: 16,
             borderRadius: '50%',
-            background: '#fff',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-            transition: 'left var(--transition) cubic-bezier(0.34, 1.56, 0.64, 1)',
+            background: '#f4f6fa',
+            boxShadow: '0 1px 3px rgb(0 0 0 / 0.25)',
+            transition: 'left var(--transition)',
           }}
         />
       </button>

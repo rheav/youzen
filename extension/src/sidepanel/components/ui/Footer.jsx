@@ -17,7 +17,7 @@ export default function Footer() {
         transform: 'translateX(-50%)',
         zIndex: 20,
         padding: '2px 14px',
-        background: 'rgba(20, 32, 50, 0.1)',
+        background: 'var(--surface)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         border: '1px solid var(--border)',

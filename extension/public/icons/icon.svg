@@ -1,22 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="youZen leaf">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="youZen">
   <title>youZen</title>
-  <desc>Sage rounded-square with a soft white leaf, the youZen brand mark.</desc>
+  <desc>Nord "room" rounded square with a soft sky light in the corner and the youZen leaf in Nord green.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#C6D8A9" />
-      <stop offset="100%" stop-color="#A8C9A0" />
+    <linearGradient id="room" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#2b3448" />
+      <stop offset="1" stop-color="#11141c" />
     </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.15" r="0.9">
+      <stop offset="0" stop-color="#8ecae6" stop-opacity="0.35" />
+      <stop offset="0.6" stop-color="#8ecae6" stop-opacity="0" />
+    </radialGradient>
   </defs>
-
-  <!-- Rounded-square sage background -->
-  <rect width="128" height="128" rx="28" ry="28" fill="url(#bg)" />
-
-  <!-- Leaf silhouette, scaled from the canonical 24×24 path. Single
-       solid fill for max legibility at 16×16. -->
-  <g transform="translate(64 64) rotate(-20) scale(3.9) translate(-12 -12)">
-    <path
-      d="M12 2C8 2 4 5 4 11c0 4 2 7 5 9 1-4 3-7 6-9-2 3-3 6-4 9 4-1 8-4 9-10 0-5-4-8-8-8z"
-      fill="#FDFCF8"
-    />
+  <rect width="128" height="128" rx="28" fill="url(#room)" />
+  <rect width="128" height="128" rx="28" fill="url(#glow)" />
+  <rect x="0.75" y="0.75" width="126.5" height="126.5" rx="27.25" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1.5" />
+  <!-- Leaf, scaled from the canonical 24×24 path; one solid fill reads at 16×16. -->
+  <g transform="translate(64 66) rotate(-20) scale(3.7) translate(-12 -12)">
+    <path d="M12 2C8 2 4 5 4 11c0 4 2 7 5 9 1-4 3-7 6-9-2 3-3 6-4 9 4-1 8-4 9-10 0-5-4-8-8-8z" fill="#b2dba4" />
   </g>
 </svg>

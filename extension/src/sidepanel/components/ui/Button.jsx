@@ -21,9 +21,9 @@ const variants = {
   },
   danger: {
     background: 'var(--error)',
-    color: '#fff',
+    color: 'var(--bg-primary)',
     border: 'none',
-    hover: '#dc2626',
+    hover: 'color-mix(in oklab, var(--error) 85%, black)',
   },
 };
 

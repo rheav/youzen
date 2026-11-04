@@ -97,21 +97,18 @@ export default function RuleList({
             alignItems: 'center',
             gap: 4,
             fontFamily: 'inherit',
-            fontSize: 11,
-            fontWeight: 600,
-            color: '#fff',
-            background:
-              'linear-gradient(135deg, var(--color-accent-from) 0%, var(--color-accent-to) 100%)',
-            border: 'none',
-            borderRadius: 'var(--radius)',
-            padding: '6px 10px',
+            fontSize: 12,
+            fontWeight: 500,
+            color: 'var(--text-primary)',
+            background: 'var(--seg-rail)',
+            border: '1px solid var(--border)',
+            borderRadius: 999,
+            padding: '5px 11px 5px 9px',
             cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(255,77,77,0.25)',
-            letterSpacing: '0.02em',
           }}
         >
-          <Plus size={12} strokeWidth={2.5} />
-          ADD
+          <Plus size={13} strokeWidth={2} />
+          Add
         </button>
       </header>
 

@@ -33,6 +33,17 @@ function useSettings(ch) {
     ch.storage.local.get(keys, (r = {}) => {
       setSettings(Object.fromEntries(Object.entries(SETTINGS).map(([name, [k, d]]) => [name, r[k] ?? d])));
     });
+    // The side panel's Transcript tab writes the same keys; follow it live.
+    const onChanged = (changes, area) => {
+      if (area !== 'local') return;
+      const patch = {};
+      for (const [name, [k, d]] of Object.entries(SETTINGS)) {
+        if (k in changes) patch[name] = changes[k].newValue ?? d;
+      }
+      if (Object.keys(patch).length) setSettings((prev) => (prev ? { ...prev, ...patch } : prev));
+    };
+    ch.storage.onChanged?.addListener(onChanged);
+    return () => ch.storage.onChanged?.removeListener(onChanged);
   }, [ch]);
   const update = useCallback(
     (patch) => {

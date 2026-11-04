@@ -67,6 +67,26 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 04/11/2026 - v1.2.0 Released:
+
+NEW - Nord look for the whole extension:
+- The side panel moves to the same Nord "room" as the transcript panel and
+  the website: a dark room lit by soft sky and violet light, frosted-glass
+  cards with hairline borders, sky only on switches, focus and the main
+  action. The light theme uses Nord's light palette. Geist replaces Outfit
+  and the cursive wordmark; the wordmark is the flowing aurora gradient.
+- New icon: the youZen leaf, now Nord green, in a dark rounded square with a
+  sky light in the corner (toolbar, store and website favicon).
+- Tabs are a glass segmented control; the blocklist "Add" buttons are quiet
+  glass pills.
+
+NEW - Transcript tab:
+- Its own tab (first, opens by default): turn the transcript button on or
+  off, set the defaults (timestamps, follow the video, translate to), and a
+  short how-to. An open panel follows these settings live.
+
+--------------------------------------------------------------------------------
+
 🆕 04/11/2026 - v1.1.1 Released:
 
 FIXED - Transcript panel:

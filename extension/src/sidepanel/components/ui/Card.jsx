@@ -21,7 +21,9 @@ export default function Card({
     <div
       className={`animate-fade-in ${className}`}
       style={{
-        background: 'var(--bg-secondary)',
+        background: 'var(--surface)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius-lg)',
         boxShadow: hovered ? 'var(--shadow-hover)' : 'var(--shadow)',

@@ -27,8 +27,8 @@ export default function RuleCard({ rule, onEdit, onDelete }) {
         alignItems: 'center',
         gap: 8,
         padding: '8px 10px',
-        background: isInvalid ? 'rgba(255, 77, 77, 0.08)' : 'rgba(255, 255, 255, 0.5)',
-        border: `1px solid ${isInvalid ? 'rgba(255, 77, 77, 0.5)' : 'var(--border)'}`,
+        background: isInvalid ? 'var(--error-subtle)' : 'var(--surface)',
+        border: `1px solid ${isInvalid ? 'var(--error)' : 'var(--border)'}`,
         borderRadius: 'var(--radius)',
         transition: 'background var(--transition-fast), border-color var(--transition-fast)',
       }}
@@ -130,8 +130,8 @@ function IconButton({ children, onClick, destructive, ...rest }) {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.background = destructive
-          ? 'rgba(255,77,77,0.1)'
-          : 'rgba(255,77,77,0.08)';
+          ? 'var(--error-subtle)'
+          : 'var(--error-subtle)';
         e.currentTarget.style.color = destructive
           ? 'var(--color-brute-red)'
           : 'var(--color-accent-from)';

@@ -1,13 +1,9 @@
 import { useRef, useEffect } from 'react';
 
 /**
- * TabNav — horizontal scroll-snap segmented control.
- *
- * Per design-extension.md §5.2:
- *   • Tabs share one segmented-control row (rounded only on first and last).
- *   • Labels wear code-bracket ornaments: `<{label} />`.
- *   • Active tab renders the label in the vision gradient + azure border/shadow.
- *   • The container scroll-snaps horizontally and auto-centers the active tab.
+ * TabNav — Nord segmented control: a glass rail with a pill on the active tab
+ * (active tab in plain text, never accent). Scrolls horizontally if it ever
+ * outgrows the panel and keeps the active tab in view.
  *
  * Props:
  *   tabs    Array<{ id: string, label: string }>
@@ -29,68 +25,52 @@ export default function TabNav({ tabs = [], active, onChange }) {
     <div
       ref={containerRef}
       className="no-scrollbar"
+      role="tablist"
       style={{
         display: 'flex',
-        width: '100%',
-        maxWidth: 480,
+        gap: 2,
+        width: 'calc(100% - 24px)',
+        maxWidth: 456,
         margin: '0 auto 16px',
-        padding: '0 12px',
+        padding: 3,
         overflowX: 'auto',
-        scrollSnapType: 'x mandatory',
-        scrollBehavior: 'smooth',
-        whiteSpace: 'nowrap',
+        borderRadius: 12,
+        background: 'var(--seg-rail)',
+        boxShadow: 'inset 0 0 0 1px var(--border-subtle)',
       }}
     >
-      {tabs.map((tab, index) => {
+      {tabs.map((tab) => {
         const isActive = active === tab.id;
-        const isFirst = index === 0;
-        const isLast = index === tabs.length - 1;
-
         return (
           <button
             key={tab.id}
             ref={(el) => (tabRefs.current[tab.id] = el)}
             type="button"
+            role="tab"
             onClick={() => onChange(tab.id)}
+            aria-selected={isActive}
             aria-pressed={isActive}
             style={{
-              flexShrink: 0,
-              scrollSnapAlign: 'center',
-              padding: '10px 16px',
-              fontSize: 13,
-              fontWeight: 500,
-              letterSpacing: '-0.005em',
-              lineHeight: 1.1,
-              background: isActive ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-              border: isActive ? '1px solid rgba(127, 168, 127, 0.55)' : '1px solid var(--border)',
-              borderRadius: 0,
-              borderTopLeftRadius: isFirst ? 10 : 0,
-              borderBottomLeftRadius: isFirst ? 10 : 0,
-              borderTopRightRadius: isLast ? 10 : 0,
-              borderBottomRightRadius: isLast ? 10 : 0,
-              // Prevent double borders between adjacent tabs.
-              marginLeft: isFirst ? 0 : -1,
+              flex: 1,
+              height: 30,
+              padding: '0 14px',
+              fontFamily: 'inherit',
+              fontSize: 12.5,
+              fontWeight: isActive ? 600 : 500,
+              color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+              background: isActive ? 'var(--seg-thumb)' : 'transparent',
+              border: 'none',
+              borderRadius: 9,
               boxShadow: isActive
-                ? '0 0 0 1px rgba(127, 168, 127, 0.35), 0 6px 18px rgba(127, 168, 127, 0.12)'
-                : 'var(--shadow-sm)',
-              color: isActive ? 'transparent' : 'var(--text-muted)',
+                ? 'inset 0 1px 0 rgb(255 255 255 / 0.09), 0 4px 10px -6px rgb(0 0 0 / 0.6)'
+                : 'none',
               cursor: 'pointer',
-              transition:
-                'background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast)',
               whiteSpace: 'nowrap',
-              position: 'relative',
+              transition:
+                'background-color var(--transition-slow), color var(--transition-fast), box-shadow var(--transition-slow)',
             }}
           >
-            <span
-              className={isActive ? 'text-accent-gradient' : undefined}
-              style={{
-                display: 'inline-block',
-                fontWeight: 500,
-                fontSize: 13,
-              }}
-            >
-              {tab.label}
-            </span>
+            {tab.label}
           </button>
         );
       })}

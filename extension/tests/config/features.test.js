@@ -12,7 +12,7 @@ describe('config/features — integrity', () => {
     for (const e of FEATURES) {
       expect(typeof e.id).toBe('string');
       expect(e.id.length).toBeGreaterThan(0);
-      expect(['feeds', 'watch']).toContain(e.tab);
+      expect(['feeds', 'watch', 'transcript']).toContain(e.tab);
     }
   });
 
@@ -118,7 +118,7 @@ describe('config/features — groups', () => {
     ]);
 
     const loose = featuresIn('watch', null).map((f) => f.id);
-    expect(loose).toEqual(['redirectShorts', 'transcriptPanel']);
+    expect(loose).toEqual(['redirectShorts']);
   });
 });
 
@@ -157,7 +157,7 @@ describe('config/features — expected feature set', () => {
     expect(f.kind).toBe('js');
     expect(f.default).toBe(true);
     expect(f.group).toBe(null);
-    expect(f.tab).toBe('watch');
+    expect(f.tab).toBe('transcript');
     expect(f.attr).toBe('data-ytc-transcript');
   });
 

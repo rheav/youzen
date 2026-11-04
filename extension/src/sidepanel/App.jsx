@@ -6,16 +6,18 @@ import ErrorBoundary from './components/ui/ErrorBoundary';
 import FeedsTab from './components/tabs/FeedsTab';
 import WatchTab from './components/tabs/WatchTab';
 import BlocklistTab from './components/tabs/BlocklistTab';
+import TranscriptTab from './components/tabs/TranscriptTab';
 import { useTheme } from './context/ThemeContext';
 
 const TABS = [
+  { id: 'transcript', label: 'Transcript' },
   { id: 'feeds', label: 'Feeds' },
   { id: 'watch', label: 'Watch' },
   { id: 'blocklist', label: 'Blocklist' },
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('feeds');
+  const [activeTab, setActiveTab] = useState('transcript');
   const { theme } = useTheme();
 
   // Apply the root atmosphere class to <body> so the gradient fills the whole panel.
@@ -33,6 +35,7 @@ export default function App() {
       <TabNav tabs={TABS} active={activeTab} onChange={setActiveTab} />
       <main>
         <ErrorBoundary key={activeTab}>
+          {activeTab === 'transcript' && <TranscriptTab />}
           {activeTab === 'feeds' && <FeedsTab />}
           {activeTab === 'watch' && <WatchTab />}
           {activeTab === 'blocklist' && <BlocklistTab />}

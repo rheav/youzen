@@ -38,7 +38,7 @@
 /**
  * @typedef {Object} Feature
  * @property {string}      id          — unique id; also the storage key for its boolean flag
- * @property {'feeds'|'watch'} tab
+ * @property {'feeds'|'watch'|'transcript'} tab
  * @property {string|null} group       — group id (see GROUPS), or null for loose/standalone
  * @property {string}      label
  * @property {string}      [description]
@@ -375,7 +375,7 @@ export const FEATURES = [
   },
   {
     id: 'transcriptPanel',
-    tab: 'watch',
+    tab: 'transcript', // its own side panel tab (TranscriptTab), not a FeaturePanel group
     group: null,
     label: 'Transcript panel next to the video',
     description: 'Button in the player; click a line to jump there',
@@ -389,7 +389,7 @@ export const FEATURES = [
  * Groups define which Card contains which features on each tab.
  * Order here drives UI order.
  *
- * @type {Record<'feeds'|'watch', Array<{id: string|null, title: string|null, hasMaster: boolean, loose?: boolean}>>}
+ * @type {Record<'feeds'|'watch'|'transcript', Array<{id: string|null, title: string|null, hasMaster: boolean, loose?: boolean}>>}
  */
 export const GROUPS = {
   feeds: [
@@ -404,6 +404,8 @@ export const GROUPS = {
     // Loose row: standalone features with group: null render below the grouped Cards.
     { id: null, title: null, hasMaster: false, loose: true },
   ],
+  // The Transcript tab is hand-built (TranscriptTab.jsx); its one feature is loose.
+  transcript: [{ id: null, title: null, hasMaster: false, loose: true }],
 };
 
 /**

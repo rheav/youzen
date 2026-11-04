@@ -22,7 +22,7 @@ export default function Select({
         fontSize: 12,
         fontWeight: 500,
         color: 'var(--text-primary)',
-        background: 'rgba(255, 255, 255, 0.5)',
+        background: 'var(--field-bg)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--radius)',
         padding: '6px 10px',
@@ -31,8 +31,8 @@ export default function Select({
         transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)',
       }}
       onFocus={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(3, 102, 214, 0.6)';
-        e.currentTarget.style.boxShadow = '0 0 0 2px rgba(3, 102, 214, 0.15)';
+        e.currentTarget.style.borderColor = 'var(--accent)';
+        e.currentTarget.style.boxShadow = '0 0 0 3px var(--info-subtle)';
       }}
       onBlur={(e) => {
         e.currentTarget.style.borderColor = 'var(--border)';
