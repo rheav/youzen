@@ -47,6 +47,12 @@ export default defineManifest({
       css: ['src/styles/youtube.css'],
       run_at: 'document_start',
     },
+    {
+      matches: ['*://www.youtube.com/*'],
+      js: ['src/content/page-hooks.js'],
+      run_at: 'document_start',
+      world: 'MAIN',
+    },
   ],
 
   web_accessible_resources: [
