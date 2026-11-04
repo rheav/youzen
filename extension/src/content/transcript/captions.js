@@ -17,8 +17,9 @@ const YT_ORIGIN = 'https://www.youtube.com';
 /**
  * @typedef {{ start: number, end: number, text: string }} Cue
  * @typedef {{ start: number, end: number, from: number, to: number }} Block
- * @typedef {{ lang: string, label: string, auto: boolean,
+ * @typedef {{ lang: string, label: string, auto: boolean, spoken: boolean,
  *   params: { kind: string|null, name: string|null, variant: string|null } }} Track
+ *   `spoken`: the language YouTube auto-captioned, i.e. the one spoken in the video.
  */
 
 const ENTITY = /&(#\d+|#x[\da-f]+|[a-z]+);/i;
@@ -117,7 +118,8 @@ export function listTracks(captionTracks) {
     const seen = byLang.get(track.lang);
     if (!seen || (seen.auto && !track.auto)) byLang.set(track.lang, track);
   }
-  return [...byLang.values()];
+  const spoken = new Set((captionTracks ?? []).filter((t) => t.kind === 'asr').map((t) => t.languageCode));
+  return [...byLang.values()].map((t) => ({ ...t, spoken: spoken.has(t.lang) }));
 }
 
 const baseLang = (code) => String(code ?? '').toLowerCase().split('-')[0];

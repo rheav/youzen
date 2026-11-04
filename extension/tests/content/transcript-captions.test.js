@@ -110,8 +110,8 @@ describe('listTracks', () => {
       { languageCode: 'en', name: { simpleText: 'English' }, baseUrl: '/api/timedtext?v=x&lang=en' },
     ]);
     expect(tracks).toEqual([
-      { lang: 'en', label: 'English', auto: false, params: { kind: null, name: null, variant: null } },
-      { lang: 'pt', label: 'Portuguese', auto: false, params: { kind: null, name: 'CC', variant: null } },
+      { lang: 'en', label: 'English', auto: false, spoken: true, params: { kind: null, name: null, variant: null } },
+      { lang: 'pt', label: 'Portuguese', auto: false, spoken: false, params: { kind: null, name: 'CC', variant: null } },
     ]);
   });
 

@@ -48,7 +48,10 @@ function useSettings(ch) {
 function centerIn(list, el) {
   if (!list || !el) return;
   const top = el.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop;
-  list.scrollTo?.({ top: top - list.clientHeight / 2 + el.offsetHeight / 2, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  const target = top - list.clientHeight / 2 + el.offsetHeight / 2;
+  // Long jumps (search, seeking far) land at once; a smooth scroll over thousands of px drags.
+  const far = Math.abs(target - list.scrollTop) > list.clientHeight * 2;
+  list.scrollTo?.({ top: target, behavior: far || reducedMotion() ? 'auto' : 'smooth' });
 }
 
 export default function Panel({ source, doc = document, ch = chrome, getVideoId, getVideo, onClose }) {
@@ -102,7 +105,7 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
       if (!p) return setStatus('error');
       setPlayer(p);
       if (!p.tracks.length) return setStatus('none');
-      setTrack(p.tracks.find((t) => t.lang === settings.lang) ?? p.tracks[0]);
+      setTrack(p.tracks.find((t) => t.lang === settings.lang) ?? p.tracks.find((t) => t.spoken) ?? p.tracks[0]);
     });
     return () => {
       stale = true;

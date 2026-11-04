@@ -45,6 +45,13 @@ never leave the browser.
      Shorts open as normal video pages — full playback controls, no vertical
      scroll cage.
 
+  📝 Transcript Panel Next to the Video
+     A youZen button in the player opens the transcript beside the video
+     (theater, default and narrow layouts). The phrase being spoken lights up
+     yellow, click any line to jump there, search it, translate it into any
+     language YouTube offers, fix mistakes inline, copy it, or export TXT,
+     SRT or VTT. Free, nothing leaves YouTube.
+
   ⏸️ Per-Tab Pause & Global Kill-Switch
      Right-click the page to pause youZen on just that tab. Use the global
      toggle to turn everything off at once, without losing your settings.
@@ -57,6 +64,43 @@ never leave the browser.
      No telemetry, no accounts, no external requests. Permissions are the
      minimum needed: sidepanel, storage, context menus, and YouTube host
      access. That's it.
+
+--------------------------------------------------------------------------------
+
+🆕 04/11/2026 - v1.1.0 Released:
+
+NEW - Transcript panel next to the video:
+- Button in the player's controls (next to CC) opens the panel inside the
+  watch page: its own 400px column in theater mode, the top of the right
+  column in the default layout, below the player in a narrow window. Hidden
+  in fullscreen. Stays open as you move to the next video.
+- Karaoke: the phrase being spoken is yellow and the list follows the video
+  (Scroll in the dock). YouTube sends captions in phrases of a few seconds
+  with no per-word timing, so the highlight moves phrase by phrase.
+- Click any phrase or time to jump the video there.
+- Caption track picker (manual tracks preferred; defaults to the language
+  spoken in the video, then remembers your choice).
+- Translate into any language YouTube offers; the translation sits under
+  each paragraph and stays on for the next video.
+- Search (Ctrl/Cmd+F inside the panel): ignores accents and case, "n of m",
+  Enter / Shift+Enter between matches. Typing never triggers YouTube's
+  player shortcuts.
+- Copy the whole transcript, or export TXT (paragraphs, optional times),
+  SRT or VTT, with or without the translation.
+- Edit transcript: fix any phrase inline; edits are saved per video and
+  used by copy, export and search. Undo all edits from the same menu.
+- Nord look (dark room lit by the video's own thumbnail, frosted dock);
+  follows YouTube's light theme too.
+- New "Transcript panel next to the video" toggle in the Watch tab (on by
+  default). Pausing youZen on a tab also removes it.
+
+CHANGED - Related videos sidebar:
+- While the transcript panel is open, the right column stays (the panel
+  lives there) and only the related list is hidden.
+
+PRIVACY:
+- Captions come from YouTube itself, using the player's own caption request.
+  No new permissions, no other servers, no accounts.
 
 --------------------------------------------------------------------------------
 

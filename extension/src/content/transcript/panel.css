@@ -204,7 +204,7 @@ mark.cur { background: var(--nv-sky); color: var(--nv-ink); }
 }
 .is-light .light, .is-light .vignette { display: none; }
 .is-light .row.now .t { color: #9a6200; }
-.is-light .dsep { background: rgb(61 74 104 / 0.14); }
+.is-light .dsep, .is-light .dot { background: rgb(61 74 104 / 0.18); }
 .is-light .dock { box-shadow: 0 12px 30px rgb(35 42 55 / 0.14); }
 .is-light .toast { background: rgb(35 42 55 / 0.9); }
 
