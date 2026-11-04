@@ -373,6 +373,16 @@ export const FEATURES = [
     default: true,
     kind: 'js',
   },
+  {
+    id: 'transcriptPanel',
+    tab: 'watch',
+    group: null,
+    label: 'Transcript panel next to the video',
+    description: 'Button in the player; click a line to jump there',
+    attr: 'data-ytc-transcript',
+    default: true,
+    kind: 'js',
+  },
 ];
 
 /**

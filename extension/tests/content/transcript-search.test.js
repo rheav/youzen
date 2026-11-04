@@ -28,3 +28,15 @@ describe('transcript search', () => {
     expect(findMatches('the future now', ' future   now ')).toEqual([[4, 14]]);
   });
 });
+
+describe('splitRanges', () => {
+  it('splits block-level ranges back into per-phrase pieces', async () => {
+    const { splitRanges } = await import('../../src/content/transcript/search.js');
+    // block text = 'the future' + ' ' + 'might change'
+    const parts = ['the future', 'might change'];
+    const pieces = splitRanges(parts, [[4, 16]], 7);
+    expect(pieces[0]).toEqual([{ text: 'the ', m: -1 }, { text: 'future', m: 7 }]);
+    expect(pieces[1]).toEqual([{ text: 'might', m: 7 }, { text: ' change', m: -1 }]);
+    expect(splitRanges(['plain'], [], 0)).toEqual([null]);
+  });
+});

@@ -151,3 +151,17 @@ export function trackKey(url) {
   const params = new URL(url, YT_ORIGIN).searchParams;
   return KEY_PARAMS.map((p) => params.get(p) ?? '').join('|');
 }
+
+/**
+ * Translation text per original cue: each translated cue goes to the original
+ * cue playing at its start (YouTube usually keeps the same cue boundaries).
+ * @param {Cue[]} cues @param {Cue[]} translated @returns {string[]}
+ */
+export function alignTranslations(cues, translated) {
+  const out = cues.map(() => []);
+  for (const t of translated) {
+    const i = findActiveCue(cues, t.start + 0.05);
+    if (i >= 0) out[i].push(t.text);
+  }
+  return out.map((parts) => parts.join(' '));
+}

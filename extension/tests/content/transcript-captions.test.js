@@ -153,3 +153,22 @@ describe('timedtext URLs', () => {
     expect(trackKey(a)).toBe('abc|en|asr|||');
   });
 });
+
+describe('alignTranslations', () => {
+  it('attaches each translated cue to the original cue playing at its start', async () => {
+    const { alignTranslations } = await import('../../src/content/transcript/captions.js');
+    const cues = [
+      { start: 0, end: 2, text: 'a' },
+      { start: 2, end: 5, text: 'b' },
+      { start: 5, end: 9, text: 'c' },
+    ];
+    expect(
+      alignTranslations(cues, [
+        { start: 0, end: 2, text: 'A' },
+        { start: 2, end: 3, text: 'B1' },
+        { start: 3.5, end: 5, text: 'B2' },
+      ]),
+    ).toEqual(['A', 'B1 B2', '']);
+    expect(alignTranslations(cues, [])).toEqual(['', '', '']);
+  });
+});

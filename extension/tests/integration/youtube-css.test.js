@@ -219,6 +219,24 @@ describe('youtube.css — sampler: existing rules still work', () => {
     expect(primary.maxWidth).toBe('none');
     expect(primary.width).toBe('100%');
   });
+
+  it('transcript panel open keeps #secondary and hides only #related', () => {
+    mountSnippet(
+      document,
+      `<ytd-watch-flexy is-two-columns_>
+         <div id="primary" class="ytd-watch-flexy"></div>
+         <div id="secondary" class="ytd-watch-flexy">
+           <div id="secondary-inner"><div id="playlist"></div><div id="related"></div></div>
+         </div>
+       </ytd-watch-flexy>`,
+    );
+    setAttr(document, 'data-ytc-related');
+    setAttr(document, 'data-yz-transcript-open');
+    expect(isHidden(document.querySelector('#secondary'))).toBe(false);
+    expect(isHidden(document.querySelector('#playlist'))).toBe(false);
+    expect(isHidden(document.querySelector('#related'))).toBe(true);
+    expect(window.getComputedStyle(document.querySelector('#primary')).maxWidth).not.toBe('none');
+  });
 });
 
 describe('youtube.css — Shorts coverage', () => {

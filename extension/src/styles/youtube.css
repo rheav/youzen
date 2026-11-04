@@ -194,16 +194,18 @@ html[data-ytc-live-chat] ytd-watch-flexy[theater] #player-full-bleed-container {
  * #13 Hide related videos sidebar
  * data-ytc-related
  * ─────────────────────────────────────────────────────────── */
-html[data-ytc-related] ytd-watch-flexy #secondary,
-html[data-ytc-related] #secondary.ytd-watch-flexy,
+html[data-ytc-related]:not([data-yz-transcript-open]) ytd-watch-flexy #secondary,
+html[data-ytc-related]:not([data-yz-transcript-open]) #secondary.ytd-watch-flexy,
 html[data-ytc-related] #related {
   display: none !important;
 }
+/* youZen's transcript panel lives at the top of #secondary-inner, so while it
+ * is open the column stays and only the related list goes. */
 /* Widen the primary column when the sidebar is gone.
  * YouTube dropped the legacy [flexy] attribute from ytd-watch-flexy, so the
  * old selector stopped matching and the column kept its sidebar-sized
  * max-width. Key on the layout attribute that is actually present. */
-html[data-ytc-related] ytd-watch-flexy[is-two-columns_] #primary.ytd-watch-flexy {
+html[data-ytc-related]:not([data-yz-transcript-open]) ytd-watch-flexy[is-two-columns_] #primary.ytd-watch-flexy {
   max-width: none !important;
   width: 100% !important;
 }
@@ -216,7 +218,7 @@ html[data-ytc-related] ytd-watch-flexy[is-two-columns_] #primary.ytd-watch-flexy
  * limited. These props only feed the next layout recompute, so the content
  * script (attribute-applier) fires a synthetic 'resize' when this attribute is
  * toggled — otherwise the fill would not apply until the next manual resize. */
-html[data-ytc-related] ytd-watch-flexy {
+html[data-ytc-related]:not([data-yz-transcript-open]) ytd-watch-flexy {
   --ytd-watch-flexy-max-player-width-wide-screen: 100% !important;
   --ytd-watch-flexy-space-below-player: 16px !important;
 }
@@ -382,3 +384,33 @@ html[data-ytc-collapse-desc] ytd-watch-metadata ytd-text-inline-expander:not([is
  * data-ytc-paused is set. No rule body needed; this comment marker
  * makes the convention visible to future readers.
  * ─────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────
+ * Transcript panel — player button (the panel itself is a shadow root)
+ * ─────────────────────────────────────────────────────────── */
+.yz-transcript-button {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.yz-transcript-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.yz-transcript-button[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  right: 22%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8ecae6;
+  box-shadow: 0 0 8px #8ecae6;
+}

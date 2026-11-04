@@ -57,7 +57,7 @@ export default defineManifest({
 
   web_accessible_resources: [
     {
-      resources: ['_locales/*', 'icons/*'],
+      resources: ['_locales/*', 'icons/*', 'fonts/*'],
       matches: ['*://www.youtube.com/*'],
     },
   ],

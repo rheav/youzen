@@ -1,0 +1,202 @@
+/* Copied from ~/Code/libs/nord-theme/visual.css v1.2.0. Edit it there, then copy again. */
+/* ---- Camada visual: a "sala" do Flow ----
+   Opcional, por cima de nord.css. Nasceu no UGC Factory (Flow e HeyGen, 2026-11:
+   flow/provador.tsx, components/production-island.tsx, globals.css) e virou padrão.
+   São classes de CSS puro, sem Tailwind, para servir apps e extensões iguais.
+
+   A ideia: a cor do conteúdo (o vídeo, a foto) vaza para a interface. A imagem
+   atual vira a luz da sala, borrada uma vez e parada; painéis e docas são vidro
+   fosco por cima; o progresso mora numa ilha com o pôster dentro; conferências
+   são chips que ficam verdes; quando algo termina, um vazamento de luz passa uma vez.
+
+   Regras que vieram do usuário:
+   - Efeitos só em CSS. Nada anima parado; o que se mexe tem motivo (progresso,
+     algo que terminou). prefers-reduced-motion desliga tudo que se mexe.
+   - Hover é borda ou 2px de elevação. Sem brilho seguindo o mouse.
+   - Texto claro e curto: rótulos que dizem o que acontece, nunca 3 linhas.
+   - Feito para superfícies escuras (a sala). No claro, use só vidro, chips, ilha e anel.
+
+   Lê os tokens do shadcn que nord.css escreve em :root, com fallback Nord, então
+   funciona mesmo sem Tailwind (ex.: extensão em HTML puro). */
+
+:root {
+  --nv-sky: var(--primary, #8ecae6);
+  --nv-good: var(--chart-2, #b2dba4);
+  --nv-amber: var(--chart-3, #f2cf94);
+  --nv-danger: var(--destructive, #e79aa4);
+  --nv-ink: var(--primary-foreground, #232833);
+  --nv-fg: var(--foreground, #eceff4);
+  --nv-muted: var(--muted-foreground, #aeb9cd);
+  --nv-line: var(--border, rgb(217 224 238 / 0.13));
+  --nv-island: #191d28;
+  --nv-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Sala: a imagem atual borrada atrás de tudo, mais uma vinheta.
+   <div class="nv-room"><i class="nv-room-light is-on" style="--nv-image:url(…)"></i><i class="nv-room-vignette"></i>…</div> */
+.nv-room { position: relative; isolation: isolate; overflow: hidden; }
+.nv-room-light { position: absolute; inset: -14%; z-index: -2; pointer-events: none; background: center / cover no-repeat var(--nv-image, none); filter: blur(90px) saturate(1.7) brightness(0.62); opacity: 0; transition: opacity 1.1s ease; }
+.nv-room-light.is-on { opacity: 1; }
+.nv-room-vignette { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(90% 90% at 40% 45%, transparent 35%, rgb(10 12 18 / 0.72) 100%); }
+
+/* Vidro fosco, para docas e menus que flutuam sobre a sala. */
+.nv-frost { background: color-mix(in oklab, var(--card, #363d4e) 50%, transparent); backdrop-filter: blur(22px) saturate(1.7); border: 1px solid rgb(255 255 255 / 0.14); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 20px 50px rgb(0 0 0 / 0.35); }
+.nv-dock { display: flex; align-items: center; gap: 6px; height: 46px; padding: 0 6px 0 14px; border-radius: 999px; }
+
+/* Ilha de progresso: pôster borrado dentro, miniaturas empilhadas, contagem, anel.
+   <button class="nv-island"><i class="nv-island-poster" style="--nv-image:url(…)"></i>
+     <span class="nv-stack"><i style="background-image:url(…)"></i>…</span><b>2 baixando</b><small>62%</small>
+     <svg class="nv-ring" viewBox="0 0 18 18"><circle class="nv-ring-track" cx="9" cy="9" r="7"/>
+       <circle class="nv-ring-arc" cx="9" cy="9" r="7" pathLength="100" stroke-dasharray="100" stroke-dashoffset="38"/></svg></button>
+   stroke-dashoffset = 100 - porcentagem. */
+.nv-island { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px 0 10px; border-radius: 999px; border: 1px solid var(--nv-line); background: var(--nv-island); color: var(--nv-fg); font-size: 12.5px; }
+.nv-island b { font-weight: 600; white-space: nowrap; }
+.nv-island small { font-size: 12px; color: var(--nv-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.nv-island-poster { position: absolute; inset: -90%; z-index: -1; background: center / cover no-repeat var(--nv-image, none); opacity: 0.55; filter: blur(14px) saturate(1.7); }
+.nv-stack { display: flex; padding-left: 6px; }
+.nv-stack > * { width: 15px; height: 24px; margin-left: -6px; border-radius: 4px; background: center / cover #2c3344; box-shadow: 0 0 0 1.5px var(--nv-island); }
+.nv-ring { width: 18px; height: 18px; flex: none; transform: rotate(-90deg); }
+.nv-ring circle { fill: none; stroke-width: 3.5; }
+.nv-ring-track { stroke: rgb(255 255 255 / 0.15); }
+.nv-ring-arc { stroke: var(--nv-sky); stroke-linecap: round; transition: stroke-dashoffset 0.7s var(--nv-ease); }
+
+/* Rótulo de seção (o único uppercase permitido: 11px, espaçado). */
+.nv-label { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--nv-muted); }
+
+/* Chips de conferência: is-ok (check verde), is-warn (aviso âmbar), is-run (rodando), is-wait (ainda não). */
+.nv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.nv-chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; background: rgb(255 255 255 / 0.07); color: var(--nv-fg); font-size: 11.5px; white-space: nowrap; }
+.nv-chip > svg { width: 12px; height: 12px; flex: none; }
+.nv-chip.is-ok > svg { color: var(--nv-good); }
+.nv-chip.is-warn > svg { color: var(--nv-amber); }
+.nv-chip.is-run { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--nv-sky) 55%, transparent); }
+.nv-chip.is-run > svg { color: var(--nv-sky); animation: nv-spin 1s linear infinite; }
+.nv-chip.is-wait { background: transparent; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07); color: var(--nv-muted); }
+@keyframes nv-spin { to { transform: rotate(360deg); } }
+
+/* Cartão de mídia com legenda sobre degradê, pílula de vidro e barra fina de progresso. */
+.nv-hero { position: relative; overflow: hidden; border-radius: var(--radius-card, 1.25rem); aspect-ratio: 16 / 9; background: center / cover no-repeat #171b25; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 30px rgb(0 0 0 / 0.35); }
+.nv-hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 35%, rgb(0 0 0 / 0.8)); }
+.nv-hero-caption { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 1; text-align: center; color: #eceff4; }
+.nv-hero-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 3px; background: rgb(255 255 255 / 0.15); }
+.nv-hero-bar > i { display: block; height: 100%; background: var(--nv-sky); transition: width 0.3s linear; }
+.nv-glass-pill { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 11px; background: rgb(10 12 18 / 0.62); backdrop-filter: blur(8px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16); color: #eceff4; font-size: 11px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.nv-mark { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--nv-good); color: var(--nv-ink); }
+.nv-mark.is-sky { background: var(--nv-sky); } .nv-mark.is-amber { background: var(--nv-amber); }
+
+/* Botão que vira barra de progresso enquanto roda: <div class="nv-progress" style="--nv-progress:62%"><i></i><span>Baixando, 62%</span></div> */
+.nv-progress { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 36px; border-radius: var(--radius, 0.75rem); background: rgb(255 255 255 / 0.1); color: var(--nv-fg); font-size: 13px; font-weight: 500; }
+.nv-progress > i { position: absolute; inset: 0 auto 0 0; width: var(--nv-progress, 0%); background: color-mix(in oklab, var(--nv-sky) 60%, transparent); transition: width 0.3s linear; }
+.nv-progress > span { position: relative; }
+.nv-glow:hover { box-shadow: 0 0 24px -4px var(--nv-sky); }
+
+/* Item de coleção: sobe 2px no hover, anel azul quando selecionado, apagado depois de revisado. */
+.nv-tile { transition: transform 0.15s var(--nv-ease), box-shadow 0.15s var(--nv-ease); }
+.nv-tile:hover { transform: translateY(-2px); }
+.nv-tile.is-selected { box-shadow: 0 0 0 2px var(--nv-sky); }
+.nv-tile.is-dimmed { filter: saturate(0.25) brightness(0.55); }
+
+/* Vazamento de luz quando algo termina: <div class="nv-leak-box nv-flash"><i class="nv-leak"></i></div>, uma vez. */
+.nv-leak-box { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.nv-leak { position: absolute; inset: -40% -70%; opacity: 0; mix-blend-mode: screen; background:
+  radial-gradient(9% 70% at 46% 50%, rgb(255 246 226 / 0.95), transparent 70%),
+  radial-gradient(34% 62% at 38% 52%, rgb(255 190 120 / 0.95), transparent 72%),
+  radial-gradient(22% 52% at 54% 38%, rgb(255 112 132 / 0.9), transparent 70%),
+  radial-gradient(20% 44% at 66% 66%, rgb(200 150 255 / 0.62), transparent 72%); }
+.nv-flash .nv-leak { animation: nv-leak 0.85s cubic-bezier(0.3, 0.05, 0.2, 1) both; }
+@keyframes nv-leak { 0% { opacity: 0; transform: translateX(-60%) skewX(-8deg); } 16% { opacity: 1; } 62% { opacity: 0.95; } 100% { opacity: 0; transform: translateX(60%) skewX(-8deg); } }
+
+/* Tecla em dica de atalho: <kbd class="nv-kbd">Espaço</kbd> amplia */
+.nv-kbd { display: inline-block; padding: 0 4px; border-radius: 4px; background: rgb(255 255 255 / 0.1); color: var(--nv-fg); font: 10.5px/1.6 "Geist Mono", ui-monospace, monospace; }
+
+/* ==== Sala do Flow para apps inteiros (desde 1.2.0) ====
+   O padrão de UI dos apps: o app inteiro mora na sala escura do Flow. Guia
+   completo no README ("Sala do Flow: o padrão de UI"). As superfícies leem
+   variáveis, então um app com tema claro só reescreve as variáveis no claro. */
+:root {
+  --nv-room: #12151d;
+  --nv-floor: radial-gradient(80% 55% at 12% 0%, rgb(142 202 230 / 0.10), transparent 60%),
+    radial-gradient(70% 50% at 92% 6%, rgb(203 170 217 / 0.09), transparent 62%), var(--nv-room);
+  --nv-glass-bg: rgb(22 26 36 / 0.62);
+  --nv-glass-line: rgb(255 255 255 / 0.07);
+  --nv-card-bg: rgb(255 255 255 / 0.04);
+  --nv-card-hover: rgb(255 255 255 / 0.06);
+  --nv-hair: rgb(255 255 255 / 0.13);
+  --nv-fill: rgb(255 255 255 / 0.07);
+  --nv-fill-2: rgb(255 255 255 / 0.08);
+  --nv-fill-3: rgb(255 255 255 / 0.14);
+  --nv-sheet-bg: color-mix(in oklab, #1f2431 88%, transparent);
+  --nv-menu-bg: color-mix(in oklab, var(--card, #363d4e) 86%, transparent);
+  --nv-scrim: rgb(10 12 18 / 0.55);
+  --nv-field-line: var(--input, rgb(217 224 238 / 0.17));
+  --nv-chip-fg: #d9e0ee;
+}
+
+/* Chão da sala: no <body> ou no layout raiz. */
+.nv-floor { background: var(--nv-floor); }
+
+/* Luzes paradas atrás da tela, na cor de cada coluna ou grupo, mais a vinheta.
+   <div class="nv-lights"><i style="--nv-light:#5e8fd6; left:240px; top:150px"></i>…<i class="nv-room-vignette"></i></div>
+   Uma luz por coluna, centrada nela. Borradas uma vez, nunca animam. */
+.nv-lights { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.nv-lights > i:not(.nv-room-vignette) { position: absolute; width: 520px; height: 520px; border-radius: 50%; background: var(--nv-light, var(--nv-sky)); opacity: var(--nv-light-strength, 0.55); filter: blur(90px) saturate(1.7) brightness(0.62); }
+
+/* Vidro de coluna e de painel lateral: a luz atravessa. */
+.nv-glass { background: var(--nv-glass-bg); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px var(--nv-glass-line); border-radius: 20px; }
+
+/* Card de coleção, sem borda: sobe 2px e ganha um fio de luz no hover, anel azul quando selecionado. */
+.nv-card { background: var(--nv-card-bg); border-radius: 14px; transition: transform 0.15s var(--nv-ease), box-shadow 0.15s var(--nv-ease), background-color 0.15s var(--nv-ease); }
+.nv-card:hover { transform: translateY(-2px); background: var(--nv-card-hover); box-shadow: inset 0 0 0 1px var(--nv-hair); }
+.nv-card.is-selected { box-shadow: 0 0 0 2px var(--nv-sky); }
+.nv-card.is-accent { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--nv-c, var(--nv-sky)) 45%, transparent), 0 14px 30px -16px color-mix(in oklab, var(--nv-c, var(--nv-sky)) 45%, transparent); }
+
+/* Folha: o card aberto, modal ou painel. Vidro escuro, filete de luz no topo, sombra longa. */
+.nv-sheet { background: var(--nv-sheet-bg); backdrop-filter: blur(22px) saturate(1.7); border: 1px solid rgb(255 255 255 / 0.14); border-radius: 20px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 24px 60px -20px rgb(0 0 0 / 0.55); }
+.nv-scrim { background: var(--nv-scrim); backdrop-filter: blur(3px); }
+/* A cor da coluna do card, como luz vinda do canto de cima da folha. */
+.nv-sheet-light { background-image: radial-gradient(60% 45% at 14% 0%, color-mix(in oklab, var(--nv-c, var(--nv-sky)) 18%, transparent), transparent 72%); }
+
+/* Menu que flutua (dropdown, select, popover). Abre com escala .96 → 1 em ~180ms. */
+.nv-menu { background: var(--nv-menu-bg); backdrop-filter: blur(22px) saturate(1.7); border: 1px solid rgb(255 255 255 / 0.14); border-radius: 14px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 30px 70px -30px #000; }
+
+/* Trilho de abas com a pílula que desliza (a pílula é um elemento, movido por JS/motion). */
+.nv-seg { display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgb(255 255 255 / 0.035); box-shadow: inset 0 0 0 1px var(--nv-glass-line); }
+.nv-seg-thumb { border-radius: 9px; background: rgb(255 255 255 / 0.09); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09), 0 4px 10px -6px rgb(0 0 0 / 0.6); }
+
+/* Campo: fio de 1px, preenchimento quase nenhum, anel azul no foco. */
+.nv-field { border-radius: 10px; background: rgb(255 255 255 / 0.025); box-shadow: inset 0 0 0 1px var(--nv-field-line); transition: box-shadow 0.15s var(--nv-ease); }
+.nv-field:hover { box-shadow: inset 0 0 0 1px rgb(217 224 238 / 0.26); }
+.nv-field:focus-within { box-shadow: inset 0 0 0 1px rgb(142 202 230 / 0.7), 0 0 0 3px rgb(142 202 230 / 0.12); }
+
+/* Botão redondo de vidro (secundário). O principal é sky maciço, também em pílula. */
+.nv-round { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 999px; background: var(--nv-fill-2); color: var(--nv-fg); font-size: 12.5px; font-weight: 500; transition: background-color 0.15s var(--nv-ease); }
+.nv-round:hover { background: var(--nv-fill-3); }
+
+/* Chip de dado: ponto de cor em vez de pílula colorida. <span class="nv-chip"><i class="nv-dot" style="--nv-c:#d08770"></i>Flame</span> */
+.nv-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--nv-c, var(--nv-sky)); }
+/* Chip em destaque (raro, tipo "Mobile"): anel da cor, texto da cor. */
+.nv-chip.is-accent { background: color-mix(in oklab, var(--nv-c, var(--nv-sky)) 14%, transparent); color: var(--nv-c, var(--nv-sky)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--nv-c, var(--nv-sky)) 55%, transparent); font-weight: 600; }
+/* Chip de prazo: o anel da ilha, pequeno, esvaziando. is-warn na última semana, is-urgent nos 3 últimos dias, is-over vencido. */
+.nv-chip .nv-ring { width: 12px; height: 12px; }
+.nv-chip .nv-ring circle { stroke-width: 3.2; }
+.nv-chip .nv-ring-arc { stroke: currentColor; }
+.nv-chip.is-life { color: var(--nv-chip-fg); }
+.nv-chip.is-life.is-warn { color: var(--nv-amber); }
+.nv-chip.is-life.is-urgent { color: var(--nv-danger); }
+.nv-chip.is-life.is-over { color: var(--nv-danger); background: transparent; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--nv-danger) 40%, transparent); }
+
+/* Barras de sinal (Mobile): acendem em sequência no hover do chip ou do card. */
+.nv-signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 10px; flex: none; }
+.nv-signal > i { width: 2.5px; border-radius: 1px; background: currentColor; }
+.nv-signal > i:nth-child(1) { height: 30%; } .nv-signal > i:nth-child(2) { height: 55%; } .nv-signal > i:nth-child(3) { height: 80%; } .nv-signal > i:nth-child(4) { height: 100%; }
+:is(.nv-chip:hover, .nv-card:hover) .nv-signal > i { animation: nv-signal 0.5s var(--nv-ease) both; }
+:is(.nv-chip:hover, .nv-card:hover) .nv-signal > i:nth-child(2) { animation-delay: 0.06s; }
+:is(.nv-chip:hover, .nv-card:hover) .nv-signal > i:nth-child(3) { animation-delay: 0.12s; }
+:is(.nv-chip:hover, .nv-card:hover) .nv-signal > i:nth-child(4) { animation-delay: 0.18s; }
+@keyframes nv-signal { from { opacity: 0.2; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-room-light, .nv-ring-arc, .nv-hero-bar > i, .nv-progress > i, .nv-tile, .nv-card, .nv-field, .nv-round { transition: none; }
+  .nv-flash .nv-leak, .nv-chip.is-run > svg, .nv-signal > i { animation: none !important; }
+  .nv-tile:hover, .nv-card:hover { transform: none; }
+}

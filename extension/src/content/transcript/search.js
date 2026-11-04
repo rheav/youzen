@@ -41,3 +41,31 @@ export function findMatches(text, query) {
   }
   return ranges;
 }
+
+/**
+ * Cuts block-level match ranges into per-phrase pieces. The block text is
+ * `parts.join(' ')`. Returns, per part, null (no match) or pieces with `m` =
+ * global match number (or -1 for plain text).
+ * @param {string[]} parts @param {Array<[number, number]>} ranges @param {number} first number of ranges[0]
+ */
+export function splitRanges(parts, ranges, first) {
+  let offset = 0;
+  return parts.map((part) => {
+    const from = offset;
+    const to = from + part.length;
+    offset = to + 1;
+    const pieces = [];
+    let cursor = from;
+    ranges.forEach(([a, b], k) => {
+      const s = Math.max(a, from);
+      const e = Math.min(b, to);
+      if (s >= e) return;
+      if (s > cursor) pieces.push({ text: part.slice(cursor - from, s - from), m: -1 });
+      pieces.push({ text: part.slice(s - from, e - from), m: first + k });
+      cursor = e;
+    });
+    if (!pieces.length) return null;
+    if (cursor < to) pieces.push({ text: part.slice(cursor - from), m: -1 });
+    return pieces;
+  });
+}

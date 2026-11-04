@@ -11,6 +11,7 @@
  *   • page-router       — routes URL changes to per-page handlers
  *   • page handlers     — shorts redirect, home quick-links, watch collapse
  *   • blocklist-filter  — marks matching cards with data-ytc-blocked
+ *   • transcript        — player button + in-page transcript panel (src/content/transcript/)
  */
 
 import { initAttributeApplier } from './modules/attribute-applier.js';
@@ -20,6 +21,7 @@ import { initPauseState } from './modules/pause-state.js';
 import { makeShortsHandler } from './pages/shorts.js';
 import { makeHomeHandler } from './pages/home.js';
 import { makeWatchHandler } from './pages/watch.js';
+import { makeTranscriptHandler } from './transcript/index.js';
 
 // 0. Pause singleton — must init before the JS handlers so they can
 //    consult it at first-evaluate time.
@@ -29,7 +31,12 @@ initPauseState();
 initAttributeApplier();
 
 // 2. Page router + per-page JS handlers.
-const router = createPageRouter([makeShortsHandler(), makeHomeHandler(), makeWatchHandler()]);
+const router = createPageRouter([
+  makeShortsHandler(),
+  makeHomeHandler(),
+  makeWatchHandler(),
+  makeTranscriptHandler(),
+]);
 router.start();
 
 // 3. Blocklist filter: DOM-level keyword/channel hiding.

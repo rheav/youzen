@@ -118,14 +118,14 @@ describe('config/features — groups', () => {
     ]);
 
     const loose = featuresIn('watch', null).map((f) => f.id);
-    expect(loose).toEqual(['redirectShorts']);
+    expect(loose).toEqual(['redirectShorts', 'transcriptPanel']);
   });
 });
 
 describe('config/features — expected feature set', () => {
-  it('has exactly 25 non-master feature entries', () => {
+  it('has exactly 26 non-master feature entries', () => {
     const count = FEATURES.filter((e) => !e.isMaster).length;
-    expect(count).toBe(25);
+    expect(count).toBe(26);
   });
 
   it('has exactly 5 master entries (spec §4.3)', () => {
@@ -152,6 +152,15 @@ describe('config/features — expected feature set', () => {
     expect(f.tab).toBe('watch');
   });
 
+  it('transcriptPanel is JS-kind, default ON, group null', () => {
+    const f = findFeature('transcriptPanel');
+    expect(f.kind).toBe('js');
+    expect(f.default).toBe(true);
+    expect(f.group).toBe(null);
+    expect(f.tab).toBe('watch');
+    expect(f.attr).toBe('data-ytc-transcript');
+  });
+
   it('default-ON features match the spec §2.1 list', () => {
     const defaultOn = FEATURES.filter((e) => !e.isMaster && e.default === true)
       .map((f) => f.id)
@@ -172,6 +181,7 @@ describe('config/features — expected feature set', () => {
         'hideSubsShorts',
         'hideWatchActions',
         'redirectShorts',
+        'transcriptPanel',
       ].sort(),
     );
   });
