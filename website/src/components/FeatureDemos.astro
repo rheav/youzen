@@ -19,7 +19,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
  * state and hides the "noisy" layer entirely.
  *
  * All mini-mockup styles are prefixed `.fd-*` to avoid collisions with the
- * larger AppPreview mockup's `.yt-*` / `.sp-*` styles.
+ * page's other sections.
  */
 ---
 
@@ -29,7 +29,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
   <div
     class="blob"
     aria-hidden="true"
-    style="top: 8%; right: -12%; width: 420px; height: 420px; background: #d4e5cd; opacity: 0.45;"
+    style="top: 8%; right: -12%; width: 420px; height: 420px; background: #8ecae6; opacity: 0.14;"
   >
   </div>
 
@@ -63,7 +63,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
   >
     <!-- ───── Demo A: Quiet the thumbnails ───── -->
     <article
-      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-white p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
+      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-glass p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
     >
       <div class="fd-stage">
         <div class="fd-thumbs">
@@ -113,10 +113,10 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
       <div class="mt-6 flex items-start gap-3">
         <span
           class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-          style="background-color: rgba(127, 168, 127, 0.22);"
+          style="background-color: rgb(142 202 230 / 0.14);"
           aria-hidden="true"
         >
-          <Wand2 size={14} color="#1c1c1c" strokeWidth={2} />
+          <Wand2 size={14} color="#8ecae6" strokeWidth={2} />
         </span>
         <div>
           <p
@@ -141,7 +141,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
 
     <!-- ───── Demo B: Silence the comments ───── -->
     <article
-      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-white p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
+      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-glass p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
     >
       <div class="fd-stage">
         <div class="fd-comments">
@@ -190,7 +190,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
         </div>
         <div class="fd-paused">
           <div class="fd-paused-leaf" aria-hidden="true">
-            <Leaf size={14} color="#ffffff" strokeWidth={2.5} />
+            <Leaf size={14} color="#232833" strokeWidth={2.5} />
           </div>
           <span class="fd-paused-cursive">quieter.</span>
           <span class="fd-paused-text">comments paused on this tab</span>
@@ -200,10 +200,10 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
       <div class="mt-6 flex items-start gap-3">
         <span
           class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-          style="background-color: rgba(168, 201, 160, 0.22);"
+          style="background-color: rgb(142 202 230 / 0.14);"
           aria-hidden="true"
         >
-          <MessageSquareOff size={14} color="#1c1c1c" strokeWidth={2} />
+          <MessageSquareOff size={14} color="#8ecae6" strokeWidth={2} />
         </span>
         <div>
           <p
@@ -228,7 +228,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
 
     <!-- ───── Demo C: Block whatever bugs you ───── -->
     <article
-      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-white p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
+      class="group relative flex flex-col overflow-hidden rounded-[2rem] border border-stone-100 bg-glass p-5 shadow-softly transition-transform duration-500 hover:-translate-y-1 hover:shadow-softly-lg"
     >
       <div class="fd-stage">
         <div class="fd-blocklist">
@@ -275,10 +275,10 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
       <div class="mt-6 flex items-start gap-3">
         <span
           class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-          style="background-color: rgba(198, 216, 169, 0.35);"
+          style="background-color: rgb(142 202 230 / 0.14);"
           aria-hidden="true"
         >
-          <Shield size={14} color="#1c1c1c" strokeWidth={2} />
+          <Shield size={14} color="#8ecae6" strokeWidth={2} />
         </span>
         <div>
           <p
@@ -311,8 +311,8 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     width: 100%;
     aspect-ratio: 16 / 10;
     border-radius: 1.25rem;
-    background: #fafaf9;
-    border: 1px solid #f5f5f4;
+    background: rgb(255 255 255 / 0.03);
+    border: 1px solid rgb(255 255 255 / 0.06);
     padding: 12px;
     overflow: hidden;
     isolation: isolate;
@@ -388,16 +388,16 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
   }
   /* Calm pastel replacements, same dimensions. */
   .fd-c1 {
-    background: linear-gradient(135deg, #d4e5cd 0%, #a8c9a0 100%);
+    background: linear-gradient(135deg, #24324a 0%, #5b7ea3 100%);
   }
   .fd-c2 {
-    background: linear-gradient(135deg, #efedf4 0%, #d4e5cd 100%);
+    background: linear-gradient(135deg, #2f2a40 0%, #8a74a3 100%);
   }
   .fd-c3 {
-    background: linear-gradient(135deg, #e8efe8 0%, #c6d8a9 100%);
+    background: linear-gradient(135deg, #22343a 0%, #4f8f88 100%);
   }
   .fd-c4 {
-    background: linear-gradient(135deg, #faf9f5 0%, #d4e5cd 100%);
+    background: linear-gradient(135deg, #2a3346 0%, #6f88b0 100%);
   }
 
   /* Tiny title bars under each thumb — these never change. */
@@ -414,7 +414,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
   .fd-thumb-title .bar {
     height: 3px;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgb(18 21 29 / 0.75);
   }
 
   /* Cross-fade animation: noisy layer fades OUT at 30%, fades back IN at 90% */
@@ -454,8 +454,8 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     gap: 6px;
     padding: 6px 8px;
     border-radius: 10px;
-    background: #fafaf9;
-    border: 1px solid #f1f1ef;
+    background: rgb(255 255 255 / 0.03);
+    border: 1px solid rgb(255 255 255 / 0.06);
     animation: fd-comment-fade 10s ease-in-out infinite;
   }
   .fd-avatar {
@@ -463,7 +463,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     height: 16px;
     border-radius: 9999px;
     flex-shrink: 0;
-    background: #d6d3d1;
+    background: rgb(255 255 255 / 0.12);
   }
   .fd-avatar-1 {
     background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
@@ -492,17 +492,17 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
   .fd-comment-name {
     font-size: 9px;
     font-weight: 600;
-    color: #44403c;
+    color: #d9e0ee;
   }
   .fd-comment-like {
     font-size: 8px;
-    color: #a8a29e;
+    color: #8b96ab;
     margin-left: auto;
   }
   .fd-comment-text {
     height: 4px;
     border-radius: 9999px;
-    background: #e7e5e4;
+    background: rgb(255 255 255 / 0.1);
   }
   .fd-comment-text.short {
     width: 60%;
@@ -511,7 +511,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     width: 85%;
   }
   .fd-comment-text.angry {
-    background: linear-gradient(90deg, #fca5a5 0%, #f87171 70%, #e7e5e4 100%);
+    background: linear-gradient(90deg, #fca5a5 0%, #f87171 70%, rgb(255 255 255 / 0.1) 100%);
   }
 
   /* "Comments paused" replacement note */
@@ -531,17 +531,17 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     width: 32px;
     height: 32px;
     border-radius: 9999px;
-    background: linear-gradient(135deg, #7fa87f 0%, #c6d8a9 100%);
+    background: var(--aurora);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: #232833;
     font-size: 14px;
     line-height: 1;
   }
   .fd-paused-text {
     font-size: 12px;
-    color: #5e5d59;
+    color: #aeb9cd;
   }
   .fd-paused-cursive {
     font-family: var(--font-cursive);
@@ -604,11 +604,11 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     align-items: center;
     gap: 4px;
     padding: 5px 8px;
-    background: rgba(168, 201, 160, 0.12);
-    border: 1px solid rgba(168, 201, 160, 0.4);
+    background: rgb(142 202 230 / 0.1);
+    border: 1px solid rgb(142 202 230 / 0.35);
     border-radius: 9999px;
     font-size: 9px;
-    color: #5e5d59;
+    color: #aeb9cd;
   }
   .fd-pill-bar-label {
     flex-shrink: 0;
@@ -619,8 +619,8 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
-    background: #7fa87f;
-    color: #fff;
+    background: #8ecae6;
+    color: #232833;
     border-radius: 9999px;
     font-size: 9px;
     font-weight: 600;
@@ -639,7 +639,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     padding: 5px 6px;
     border-radius: 8px;
     font-size: 9px;
-    color: #44403c;
+    color: #d9e0ee;
     overflow: hidden;
     max-height: 26px;
   }
@@ -648,7 +648,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
     width: 24px;
     height: 14px;
     border-radius: 3px;
-    background: linear-gradient(135deg, #c6d8a9 0%, #e8efe8 100%);
+    background: linear-gradient(135deg, rgb(142 202 230 / 0.25), rgb(203 170 217 / 0.2));
   }
   .fd-row-text {
     flex: 1;
@@ -660,7 +660,7 @@ import { Leaf, MessageSquareOff, Shield, Wand2 } from "@lucide/astro";
   .fd-row-badge {
     flex-shrink: 0;
     font-size: 8px;
-    color: #c96442;
+    color: #e79aa4;
     font-weight: 700;
     opacity: 0;
     animation: fd-badge-appear 10s ease-in-out infinite;

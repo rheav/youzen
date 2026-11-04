@@ -1,46 +1,71 @@
-@import "@fontsource-variable/outfit";
-@import "@fontsource-variable/caveat";
 @import "tailwindcss";
 
-/* ─── Softly palette — leafy edition ─── */
-/* Primary accent is now pastel sage-green (not coral). Keeps the soft,
-   analog feel while leaning "garden" over "peach". */
-@theme {
-  --color-canvas: #fdfcf8;
-  --color-sage: #e8efe8;
-  --color-lavender: #efedf4;
+/* ─── youZen website — Nord "Sala do Flow" (~/Code/libs/nord-theme, v1.2.0) ───
+ * Same look as the extension: a dark room lit by soft sky/violet light,
+ * frosted glass, 1px hairlines, sky on the main action, the karaoke yellow on
+ * the one word that matters. The old "Softly" token names are kept and
+ * re-pointed at Nord so every component re-themes from here. */
 
-  /* Leafy accent family */
-  --color-leaf: #a8c9a0; /* primary accent */
-  --color-leaf-deep: #7fa87f; /* hover / gradient-from */
-  --color-leaf-mist: #d4e5cd; /* background blobs, pills */
-  --color-pistachio: #c6d8a9; /* gradient-to complement */
-
-  /* Supporting tints (kept for blob variation) */
-  --color-iris-soft: #e6e6fa;
-
-  --color-ink: #292524;
-  --color-muted: #78716c;
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-800: #292524;
-
-  --font-outfit:
-    "Outfit Variable", "Outfit", system-ui, -apple-system, sans-serif;
-  --font-cursive: "Caveat Variable", "Caveat", cursive;
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/geist-latin.woff2") format("woff2");
 }
 
-/* Plain-CSS vars that are ONLY referenced in scoped component <style>
-   blocks (not by Tailwind utilities) need to live in a normal :root
-   block. Tailwind v4's @theme only emits theme vars that a utility class
-   actually uses, so anything we consume through raw var(...) — like the
-   ChromeButton gradient — must be declared here. */
+@theme {
+  --color-canvas: #12151d;
+  --color-glass: rgb(22 26 36 / 0.62);
+  --color-sage: rgb(178 219 164 / 0.08);
+  --color-lavender: rgb(203 170 217 / 0.08);
+
+  /* Accents (old leaf names → Nord) */
+  --color-leaf: #8ecae6;
+  --color-leaf-deep: #8ecae6;
+  --color-leaf-mist: rgb(142 202 230 / 0.14);
+  --color-pistachio: #cbaad9;
+  --color-iris-soft: rgb(203 170 217 / 0.12);
+  --color-sky: #8ecae6;
+  --color-violet: #cbaad9;
+  --color-say: #ffc75f;
+  --color-good: #b2dba4;
+
+  /* Neutrals: text on the dark room, hairlines and fills as white alphas */
+  --color-ink: #eceff4;
+  --color-muted: #aeb9cd;
+  --color-stone-50: rgb(255 255 255 / 0.03);
+  --color-stone-100: rgb(255 255 255 / 0.05);
+  --color-stone-200: rgb(255 255 255 / 0.1);
+  --color-stone-300: rgb(255 255 255 / 0.16);
+  --color-stone-400: #8b96ab;
+  --color-stone-500: #aeb9cd;
+  --color-stone-600: #c3cbda;
+  --color-stone-700: #d9e0ee;
+  --color-stone-800: #eceff4;
+
+  --font-outfit: "Geist", system-ui, -apple-system, sans-serif;
+  --font-cursive: "Geist", system-ui, -apple-system, sans-serif;
+}
+
 :root {
-  --color-accent-from: #5f9a6a; /* darker than leaf-deep for contrast */
-  --color-accent-to: #a8c9a0; /* leaf */
+  --room: #12151d;
+  --fg: #eceff4;
+  --fg-2: #c3cbda;
+  --muted: #aeb9cd;
+  --sky: #8ecae6;
+  --violet: #cbaad9;
+  --say: #ffc75f;
+  --ink: #232833;
+  --glass-line: rgb(255 255 255 / 0.07);
+  --fill: rgb(255 255 255 / 0.07);
+  --fill-2: rgb(255 255 255 / 0.08);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --aurora: linear-gradient(100deg, #8ecae6, #cbaad9, #7dafd6, #b6e2f2, #8ecae6);
+  /* Kept for components that still read the old pair. */
+  --color-accent-from: #8ecae6;
+  --color-accent-to: #cbaad9;
+  color-scheme: dark;
 }
 
 /* ─── Base ─── */
@@ -51,8 +76,8 @@
 }
 
 html {
-  background: var(--color-canvas);
-  color: var(--color-ink);
+  background: var(--room);
+  color: var(--fg);
   font-family: var(--font-outfit);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
@@ -62,37 +87,201 @@ html {
 
 body {
   min-height: 100vh;
-  font-feature-settings: "ss01", "cv01";
 }
 
-/* Sentence-case headings, tracking-tight by default */
 h1,
 h2,
 h3,
 h4 {
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   line-height: 1.05;
-  color: var(--color-ink);
-  font-weight: 500;
+  color: var(--fg);
+  font-weight: 600;
 }
 
 p {
-  color: var(--color-ink);
+  color: var(--fg-2);
   line-height: 1.6;
 }
 
-/* ─── Grain overlay (global, always on) ─── */
-/* SVG fractal noise, fixed full-viewport, mix-blend-mode: overlay, 0.35 opacity.
-   The noise is encoded as a data URI so there's zero network round-trip. */
-.grain-overlay {
+::selection {
+  background: rgb(142 202 230 / 0.3);
+  color: var(--fg);
+}
+
+/* ─── The room: two still lights behind everything ─── */
+.room-floor {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: -1;
   pointer-events: none;
+  background:
+    radial-gradient(70% 50% at 12% 0%, rgb(142 202 230 / 0.12), transparent 60%),
+    radial-gradient(60% 45% at 92% 8%, rgb(203 170 217 / 0.1), transparent 62%),
+    radial-gradient(60% 50% at 50% 110%, rgb(142 202 230 / 0.06), transparent 60%),
+    var(--room);
+}
+
+/* Section lights (the old .blob, now still: Nord never animates at rest). */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px) saturate(1.4);
   opacity: 0.35;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.14  0 0 0 0 0.14  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  background-size: 240px 240px;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at center, #000 45%, transparent 82%);
+  mask-image: radial-gradient(circle at center, #000 45%, transparent 82%);
+}
+
+/* Frosted glass card. */
+.glass {
+  background: var(--color-glass);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: inset 0 0 0 1px var(--glass-line);
+}
+
+/* ─── Aurora button (variant 1 "Aurora fluindo", chosen 2026-11-04) ───
+ * Filled with the background gradient flowing, glow behind. On hover it turns
+ * into an outline: gradient and glow only on the edges.
+ * Markup: <a class="aurora"><i class="aurora-glow"><i></i></i><i class="aurora-halo"><i></i></i>
+ *          <i class="aurora-fill"></i><i class="aurora-ring"></i><span>Label</span></a> */
+.aurora {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 26px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: transform 0.2s var(--ease);
+}
+.aurora.is-small {
+  height: 38px;
+  padding: 0 18px;
+  font-size: 13.5px;
+}
+.aurora:active {
+  transform: scale(0.98);
+}
+.aurora > i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.aurora > span {
+  position: relative;
+  z-index: 4;
+  transition: color 0.25s var(--ease);
+}
+.aurora-fill,
+.aurora-ring,
+.aurora-glow > i,
+.aurora-halo > i {
+  background: var(--aurora);
+  background-size: 300% 100%;
+  animation: aurora-flow 6s linear infinite;
+}
+.aurora > .aurora-fill {
+  z-index: 1;
+  transition: opacity 0.3s var(--ease);
+}
+.aurora > .aurora-ring {
+  z-index: 2;
+  padding: 1.5px;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.aurora > .aurora-glow {
+  z-index: -1;
+  inset: -4px;
+  filter: blur(14px);
+  opacity: 0.55;
+  transition: opacity 0.3s var(--ease);
+}
+.aurora > .aurora-halo {
+  z-index: 0;
+  inset: -3px;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.aurora-glow > i,
+.aurora-halo > i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.aurora-halo > i {
+  padding: 4px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.aurora:hover > .aurora-fill,
+.aurora:focus-visible > .aurora-fill {
+  opacity: 0;
+}
+.aurora:hover > .aurora-ring,
+.aurora:focus-visible > .aurora-ring,
+.aurora:hover > .aurora-halo,
+.aurora:focus-visible > .aurora-halo {
+  opacity: 1;
+}
+.aurora:hover > .aurora-glow,
+.aurora:focus-visible > .aurora-glow {
+  opacity: 0;
+}
+.aurora:hover > span,
+.aurora:focus-visible > span {
+  color: var(--fg);
+}
+.aurora:focus-visible {
+  outline: none;
+}
+@keyframes aurora-flow {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+/* Secondary: round glass button. */
+.btn-round {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--fill-2);
+  color: var(--fg);
+  font-weight: 500;
+  font-size: 15px;
+  transition: background-color 0.15s var(--ease);
+}
+.btn-round:hover {
+  background: rgb(255 255 255 / 0.14);
+}
+
+/* Small label: the one uppercase allowed (nv-label). */
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* ─── Scroll-triggered reveal ─── */
@@ -127,114 +316,6 @@ p {
 }
 .reveal-group > .reveal:nth-child(6) {
   transition-delay: 500ms;
-}
-
-/* ─── Floating blobs — breathing, drifting ─────────────────────────────────
- * Much slower than before (14s vs 6s) and now scales subtly in + out, so
- * each blob reads as "breathing". Keeps the zen atmosphere the brand wants. */
-@keyframes blob-breathe {
-  0%,
-  100% {
-    transform: translateY(0) translateX(0) scale(1);
-  }
-  50% {
-    transform: translateY(-14px) translateX(8px) scale(1.04);
-  }
-}
-@keyframes blob-breathe-alt {
-  0%,
-  100% {
-    transform: translateY(0) translateX(0) scale(1);
-  }
-  50% {
-    transform: translateY(12px) translateX(-10px) scale(1.03);
-  }
-}
-
-.blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  opacity: 0.6;
-  animation: blob-breathe 14s ease-in-out infinite;
-  pointer-events: none;
-  will-change: transform;
-  /* Radial mask: even if a blob is positioned at the edge and the parent
-     clips horizontally, the mask already faded the blob to 0 before the
-     clip boundary — so no hard vertical cut ever appears.               */
-  -webkit-mask-image: radial-gradient(
-    circle at center,
-    #000 45%,
-    transparent 82%
-  );
-  mask-image: radial-gradient(circle at center, #000 45%, transparent 82%);
-}
-.blob-alt {
-  animation: blob-breathe-alt 17s ease-in-out infinite;
-}
-
-/* ─── Floating leaves — ambient particles drifting up the viewport ───────
- * Rendered by FloatingLeaves.astro as 6 fixed-positioned SVG leaves that
- * drift slowly upward with gentle horizontal sway and rotation. Each leaf
- * uses a different duration/delay so the set never cycles in unison. */
-@keyframes leaf-drift {
-  0% {
-    transform: translate3d(0, 110vh, 0) rotate(-20deg);
-    opacity: 0;
-  }
-  8% {
-    opacity: var(--leaf-opacity, 0.18);
-  }
-  50% {
-    transform: translate3d(20px, 50vh, 0) rotate(45deg);
-  }
-  92% {
-    opacity: var(--leaf-opacity, 0.18);
-  }
-  100% {
-    transform: translate3d(-15px, -15vh, 0) rotate(180deg);
-    opacity: 0;
-  }
-}
-
-/* ─── Cursive-word sway — very subtle, for Hero-style accents ──────────── */
-@keyframes cursive-sway {
-  0%,
-  100% {
-    transform: rotate(-0.8deg);
-  }
-  50% {
-    transform: rotate(0.8deg);
-  }
-}
-.sway {
-  display: inline-block;
-  transform-origin: 50% 100%;
-  animation: cursive-sway 7s ease-in-out infinite;
-}
-
-/* ─── Shadows (soft, never harsh) ─── */
-.shadow-softly {
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-}
-.shadow-softly-lg {
-  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.06);
-}
-
-/* ─── Pulse used on the Breathe button (very slow, meditative) ─── */
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(168, 201, 160, 0.5);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 18px rgba(168, 201, 160, 0);
-  }
-}
-.breathe-pulse {
-  animation: breathe 4s ease-in-out infinite;
 }
 
 /* ─── Marquee-ish helper for horizontal-scroll shelves ─── */
@@ -280,17 +361,23 @@ p {
     transform: none !important;
     transition: none !important;
   }
-  .blob,
-  .blob-alt,
-  .breathe-pulse,
-  .sway,
-  .floating-leaf {
+  .aurora-fill,
+  .aurora-ring,
+  .aurora-glow > i,
+  .aurora-halo > i {
     animation: none !important;
-  }
-  .floating-leaf {
-    opacity: 0 !important;
   }
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Old shadow helpers, re-pointed at Nord (hairline + one long soft shadow). */
+.shadow-softly {
+  box-shadow: inset 0 0 0 1px var(--glass-line);
+}
+.shadow-softly-lg {
+  box-shadow:
+    inset 0 0 0 1px var(--glass-line),
+    0 24px 60px -24px rgb(0 0 0 / 0.6);
 }

@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import {
+  Captions,
   BookOpen,
   Rocket,
   LayoutGrid,
@@ -28,6 +29,7 @@ import {
 
 const sidebar = [
   { id: "quick-start", label: "Quick start", icon: Rocket },
+  { id: "transcript", label: "Transcript", icon: Captions },
   { id: "feeds", label: "Feeds", icon: LayoutGrid },
   { id: "watch", label: "Watch", icon: Tv },
   { id: "blocklist", label: "Blocklist", icon: ShieldOff },
@@ -558,6 +560,10 @@ const kindBadge = (kind: string) => {
               <h3 class="docs-card-title">Where things live</h3>
               <ul class="docs-list">
                 <li>
+                  <strong class="text-ink">Transcript tab</strong> — the
+                  transcript button and its defaults.
+                </li>
+                <li>
                   <strong class="text-ink">Feeds tab</strong> — homepage,
                   search, sidebar, navigation chrome.
                 </li>
@@ -576,6 +582,58 @@ const kindBadge = (kind: string) => {
               </ul>
             </div>
           </div>
+        </section>
+
+        <!-- Transcript panel (in the YouTube page, not a registry feature) -->
+        <section id="transcript" class="reveal mb-20 scroll-mt-28" aria-labelledby="transcript-title">
+          <header class="mb-6 flex items-center gap-3 border-b border-stone-200/70 pb-4">
+            <span class="docs-section-icon"><Captions size={18} stroke-width={2} /></span>
+            <h2 id="transcript-title" class="text-ink text-2xl font-medium tracking-tight md:text-3xl">Transcript</h2>
+          </header>
+          <p class="mb-5 max-w-2xl text-stone-600">
+            A button next to CC in the player opens the video's transcript beside it: its own column in
+            theater mode, the top of the right column in the default layout, below the player on a narrow
+            window. It hides in fullscreen and stays open as you move to the next video.
+          </p>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="docs-card">
+              <h3 class="docs-card-title">Reading along</h3>
+              <ul class="docs-list">
+                <li>The phrase being spoken is yellow; the list follows the video (Scroll in the dock).</li>
+                <li>Click any phrase or time to play from there.</li>
+                <li>Time in the dock shows or hides the timestamps.</li>
+                <li>YouTube sends captions in phrases of a few seconds, so the yellow moves phrase by phrase.</li>
+              </ul>
+            </div>
+            <div class="docs-card">
+              <h3 class="docs-card-title">Languages</h3>
+              <ul class="docs-list">
+                <li>The track chip lists the video's captions; manual ones win over auto-generated.</li>
+                <li>Translate shows any language YouTube offers under each paragraph.</li>
+                <li>Both choices carry over to the next video.</li>
+              </ul>
+            </div>
+            <div class="docs-card">
+              <h3 class="docs-card-title">Search, copy, export</h3>
+              <ul class="docs-list">
+                <li>Ctrl+F (⌘F) inside the panel searches; accents and case are ignored.</li>
+                <li>Copy puts the whole transcript on the clipboard as paragraphs.</li>
+                <li>Export saves TXT, SRT or VTT, with or without the translation.</li>
+              </ul>
+            </div>
+            <div class="docs-card">
+              <h3 class="docs-card-title">Fixing mistakes</h3>
+              <ul class="docs-list">
+                <li>⋯ → Edit transcript: click a phrase and type. Enter goes to the next one, Esc undoes.</li>
+                <li>Edits are saved per video and language, and used by copy, export and search.</li>
+                <li>⋯ → Undo all edits puts the original back.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-stone-500">
+            Settings: the side panel's Transcript tab turns the button off and sets the defaults. The captions come
+            from YouTube's own player request; nothing is sent anywhere else.
+          </p>
         </section>
 
         <!-- Feature sections from registry -->
@@ -732,6 +790,21 @@ const kindBadge = (kind: string) => {
             </h2>
           </header>
 
+          <div class="docs-card mb-4">
+            <h3 class="docs-card-title">1.2.0 — Nord, everywhere</h3>
+            <p class="mt-2 text-stone-600">
+              New look for the side panel (the same Nord room as the transcript panel), a new icon, and a
+              Transcript tab with the panel's switch and defaults.
+            </p>
+          </div>
+          <div class="docs-card mb-4">
+            <h3 class="docs-card-title">1.1.0 — the transcript panel</h3>
+            <p class="mt-2 text-stone-600">
+              The transcript beside the video: yellow phrase following the video, click to jump, translate,
+              search, copy, export TXT / SRT / VTT, and inline edits. 1.1.1 fixed moving between videos,
+              fullscreen and "Try again".
+            </p>
+          </div>
           <div class="docs-card">
             <h3 class="docs-card-title">1.0.0 — first quiet</h3>
             <p class="mt-2 text-stone-600">
@@ -798,12 +871,12 @@ const kindBadge = (kind: string) => {
 
   .docs-nav-link:hover {
     color: var(--color-ink);
-    background-color: rgba(168, 201, 160, 0.12);
+    background-color: rgb(142 202 230 / 0.1);
   }
 
   .docs-nav-link[aria-current="true"] {
     color: var(--color-leaf-deep);
-    background-color: rgba(168, 201, 160, 0.18);
+    background-color: rgb(142 202 230 / 0.16);
     font-weight: 500;
   }
 
@@ -819,18 +892,18 @@ const kindBadge = (kind: string) => {
     width: 32px;
     height: 32px;
     border-radius: 9px;
-    background-color: rgba(168, 201, 160, 0.18);
+    background-color: rgb(142 202 230 / 0.16);
     color: var(--color-leaf-deep);
   }
 
   /* ─── Cards ──────────────────────────────────────────────────────── */
   .docs-card {
-    border: 1px solid rgba(231, 229, 228, 0.8);
-    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    background-color: rgb(22 26 36 / 0.62);
     border-radius: 1rem;
     padding: 1.25rem 1.4rem;
     backdrop-filter: blur(4px);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
   }
 
   .docs-card-title {
@@ -843,7 +916,7 @@ const kindBadge = (kind: string) => {
     margin-top: 0.5rem;
     padding-left: 1.1rem;
     list-style: disc;
-    color: rgb(87, 83, 78); /* stone-600 */
+    color: #c3cbda;
     font-size: 0.9rem;
     line-height: 1.6;
   }

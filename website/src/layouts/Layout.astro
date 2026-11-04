@@ -1,7 +1,5 @@
 ---
 import "../styles/global.css";
-import FloatingLeaves from "../components/FloatingLeaves.astro";
-import LeafBurst from "../components/LeafBurst.astro";
 
 interface Props {
   title?: string;
@@ -9,8 +7,8 @@ interface Props {
 }
 
 const {
-  title = "youZen — your YouTube, but softer",
-  description = "A gentle Chrome extension that quiets YouTube. Hide Shorts, silence comments, block the chaos. Designed for focused, intentional watching.",
+  title = "youZen — YouTube for studying, not scrolling",
+  description = "A free Chrome extension for studying on YouTube: a transcript beside the video that follows along, in any language, plus a quieter YouTube without Shorts, comments or recommendations.",
 } = Astro.props;
 ---
 
@@ -20,7 +18,7 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#FDFCF8" />
+    <meta name="theme-color" content="#12151d" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
 
@@ -47,14 +45,7 @@ const {
     </noscript>
   </head>
   <body class="bg-canvas text-ink relative overflow-x-hidden">
-    <!-- Grain overlay: fixed, z-50, mix-blend-mode overlay -->
-    <div class="grain-overlay" aria-hidden="true"></div>
-
-    <!-- Ambient drifting leaves, z-5, behind content (z-10+) -->
-    <FloatingLeaves />
-
-    <!-- Site-wide leaf-burst particle system (script + styles) -->
-    <LeafBurst />
+    <div class="room-floor" aria-hidden="true"></div>
 
     <slot />
 

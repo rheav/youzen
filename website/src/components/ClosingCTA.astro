@@ -14,62 +14,35 @@
  *     alive-grass breath as the hero.
  */
 import ChromeButton from "./ChromeButton.astro";
-import { Leaf } from "@lucide/astro";
 ---
 
-<section id="install" class="relative overflow-x-clip px-6 py-16 md:py-24">
-  <!-- Ambient blobs, breathing via global.css .blob keyframes -->
+<section id="install" class="relative overflow-x-clip px-6 py-20 md:py-28">
   <div
     class="blob"
     aria-hidden="true"
-    style="top: -10%; left: 15%; width: 520px; height: 520px; background: #D4E5CD; opacity: 0.65;"
+    style="top: -10%; left: 15%; width: 520px; height: 520px; background: #8ecae6; opacity: 0.18;"
   >
   </div>
   <div
-    class="blob blob-alt"
+    class="blob"
     aria-hidden="true"
-    style="bottom: -25%; right: 10%; width: 460px; height: 460px; background: #E6E6FA; opacity: 0.55;"
+    style="bottom: -25%; right: 10%; width: 460px; height: 460px; background: #cbaad9; opacity: 0.16;"
   >
   </div>
-
-  <div
-    class="reveal-group relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center"
-  >
-    <span
-      class="reveal mb-6 inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/60 px-3 py-1 text-xs font-medium text-stone-500 shadow-softly backdrop-blur-sm"
-    >
-      <Leaf size={12} color="#7fa87f" stroke-width={2.2} />
-      Ready when you are
-    </span>
-
-    <h2
-      class="reveal text-ink text-4xl leading-[1.05] font-medium tracking-tight md:text-5xl lg:text-6xl"
-    >
-      Take a
-      <span
-        class="sway inline-block text-[1.15em] leading-none"
-        style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 500;"
-      >
-        quiet
-      </span>
-      breath.
-      <br class="hidden md:block" />
-      Then one more click.
+  <div class="reveal-group relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center">
+    <span class="reveal label">Ready when you are</span>
+    <h2 class="reveal mt-4 text-4xl leading-[1.05] font-semibold tracking-tight md:text-5xl lg:text-6xl">
+      Study <em class="not-italic text-sky">with</em> the video,<br class="hidden md:block" />
+      not against your feed.
     </h2>
-
-    <p
-      class="reveal text-muted mx-auto mt-6 max-w-[480px] text-base md:text-lg"
-    >
-      Install youZen and the chaos goes away. The channels you love stay. That's
-      the whole deal.
+    <p class="reveal mx-auto mt-6 max-w-[480px] text-base text-stone-600 md:text-lg">
+      Install youZen: the transcript sits beside every video, and the noise goes away. The channels you love stay.
     </p>
-
     <div class="reveal mt-9">
-      <ChromeButton>Add to your browser</ChromeButton>
+      <ChromeButton>Add to Chrome, free</ChromeButton>
     </div>
-
     <p class="reveal mt-6 text-xs text-stone-500">
-      Free · no account · works offline · open source
+      Free · no account · nothing leaves YouTube · open source
     </p>
   </div>
 </section>

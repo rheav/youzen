@@ -1,0 +1,55 @@
+---
+/**
+ * Inside — real screenshots of the side panel (Nord, v1.2.0), not a mock.
+ */
+---
+
+<section id="panel" class="relative overflow-x-clip px-6 py-20 md:py-28">
+  <div class="blob" aria-hidden="true" style="top: 0; right: -8%; width: 480px; height: 480px; background: #cbaad9; opacity: 0.14;"></div>
+  <div class="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
+    <div class="reveal-group order-2 flex justify-center gap-5 md:order-1">
+      <img
+        class="reveal panel-shot"
+        src="/images/panel-transcript.webp"
+        width="400"
+        height="760"
+        alt="youZen side panel, Transcript tab: the transcript switch, defaults and a short how-to"
+        loading="lazy"
+        decoding="async"
+      />
+      <img
+        class="reveal panel-shot is-offset hidden sm:block"
+        src="/images/panel-watch.webp"
+        width="400"
+        height="760"
+        alt="youZen side panel, Watch tab: switches to hide comments, related videos, end cards and more"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    <div class="reveal-group order-1 md:order-2">
+      <span class="reveal label">Inside</span>
+      <h2 class="reveal mt-4 text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+        Every switch in one quiet panel.
+      </h2>
+      <p class="reveal mt-6 max-w-md text-base text-stone-600 md:text-lg">
+        Open it from the toolbar. Turn the transcript on, pick its defaults, hide Shorts, comments and recommendations, block channels or words. Pause it on any tab.
+      </p>
+      <p class="reveal mt-4 text-sm text-stone-500">Settings stay in your browser. No account, no sync, no tracking.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .panel-shot {
+    width: min(42vw, 260px);
+    height: auto;
+    border-radius: 18px;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 40px 80px -30px rgb(0 0 0 / 0.8);
+  }
+  .panel-shot.is-offset {
+    margin-top: 48px;
+  }
+</style>

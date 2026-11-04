@@ -3,6 +3,14 @@ import { Plus } from "@lucide/astro";
 
 const faqs = [
   {
+    q: "Where does the transcript come from?",
+    a: "From YouTube itself: the same captions the player shows, including auto-generated ones. Videos without any captions have no transcript. youZen never sends the video or the text anywhere.",
+  },
+  {
+    q: "Why does the yellow move phrase by phrase, not word by word?",
+    a: "YouTube sends captions in phrases of a few seconds, without the timing of each word. youZen lights the phrase being spoken, which is as close as the data allows.",
+  },
+  {
     q: "Does youZen collect any data?",
     a: "No. Nothing. No analytics, no telemetry, no external requests. Everything lives in your browser's local storage. You can audit every line on GitHub.",
   },
@@ -40,7 +48,7 @@ const faqs = [
       The things people
       <span
         class="text-[1.05em] leading-none"
-        style="font-family: var(--font-cursive); color: #A8C9A0; font-weight: 400;"
+        style="color: var(--sky);"
       >
         usually
       </span>
@@ -51,7 +59,7 @@ const faqs = [
   <div class="mx-auto mt-12 max-w-2xl space-y-3">
     {
       faqs.map((f) => (
-        <details class="faq-item reveal overflow-hidden rounded-2xl border border-stone-100 bg-white">
+        <details class="faq-item reveal overflow-hidden rounded-2xl border border-stone-100 bg-glass">
           <summary class="flex items-center justify-between gap-4 px-6 py-6 text-base font-medium text-ink md:text-lg">
             <span>{f.q}</span>
             <span

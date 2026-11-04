@@ -1,73 +1,425 @@
 ---
-import { Play } from "@lucide/astro";
+/**
+ * Hero — direction B (approved 2026-11-04): centred headline, "conferência"
+ * chips that turn green one by one, then a light leak passes once over a live
+ * mini version of the transcript panel, whose yellow phrase follows the fake
+ * playhead exactly like the real extension. Everything moves for a reason and
+ * stops under prefers-reduced-motion.
+ */
 import ChromeButton from "./ChromeButton.astro";
+
+const LINES = [
+  ["0:42", ["Plants take in carbon dioxide through tiny pores in their leaves,", "and water comes up from the roots."]],
+  ["0:49", ["Inside the chloroplasts, light splits the water molecules apart.", "That is where the oxygen we breathe comes from."]],
+  ["0:57", ["The energy from that light is stored for a moment", "in two small carrier molecules, ATP and NADPH."]],
+  ["1:05", ["Then the Calvin cycle spends that energy", "to build sugar out of carbon dioxide."]],
+  ["1:12", ["So the whole story is light in, sugar out,", "with oxygen as the by-product."]],
+];
+const CHIPS = [
+  "Transcript beside the video",
+  "Shorts hidden",
+  "Comments off",
+  "No recommendations",
+  "Translate to any language",
+];
 ---
 
-<section
-  class="relative isolate flex min-h-[72vh] w-full items-center justify-center overflow-x-clip px-6 pt-20 pb-10 md:pt-24 md:pb-12"
->
-  <!-- Soft background blobs — positions kept comfortably inside the viewport
-       so the blob + its blur radius never hits the window edge. The `.blob`
-       class applies a soft radial mask in global.css that fades the edges. -->
-  <div
-    class="blob"
-    aria-hidden="true"
-    style="top: 6%; left: 4%; width: 420px; height: 420px; background: #D4E5CD;"
-  >
-  </div>
-  <div
-    class="blob blob-alt"
-    aria-hidden="true"
-    style="bottom: -4%; right: 4%; width: 460px; height: 460px; background: #E6E6FA;"
-  >
-  </div>
-
-  <div
-    class="reveal-group relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center"
-  >
-    <span
-      class="reveal mb-6 inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/60 px-3 py-1 text-xs font-medium text-stone-500 shadow-softly backdrop-blur-sm"
-    >
-      <span
-        class="block h-1.5 w-1.5 rounded-full"
-        style="background-color: #A8C9A0;"></span>
-      A quieter way to watch
-    </span>
-
-    <h1
-      class="reveal text-ink text-5xl leading-[1.04] font-medium tracking-tight md:text-6xl lg:text-[72px]"
-    >
-      Your YouTube,
-      <span
-        class="sway mt-1 block text-[1.15em] leading-none"
-        style="font-family: var(--font-cursive); color: var(--color-leaf-deep); font-weight: 500;"
-      >
-        softer
-      </span>
-      than you remember.
+<section class="relative px-6 pt-36 pb-20 md:pt-44 md:pb-28">
+  <div class="mx-auto max-w-3xl text-center">
+    <span class="eyebrow"><i></i>Free. No account. Nothing leaves YouTube.</span>
+    <h1 class="mt-6 text-5xl font-semibold tracking-tight text-balance md:text-7xl">
+      YouTube for <em class="not-italic text-say">studying</em>,<br />not scrolling.
     </h1>
-
-    <p
-      class="reveal text-muted mx-auto mt-7 max-w-[500px] text-base md:text-lg"
-    >
-      Hide Shorts, silence comments, block the chaos. youZen turns YouTube into
-      the quiet little corner it used to be — without uninstalling your favorite
-      channels.
+    <p class="mx-auto mt-6 max-w-xl text-lg text-stone-600 md:text-xl">
+      Read along with any video, in any language. Search it, save it. And hide everything that pulls you away.
     </p>
-
-    <div class="reveal mt-9 flex flex-col items-center gap-3 sm:flex-row">
-      <ChromeButton>Add to your browser</ChromeButton>
-      <a
-        href="#preview"
-        class="secondary-cta inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white/70 px-6 py-3 text-sm font-medium text-ink backdrop-blur-sm transition-all hover:border-stone-300 hover:bg-white"
-      >
-        <Play size={14} class="secondary-cta-icon" />
-        See it in action
-      </a>
+    <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+      <ChromeButton>Add to Chrome, free</ChromeButton>
+      <a href="#study" class="btn-round">See it work</a>
     </div>
+    <ul class="hero-chips mt-8 flex flex-wrap justify-center gap-2 md:-mx-24" data-chips>
+      {
+        CHIPS.map((chip) => (
+          <li class="hero-chip">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+            {chip}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 
-    <p class="reveal mt-8 text-xs text-stone-500">
-      Free · no account · works offline · open source
-    </p>
+  <div class="demo mx-auto mt-14 max-w-5xl" aria-label="The youZen transcript panel next to a lecture video" role="img">
+    <div class="demo-video">
+      <div class="slide">
+        <span class="slide-kicker">Biology 101 · Lecture 4</span>
+        <span class="slide-title">Photosynthesis</span>
+        <span class="slide-eq">6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</span>
+      </div>
+      <span class="demo-cap" data-cap></span>
+      <span class="demo-bar"><i data-bar></i></span>
+    </div>
+    <div class="demo-panel">
+      <div class="demo-head"><span>English</span><span>Português</span></div>
+      <div class="demo-rows" data-rows>
+        {
+          LINES.map(([time, phrases], r) => (
+            <div class="demo-row" data-r={r}>
+              <span class="demo-t">{time}</span>
+              <p>
+                {phrases.map((p) => (
+                  <span class="demo-ph">{p} </span>
+                ))}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+      <div class="demo-dock"><span>Scroll</span><span>Time</span><span>Copy</span><span>Export</span></div>
+    </div>
+    <span class="demo-leak" data-leak><i></i></span>
   </div>
 </section>
+
+<style>
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: var(--fill);
+    font-size: 12.5px;
+    color: #d9e0ee;
+  }
+  .eyebrow i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--say);
+    box-shadow: 0 0 10px -1px var(--say);
+  }
+  .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: var(--fill);
+    color: #d9e0ee;
+    font-size: 12.5px;
+  }
+  .hero-chip svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.3s var(--ease);
+  }
+  .hero-chip.is-ok svg {
+    stroke: var(--color-good);
+  }
+
+  /* ---- Live demo ---- */
+  .demo {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 22px;
+    background: #000;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 50px 100px -40px rgb(0 0 0 / 0.85);
+  }
+  @media (max-width: 860px) {
+    .demo {
+      grid-template-columns: 1fr;
+    }
+  }
+  .demo-video {
+    position: relative;
+    min-height: 420px;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(60% 70% at 30% 30%, rgb(90 209 200 / 0.35), transparent 70%),
+      radial-gradient(50% 60% at 80% 80%, rgb(178 219 164 / 0.25), transparent 70%),
+      linear-gradient(160deg, #0f2a2b, #0b1416 60%, #0a0f12);
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-bottom: 60px;
+    text-align: center;
+  }
+  .slide-kicker {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(236 239 244 / 0.6);
+  }
+  .slide-title {
+    font-size: clamp(32px, 5vw, 54px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: #eceff4;
+  }
+  .slide-eq {
+    font-size: clamp(14px, 1.8vw, 20px);
+    color: #b2dba4;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-cap {
+    position: absolute;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%);
+    max-width: 90%;
+    padding: 2px 8px;
+    background: rgb(8 8 8 / 0.78);
+    color: #fff;
+    font:
+      16px/1.35 Roboto,
+      Arial,
+      sans-serif;
+    text-align: center;
+  }
+  .demo-bar {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 16px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.25);
+  }
+  .demo-bar i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 30%;
+    border-radius: 2px;
+    background: #ff0033;
+    transition: width 0.6s linear;
+  }
+  .demo-panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    border-radius: 14px;
+    background: var(--room);
+    box-shadow: inset 0 0 0 1px var(--glass-line);
+    text-align: left;
+  }
+  /* The video's own colours light the panel, as in the extension. */
+  .demo-panel::before {
+    content: "";
+    position: absolute;
+    inset: -14%;
+    z-index: -2;
+    background:
+      radial-gradient(60% 70% at 30% 30%, rgb(90 209 200 / 0.5), transparent 70%),
+      radial-gradient(50% 60% at 80% 80%, rgb(178 219 164 / 0.4), transparent 70%),
+      #0f2a2b;
+    filter: blur(60px) saturate(1.5) brightness(0.62);
+    opacity: 0.8;
+  }
+  .demo-head {
+    display: flex;
+    gap: 6px;
+    padding: 12px 12px 6px;
+  }
+  .demo-head span {
+    height: 26px;
+    padding: 0 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--fill);
+    color: #d9e0ee;
+    font-size: 12px;
+  }
+  .demo-rows {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 8px 64px;
+    overflow: hidden;
+    mask-image: linear-gradient(#000 calc(100% - 64px), transparent);
+  }
+  .demo-row {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fg-2);
+    transition:
+      background-color 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+  .demo-row p {
+    color: inherit;
+    line-height: 1.5;
+  }
+  .demo-t {
+    padding-top: 2px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-row.is-now {
+    background: var(--fill);
+    box-shadow: inset 0 0 0 1px var(--glass-line);
+    color: var(--fg);
+  }
+  .demo-row.is-now .demo-t {
+    color: var(--say);
+    font-weight: 600;
+  }
+  .demo-row.is-past {
+    color: rgb(195 203 218 / 0.5);
+  }
+  .demo-ph {
+    transition: color 0.25s var(--ease);
+  }
+  .demo-ph.is-say {
+    color: var(--say);
+  }
+  .demo-dock {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: color-mix(in oklab, #363d4e 50%, transparent);
+    -webkit-backdrop-filter: blur(22px) saturate(1.7);
+    backdrop-filter: blur(22px) saturate(1.7);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .demo-dock span {
+    height: 28px;
+    padding: 0 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: #d9e0ee;
+  }
+  .demo-dock span:first-child {
+    background: var(--fill-2);
+  }
+  .demo-leak {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .demo-leak i {
+    position: absolute;
+    inset: -40% -70%;
+    opacity: 0;
+    mix-blend-mode: screen;
+    background:
+      radial-gradient(9% 70% at 46% 50%, rgb(255 246 226 / 0.9), transparent 70%),
+      radial-gradient(34% 62% at 38% 52%, rgb(255 190 120 / 0.8), transparent 72%),
+      radial-gradient(22% 52% at 54% 38%, rgb(255 112 132 / 0.7), transparent 70%);
+  }
+  .demo-leak.is-go i {
+    animation: leak 0.9s cubic-bezier(0.3, 0.05, 0.2, 1) both;
+  }
+  @keyframes leak {
+    0% {
+      opacity: 0;
+      transform: translateX(-60%) skewX(-8deg);
+    }
+    16% {
+      opacity: 1;
+    }
+    62% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(60%) skewX(-8deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .demo-leak {
+      display: none;
+    }
+    .hero-chip svg,
+    .demo-row,
+    .demo-ph,
+    .demo-bar i {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Chips turn green one by one, then a light leak passes once over the demo.
+  const chips = [...document.querySelectorAll("[data-chips] .hero-chip")];
+  const leak = document.querySelector("[data-leak]");
+  if (reduce) {
+    chips.forEach((chip) => chip.classList.add("is-ok"));
+  } else {
+    chips.forEach((chip, k) =>
+      setTimeout(() => {
+        chip.classList.add("is-ok");
+        if (k === chips.length - 1) leak?.classList.add("is-go");
+      }, 600 + k * 420),
+    );
+  }
+
+  // The yellow phrase follows a fake playhead, like the real panel.
+  const rows = [...document.querySelectorAll("[data-rows] .demo-row")];
+  const phrases = rows.flatMap((row, r) => [...row.querySelectorAll(".demo-ph")].map((el) => ({ r, el })));
+  const cap = document.querySelector("[data-cap]");
+  const bar = document.querySelector("[data-bar]");
+  let i = 0;
+  function tick() {
+    const { r, el } = phrases[i];
+    rows.forEach((row, k) => {
+      row.classList.toggle("is-now", k === r);
+      row.classList.toggle("is-past", k < r);
+    });
+    phrases.forEach((p) => p.el.classList.toggle("is-say", p.el === el));
+    if (cap) cap.textContent = el.textContent.trim();
+    if (bar) bar.style.width = `${25 + (i / (phrases.length - 1)) * 45}%`;
+    i = (i + 1) % phrases.length;
+  }
+  tick();
+  if (!reduce) {
+    setInterval(() => {
+      if (!document.hidden) tick();
+    }, 2200);
+  }
+</script>
