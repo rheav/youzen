@@ -82,10 +82,12 @@ svg.i { width: 14px; height: 14px; flex: none; }
 /* ---------- Header ---------- */
 .head { display: flex; align-items: center; gap: 6px; min-height: 50px; padding: 12px 10px 6px 12px; flex: none; }
 .sp { flex: 1; min-width: 0; }
-.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; max-width: 100%; padding: 0 10px; border-radius: 999px; background: var(--nv-fill); color: var(--nv-chip-fg); font-size: 12.5px; white-space: nowrap; transition: background-color 0.15s var(--nv-ease); }
+.chip { display: inline-flex; align-items: center; gap: 6px; flex: 0 1 auto; min-width: 0; height: 28px; padding: 0 10px; border-radius: 999px; background: var(--nv-fill); color: var(--nv-chip-fg); font-size: 12.5px; white-space: nowrap; transition: background-color 0.15s var(--nv-ease); }
 .chip:hover { background: var(--nv-fill-3); }
 .chip span { overflow: hidden; text-overflow: ellipsis; }
 .chip .cv { width: 12px; height: 12px; color: var(--nv-muted); }
+.chip svg.i { flex: none; }
+.chip + .chip { flex: none; } /* Translate keeps its label; the track name truncates */
 .chip.ghost { background: transparent; box-shadow: inset 0 0 0 1px var(--nv-glass-line); color: var(--nv-muted); }
 .chip.ghost:hover { background: var(--nv-fill-2); color: var(--nv-fg); }
 .chip.on { color: var(--nv-fg); }
@@ -130,6 +132,7 @@ svg.i { width: 14px; height: 14px; flex: none; }
 .ph.say { color: var(--say); background: var(--say-bg); }
 .tr { display: block; margin-top: 3px; font-size: 12.5px; color: var(--nv-muted); }
 .row.now .tr { color: var(--fg-2); }
+.row.past .tr { color: var(--past); }
 mark { color: inherit; background: var(--hit-bg); border-radius: 3px; }
 mark.cur { background: var(--nv-sky); color: var(--nv-ink); }
 

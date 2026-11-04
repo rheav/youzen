@@ -52,7 +52,7 @@ describe('caption source', () => {
 
   it('fetches json3 with the base URL params otherwise', async () => {
     const { source, emit, fetchFn } = setup();
-    emit({ source: 'yz-hooks', type: 'timedtext', url: BASE, body: null });
+    emit({ source: 'yz-hooks', type: 'timedtext', url: BASE, body: json3('player') });
     const result = await source.loadTrack('vid1', enAsr, 'pt');
     const url = new URL(fetchFn.mock.calls[0][0]);
     expect(url.searchParams.get('tlang')).toBe('pt');
@@ -101,9 +101,27 @@ describe('caption source', () => {
 
   it('maps HTTP 429 twice to rateLimited', async () => {
     const { source, emit, fetchFn } = setup();
-    emit({ source: 'yz-hooks', type: 'timedtext', url: BASE, body: null });
+    emit({ source: 'yz-hooks', type: 'timedtext', url: BASE, body: json3('player') });
     fetchFn.mockResolvedValue({ ok: false, status: 429, text: async () => '' });
-    expect(await source.loadTrack('vid1', enAsr, null)).toEqual({ error: 'rateLimited' });
+    expect(await source.loadTrack('vid1', enAsr, 'pt')).toEqual({ error: 'rateLimited' });
     expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignores a link whose own request came back empty', async () => {
+    const { source, emit, clicks, fetchFn } = setup();
+    emit({ source: 'yz-hooks', type: 'timedtext', url: `${BASE}&bad=1`, body: null });
+    const result = await source.loadTrack('vid1', enAsr, null);
+    expect(clicks.length).toBeGreaterThan(0); // had to ask the player for a usable link
+    expect(result.cues[0].text).toBe('from player');
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it('drops a link that yields an empty track and asks the player again', async () => {
+    const { source, emit, clicks, fetchFn } = setup();
+    emit({ source: 'yz-hooks', type: 'timedtext', url: BASE.replace('lang=en', 'lang=pt'), body: json3('pt body') });
+    fetchFn.mockResolvedValueOnce({ ok: true, status: 200, text: async () => '' });
+    const result = await source.loadTrack('vid1', enAsr, null);
+    expect(clicks.length).toBeGreaterThan(0);
+    expect(result.cues[0].text).toBe('from player');
   });
 });

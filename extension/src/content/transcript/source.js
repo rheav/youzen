@@ -17,6 +17,8 @@ const LINK_WAIT_MS = 5000;
 const AD_WAIT_MS = 60_000;
 const PLAYER_WAIT_MS = 1500;
 const RETRY_429_MS = 3000;
+const READY_WAIT_MS = 10_000;
+const GRACE_MS = 1000;
 const TIMEDTEXT = { origin: 'https://www.youtube.com', path: '/api/timedtext' };
 
 const realSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -55,11 +57,11 @@ export function createCaptionSource({
     }
     if (url.origin !== TIMEDTEXT.origin || url.pathname !== TIMEDTEXT.path) return;
     const videoId = url.searchParams.get('v');
-    if (!videoId) return;
-    links.set(videoId, url.href);
     const body = event.data.body;
-    const isJson3 = url.searchParams.get('fmt') === 'json3';
-    if (typeof body === 'string' && body && isJson3) {
+    // A request that came back empty (e.g. made before the player had its token) is no base to build on.
+    if (!videoId || typeof body !== 'string' || !body) return;
+    links.set(videoId, url.href);
+    if (url.searchParams.get('fmt') === 'json3') {
       const key = trackKey(url.href);
       bodies.delete(key);
       bodies.set(key, body);
@@ -126,6 +128,15 @@ export function createCaptionSource({
       if (waited >= AD_WAIT_MS) return;
       await sleep(500);
     }
+    // While the player starts up it applies the user's own caption setting; reading the
+    // button before that would "restore" the wrong state. Wait for video data plus a grace
+    // period in which the player may fetch captions by itself.
+    const video = player()?.querySelector('video');
+    if (video) {
+      for (let waited = 0; video.readyState < 2 && waited < READY_WAIT_MS; waited += POLL_MS) await sleep(POLL_MS);
+      for (let waited = 0; !freshLink(videoId) && waited < GRACE_MS; waited += POLL_MS) await sleep(POLL_MS);
+      if (freshLink(videoId)) return;
+    }
     const btn = ccButton();
     if (!btn) return;
     attempts.set(videoId, (attempts.get(videoId) ?? 0) + 1);
@@ -151,7 +162,7 @@ export function createCaptionSource({
    * @param {string} videoId @param {import('./captions.js').Track} track @param {string|null} tlang
    * @returns {Promise<{ cues: import('./captions.js').Cue[] } | { error: 'noLink'|'rateLimited'|'network'|'empty' }>}
    */
-  async function loadTrack(videoId, track, tlang = null) {
+  async function loadTrack(videoId, track, tlang = null, retried = false) {
     const link = await ensureLink(videoId);
     if (!link) return { error: 'noLink' };
     const url = buildTrackUrl(link, track, tlang);
@@ -169,7 +180,13 @@ export function createCaptionSource({
       }
       if (!res.ok) return { error: 'network' };
       const cues = parseJson3(await res.text());
-      return cues.length ? { cues } : { error: 'empty' };
+      if (cues.length) return { cues };
+      // An empty answer usually means a stale or token-less link: ask the player for a new one, once.
+      if (!retried && links.get(videoId) === link) {
+        links.delete(videoId);
+        return loadTrack(videoId, track, tlang, true);
+      }
+      return { error: 'empty' };
     } catch {
       return { error: 'network' };
     }

@@ -217,7 +217,8 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
   useEffect(() => {
     if (!following || activeBlock < 0 || search.open || editing) return;
     centerIn(listRef.current, listRef.current?.querySelector(`[data-b="${activeBlock}"]`));
-  }, [activeBlock, following, search.open, editing]);
+    // `rows`/showTime: a translation or the time column changes row heights, so re-centre.
+  }, [activeBlock, following, search.open, editing, rows, settings?.showTime]);
 
   // Bring the current match into view.
   useEffect(() => {
@@ -380,10 +381,7 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
             {player?.tracks.length > 0 && (
               <button type="button" className="chip" aria-haspopup="menu" aria-expanded={menu === 'track'} onClick={() => toggleMenu('track')}>
                 <Captions className="i" aria-hidden="true" />
-                <span>
-                  {track?.label ?? '…'}
-                  {track?.auto ? ' · auto' : ''}
-                </span>
+                <span>{track?.label ?? '…'}</span>
                 <ChevronDown className="i cv" aria-hidden="true" />
               </button>
             )}

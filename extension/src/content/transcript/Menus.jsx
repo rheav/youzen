@@ -24,7 +24,7 @@ export function TrackMenu({ tracks, current, onPick }) {
   return (
     <Menu place="top left" label="Caption track">
       {tracks.map((t) => (
-        <Item key={t.lang} checked={t.lang === current?.lang} onClick={() => onPick(t)} hint={t.auto ? 'auto' : null}>
+        <Item key={t.lang} checked={t.lang === current?.lang} onClick={() => onPick(t)}>
           {t.label}
         </Item>
       ))}
