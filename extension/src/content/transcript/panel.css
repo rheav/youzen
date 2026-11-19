@@ -227,7 +227,7 @@ mark.cur { background: var(--nv-sky); color: var(--nv-ink); }
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14), 0 24px 64px rgb(0 0 0 / 0.55);
 }
-:host([data-yz-floating]) .light > i.is-on { opacity: 0.34; }
+:host([data-yz-floating]) .light { display: none; } /* the glass already shows the video */
 :host([data-yz-floating]) .vignette { opacity: 0.42; }
 :host([data-yz-floating]) .yz-root.is-light {
   background: rgb(255 255 255 / 0.56);

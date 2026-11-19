@@ -9,13 +9,13 @@
 
 import { placeHost } from './placement.js';
 import { createCaptionSource } from './source.js';
-import { findFeature } from '../../config/features.js';
+import { findFeature, TRANSCRIPT_DEFAULTS } from '../../config/features.js';
 import { isPausedNow, onPauseChange } from '../modules/pause-state.js';
 import { nudgePlayerResize } from '../modules/attribute-applier.js';
 
 const FLAG = 'transcriptPanel';
 const FS_MODE_KEY = 'transcriptFullscreenMode';
-const DEFAULT_FS_MODE = 'split';
+const DEFAULT_FS_MODE = TRANSCRIPT_DEFAULTS[FS_MODE_KEY];
 const OPEN_KEY = 'yz-transcript-open';
 const OPEN_ATTR = 'data-yz-transcript-open';
 const TICK_MS = 500;

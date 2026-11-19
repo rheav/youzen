@@ -409,6 +409,18 @@ export const GROUPS = {
 };
 
 /**
+ * Defaults for the transcript panel's own settings (not feature flags).
+ * Read by the in-page panel (content script) and the side panel's Transcript
+ * tab, so a missing storage key means the same thing on both sides.
+ */
+export const TRANSCRIPT_DEFAULTS = {
+  transcriptShowTime: true,
+  transcriptAutoScroll: true,
+  transcriptColorLeak: true,
+  transcriptFullscreenMode: 'split',
+};
+
+/**
  * Returns the Feature entry (non-master) for a given id, or null.
  * @param {string} id
  * @returns {Feature|null}

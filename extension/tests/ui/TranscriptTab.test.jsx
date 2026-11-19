@@ -72,6 +72,7 @@ describe('<TranscriptTab />', () => {
     });
 
     const label = screen.getByText('Dynamic color glow');
+    expect(screen.getByText("Tints the panel with the video's colours (dark theme)")).toBeTruthy();
     const row = label.closest('div')?.parentElement;
     const sw = row.querySelector('[role="switch"]');
     expect(sw.getAttribute('aria-checked')).toBe('true');

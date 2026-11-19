@@ -64,11 +64,14 @@ describe('transcript panel', () => {
   });
 
   it('renders blocks and marks the active cue yellow', async () => {
-    const { tick, container } = setup();
-    await screen.findByText('Second phrase here.');
-    tick(2.5);
-    expect(container.querySelector('.ph.say').textContent).toBe('Second phrase here.');
+    const { tick, video, container } = setup();
+    // Start mid-cue: the panel reads currentTime as soon as its listener attaches,
+    // so the test never races the effect that subscribes to timeupdate.
+    video.currentTime = 2.5;
+    await waitFor(() => expect(container.querySelector('.ph.say')?.textContent).toBe('Second phrase here.'));
     expect(container.querySelector('.row.now')).not.toBeNull();
+    tick(4.5);
+    expect(container.querySelector('.ph.say').textContent).toBe('Another phrase.');
   });
 
   it('clicking a phrase seeks the video', async () => {

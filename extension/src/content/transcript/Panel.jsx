@@ -13,15 +13,16 @@ import { textOf, buildTxt, buildSrt, buildVtt, safeFileName } from './exporters.
 import { findMatches, splitRanges } from './search.js';
 import { editKey, loadEdits, saveEdits } from './edits.js';
 import { createVideoLightSampler } from './color-leak.js';
+import { TRANSCRIPT_DEFAULTS } from '../../config/features.js';
 import { Row } from './Rows.jsx';
 import { TrackMenu, TranslateMenu, ExportMenu, MoreMenu } from './Menus.jsx';
 
 const SETTINGS = {
   lang: ['transcriptLang', null],
   translateLang: ['transcriptTranslateLang', null],
-  showTime: ['transcriptShowTime', true],
-  autoScroll: ['transcriptAutoScroll', true],
-  colorLeak: ['transcriptColorLeak', true],
+  showTime: ['transcriptShowTime', TRANSCRIPT_DEFAULTS.transcriptShowTime],
+  autoScroll: ['transcriptAutoScroll', TRANSCRIPT_DEFAULTS.transcriptAutoScroll],
+  colorLeak: ['transcriptColorLeak', TRANSCRIPT_DEFAULTS.transcriptColorLeak],
 };
 const POLL_MS = 500;
 const TOAST_MS = 1400;
@@ -539,6 +540,8 @@ function RoomGlow({ videoId, getVideo, dark, enabled, doc }) {
     };
 
     const sampleNow = () => {
+      // Floating over the video, the frosted glass already shows its colours.
+      if (aRef.current?.getRootNode()?.host?.hasAttribute('data-yz-floating')) return false;
       const next = sampler.sample(getVideoRef.current());
       if (next) {
         liveReady = true;

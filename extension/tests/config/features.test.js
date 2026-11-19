@@ -5,6 +5,7 @@ import {
   findFeature,
   findMaster,
   featuresIn,
+  TRANSCRIPT_DEFAULTS,
 } from '@/config/features';
 
 describe('config/features — integrity', () => {
@@ -159,6 +160,15 @@ describe('config/features — expected feature set', () => {
     expect(f.group).toBe(null);
     expect(f.tab).toBe('transcript');
     expect(f.attr).toBe('data-ytc-transcript');
+  });
+
+  it('TRANSCRIPT_DEFAULTS holds the one copy of the transcript setting defaults', () => {
+    expect(TRANSCRIPT_DEFAULTS).toEqual({
+      transcriptShowTime: true,
+      transcriptAutoScroll: true,
+      transcriptColorLeak: true,
+      transcriptFullscreenMode: 'split',
+    });
   });
 
   it('default-ON features match the spec §2.1 list', () => {

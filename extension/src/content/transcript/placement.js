@@ -14,6 +14,7 @@
 const PANEL_WIDTH = 400;
 const THEATER_INSET = 8;
 const FLOATING_INSET = 14;
+const FLOATING_TOP = 64; // clears YouTube's fullscreen title row and top-right buttons
 const FLOATING_BOTTOM = 72;
 const MIN_HEIGHT = 360;
 const GAP = 12;
@@ -56,7 +57,7 @@ export function placeHost(host, doc = document, fullscreenMode = 'split') {
       host.setAttribute(FLOATING_ATTR, '');
       applyCss(
         host,
-        `${base} position: absolute; top: ${FLOATING_INSET}px; right: ${FLOATING_INSET}px; bottom: ${FLOATING_BOTTOM}px; width: ${PANEL_WIDTH}px; z-index: 65;`,
+        `${base} position: absolute; top: ${FLOATING_TOP}px; right: ${FLOATING_INSET}px; bottom: ${FLOATING_BOTTOM}px; width: ${PANEL_WIDTH}px; z-index: 65;`,
       );
       host.hidden = false;
       return 'fullscreen-floating';

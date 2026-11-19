@@ -1,9 +1,9 @@
 import { MousePointerClick, Search, Languages, Download, PencilLine, Captions } from 'lucide-react';
 import Card from '../ui/Card';
 import FeatureRow from '../ui/FeatureRow';
-import Select from '../ui/Select';
+import SelectRow from '../ui/SelectRow';
 import { useStorageState } from '../../hooks/useStorageState';
-import { findFeature } from '@/config/features';
+import { findFeature, TRANSCRIPT_DEFAULTS } from '@/config/features';
 
 /**
  * Transcript tab — the in-page transcript panel's switch, its defaults, and how
@@ -80,76 +80,40 @@ export default function TranscriptTab() {
       <Card title="Defaults" subtitle="Used every time the panel opens">
         <FeatureRow
           label="Show timestamps"
-          checked={state.transcriptShowTime ?? true}
+          checked={state.transcriptShowTime ?? TRANSCRIPT_DEFAULTS.transcriptShowTime}
           onToggle={(v) => setValue('transcriptShowTime', v)}
           disabled={paused}
         />
         <FeatureRow
           label="Follow the video"
           description="Keeps the line being spoken in view"
-          checked={state.transcriptAutoScroll ?? true}
+          checked={state.transcriptAutoScroll ?? TRANSCRIPT_DEFAULTS.transcriptAutoScroll}
           onToggle={(v) => setValue('transcriptAutoScroll', v)}
           disabled={paused}
         />
         <FeatureRow
           label="Dynamic color glow"
-          description="Tints the panel with the colours on screen"
-          checked={state.transcriptColorLeak ?? true}
+          description="Tints the panel with the video's colours (dark theme)"
+          checked={state.transcriptColorLeak ?? TRANSCRIPT_DEFAULTS.transcriptColorLeak}
           onToggle={(v) => setValue('transcriptColorLeak', v)}
           disabled={paused}
         />
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            padding: '8px 0',
-            opacity: paused ? 0.5 : 1,
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>
-              In fullscreen
-            </span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              Side by side or frosted glass over the video
-            </span>
-          </div>
-          <Select
-            value={state.transcriptFullscreenMode ?? 'split'}
-            onChange={(v) => setValue('transcriptFullscreenMode', v)}
-            options={FULLSCREEN_MODES}
-            disabled={paused}
-            ariaLabel="In fullscreen"
-          />
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
-            padding: '8px 0',
-            opacity: paused ? 0.5 : 1,
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>
-              Translate to
-            </span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              Shown under each paragraph
-            </span>
-          </div>
-          <Select
-            value={state.transcriptTranslateLang ?? ''}
-            onChange={(v) => setValue('transcriptTranslateLang', v || null)}
-            options={LANGUAGES}
-            disabled={paused}
-            ariaLabel="Translate to"
-          />
-        </div>
+        <SelectRow
+          label="In fullscreen"
+          description="Side by side or frosted glass over the video"
+          value={state.transcriptFullscreenMode ?? TRANSCRIPT_DEFAULTS.transcriptFullscreenMode}
+          onChange={(v) => setValue('transcriptFullscreenMode', v)}
+          options={FULLSCREEN_MODES}
+          disabled={paused}
+        />
+        <SelectRow
+          label="Translate to"
+          description="Shown under each paragraph"
+          value={state.transcriptTranslateLang ?? ''}
+          onChange={(v) => setValue('transcriptTranslateLang', v || null)}
+          options={LANGUAGES}
+          disabled={paused}
+        />
       </Card>
 
       <Card title="How it works">

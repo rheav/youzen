@@ -66,6 +66,7 @@ describe('transcript placement', () => {
     expect(document.querySelector('#player-full-bleed-container').nextElementSibling).toBe(host);
     expect(host.style.position).toBe('absolute');
     expect(host.style.width).toBe('400px');
+    expect(host.style.top).toBe('64px'); // clears YouTube's fullscreen top-right buttons
     expect(host.hasAttribute('data-yz-floating')).toBe(true);
     expect(host.hidden).toBe(false);
 

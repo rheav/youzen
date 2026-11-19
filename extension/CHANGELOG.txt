@@ -67,6 +67,19 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 19/11/2026 - v1.3.2 Released:
+
+IMPROVED - Transcript panel polish:
+- Floating (frosted glass) panel now starts below YouTube's fullscreen title
+  row, so the top-right player buttons stay clickable.
+- Floating mode no longer draws the colour glow under the glass (the glass
+  already shows the video), saving GPU and the video sampling work.
+- "Dynamic color glow" now says it only applies to YouTube's dark theme.
+- Settings: the select rows share one component, and the transcript defaults
+  live in one place for the panel and the side panel.
+
+--------------------------------------------------------------------------------
+
 🆕 19/11/2026 - v1.3.1 Released:
 
 NEW - Dynamic color glow toggle:
