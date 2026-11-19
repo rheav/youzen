@@ -63,4 +63,21 @@ describe('<TranscriptTab />', () => {
     fireEvent.change(select, { target: { value: 'off' } });
     expect(env.store.transcriptFullscreenMode).toBe('off');
   });
+
+  it('renders dynamic color glow toggle defaulting to on and persists changes', async () => {
+    const env = setupChromeStorage();
+    render(<TranscriptTab />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const label = screen.getByText('Dynamic color glow');
+    const row = label.closest('div')?.parentElement;
+    const sw = row.querySelector('[role="switch"]');
+    expect(sw.getAttribute('aria-checked')).toBe('true');
+
+    fireEvent.click(sw);
+    expect(env.store.transcriptColorLeak).toBe(false);
+    expect(sw.getAttribute('aria-checked')).toBe('false');
+  });
 });

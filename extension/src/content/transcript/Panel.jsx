@@ -21,6 +21,7 @@ const SETTINGS = {
   translateLang: ['transcriptTranslateLang', null],
   showTime: ['transcriptShowTime', true],
   autoScroll: ['transcriptAutoScroll', true],
+  colorLeak: ['transcriptColorLeak', true],
 };
 const POLL_MS = 500;
 const TOAST_MS = 1400;
@@ -347,7 +348,7 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
 
   return (
     <div className={rootClass} onKeyDown={onKeyDown}>
-      <RoomGlow videoId={videoId} getVideo={getVideo} dark={dark} doc={doc} />
+      <RoomGlow videoId={videoId} getVideo={getVideo} dark={dark} enabled={settings?.colorLeak ?? true} doc={doc} />
       <i className="vignette" />
 
       <div className="head">
@@ -506,14 +507,21 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
   );
 }
 
-function RoomGlow({ videoId, getVideo, dark, doc }) {
+function RoomGlow({ videoId, getVideo, dark, enabled, doc }) {
   const aRef = useRef(null);
   const bRef = useRef(null);
   const frontRef = useRef(0);
   const shownRef = useRef(null);
+  const getVideoRef = useRef(getVideo);
+  getVideoRef.current = getVideo;
 
   useEffect(() => {
-    if (!dark || !videoId) return undefined;
+    if (!dark || !enabled || !videoId) {
+      shownRef.current = null;
+      aRef.current?.classList.remove('is-on');
+      bRef.current?.classList.remove('is-on');
+      return undefined;
+    }
     const sampler = createVideoLightSampler({ doc });
     let liveReady = false;
 
@@ -531,7 +539,7 @@ function RoomGlow({ videoId, getVideo, dark, doc }) {
     };
 
     const sampleNow = () => {
-      const next = sampler.sample(getVideo());
+      const next = sampler.sample(getVideoRef.current());
       if (next) {
         liveReady = true;
         push(next);
@@ -543,11 +551,11 @@ function RoomGlow({ videoId, getVideo, dark, doc }) {
       push(`https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg`);
     }
 
-    const video = getVideo();
+    const video = getVideoRef.current();
     const events = ['loadeddata', 'seeked', 'play'];
     events.forEach((e) => video?.addEventListener?.(e, sampleNow));
     const timer = setInterval(() => {
-      const v = getVideo();
+      const v = getVideoRef.current();
       if (v && (!v.paused || !liveReady)) sampleNow();
     }, 1800);
 
@@ -555,7 +563,7 @@ function RoomGlow({ videoId, getVideo, dark, doc }) {
       clearInterval(timer);
       events.forEach((e) => video?.removeEventListener?.(e, sampleNow));
     };
-  }, [videoId, dark, getVideo, doc]);
+  }, [videoId, dark, enabled, doc]);
 
   return (
     <div className="light" aria-hidden="true">

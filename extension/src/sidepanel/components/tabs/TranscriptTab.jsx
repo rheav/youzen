@@ -14,6 +14,7 @@ const KEYS = [
   'transcriptPanel',
   'transcriptShowTime',
   'transcriptAutoScroll',
+  'transcriptColorLeak',
   'transcriptFullscreenMode',
   'transcriptTranslateLang',
   'globallyPaused',
@@ -88,6 +89,13 @@ export default function TranscriptTab() {
           description="Keeps the line being spoken in view"
           checked={state.transcriptAutoScroll ?? true}
           onToggle={(v) => setValue('transcriptAutoScroll', v)}
+          disabled={paused}
+        />
+        <FeatureRow
+          label="Dynamic color glow"
+          description="Tints the panel with the colours on screen"
+          checked={state.transcriptColorLeak ?? true}
+          onToggle={(v) => setValue('transcriptColorLeak', v)}
           disabled={paused}
         />
         <div

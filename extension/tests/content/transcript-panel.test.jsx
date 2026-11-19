@@ -22,9 +22,30 @@ function setup({ tracks = [track] } = {}) {
     isAdShowing: () => false,
     resetAttempts: vi.fn(),
   };
+  const listeners = new Set();
+  const store = {};
   const ch = {
-    storage: { local: { get: (_k, cb) => cb({}), set: vi.fn(), remove: (_k, cb) => cb?.() } },
+    storage: {
+      local: {
+        get: (_k, cb) => cb({ ...store }),
+        set: vi.fn((items) => Object.assign(store, items)),
+        remove: (_k, cb) => cb?.(),
+      },
+      onChanged: {
+        addListener: (fn) => listeners.add(fn),
+        removeListener: (fn) => listeners.delete(fn),
+      },
+    },
   };
+  const setStorage = (patch) =>
+    act(() => {
+      const changes = {};
+      for (const [k, v] of Object.entries(patch)) {
+        changes[k] = { oldValue: store[k], newValue: v };
+        store[k] = v;
+      }
+      for (const fn of listeners) fn(changes, 'local');
+    });
   const onClose = vi.fn();
   const utils = render(
     <Panel source={source} doc={document} ch={ch} getVideoId={() => videoId} getVideo={() => video} onClose={onClose} />,
@@ -34,7 +55,7 @@ function setup({ tracks = [track] } = {}) {
       video.currentTime = t;
       video.dispatchEvent(new Event('timeupdate'));
     });
-  return { ...utils, source, video, onClose, tick, setVideo: (id) => (videoId = id) };
+  return { ...utils, source, video, onClose, tick, setStorage, setVideo: (id) => (videoId = id) };
 }
 
 describe('transcript panel', () => {
@@ -105,5 +126,18 @@ describe('transcript panel', () => {
     const { onClose } = setup();
     fireEvent.click(screen.getByLabelText('Close transcript'));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('toggles dynamic color leak glow live when transcriptColorLeak changes', async () => {
+    document.documentElement.setAttribute('dark', '');
+    const { container, setStorage } = setup();
+    await screen.findByText('Hello there.');
+    expect(container.querySelector('.light > i.is-on')).not.toBeNull();
+
+    setStorage({ transcriptColorLeak: false });
+    expect(container.querySelector('.light > i.is-on')).toBeNull();
+
+    setStorage({ transcriptColorLeak: true });
+    expect(container.querySelector('.light > i.is-on')).not.toBeNull();
   });
 });
