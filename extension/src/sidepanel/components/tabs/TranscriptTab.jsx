@@ -14,9 +14,16 @@ const KEYS = [
   'transcriptPanel',
   'transcriptShowTime',
   'transcriptAutoScroll',
+  'transcriptFullscreenMode',
   'transcriptTranslateLang',
   'globallyPaused',
 ];
+
+const FULLSCREEN_MODES = [
+  ['split', 'Side by side'],
+  ['floating', 'Floating (frosted glass)'],
+  ['off', 'Hidden'],
+].map(([value, label]) => ({ value, label }));
 
 // YouTube `tlang` codes. The panel's own menu lists every language YouTube
 // offers for the video; these are the common defaults.
@@ -83,6 +90,32 @@ export default function TranscriptTab() {
           onToggle={(v) => setValue('transcriptAutoScroll', v)}
           disabled={paused}
         />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            padding: '8px 0',
+            opacity: paused ? 0.5 : 1,
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>
+              In fullscreen
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              Side by side or frosted glass over the video
+            </span>
+          </div>
+          <Select
+            value={state.transcriptFullscreenMode ?? 'split'}
+            onChange={(v) => setValue('transcriptFullscreenMode', v)}
+            options={FULLSCREEN_MODES}
+            disabled={paused}
+            ariaLabel="In fullscreen"
+          />
+        </div>
         <div
           style={{
             display: 'flex',

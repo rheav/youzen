@@ -12,6 +12,7 @@ import { mergeBlocks, findActiveCue, alignTranslations } from './captions.js';
 import { textOf, buildTxt, buildSrt, buildVtt, safeFileName } from './exporters.js';
 import { findMatches, splitRanges } from './search.js';
 import { editKey, loadEdits, saveEdits } from './edits.js';
+import { createVideoLightSampler } from './color-leak.js';
 import { Row } from './Rows.jsx';
 import { TrackMenu, TranslateMenu, ExportMenu, MoreMenu } from './Menus.jsx';
 
@@ -345,12 +346,8 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
   const rootClass = `yz-root${dark ? '' : ' is-light'}${editing ? ' editing' : ''}`;
 
   return (
-    <div
-      className={rootClass}
-      style={videoId ? { '--thumb': `url(https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg)` } : undefined}
-      onKeyDown={onKeyDown}
-    >
-      <i className="light" />
+    <div className={rootClass} onKeyDown={onKeyDown}>
+      <RoomGlow videoId={videoId} getVideo={getVideo} dark={dark} doc={doc} />
       <i className="vignette" />
 
       <div className="head">
@@ -505,6 +502,65 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
           {toast}
         </div>
       )}
+    </div>
+  );
+}
+
+function RoomGlow({ videoId, getVideo, dark, doc }) {
+  const aRef = useRef(null);
+  const bRef = useRef(null);
+  const frontRef = useRef(0);
+  const shownRef = useRef(null);
+
+  useEffect(() => {
+    if (!dark || !videoId) return undefined;
+    const sampler = createVideoLightSampler({ doc });
+    let liveReady = false;
+
+    const push = (src) => {
+      if (!src || src === shownRef.current) return;
+      shownRef.current = src;
+      const layers = [aRef.current, bRef.current];
+      const a = layers[frontRef.current];
+      const b = layers[1 - frontRef.current];
+      if (!a || !b) return;
+      b.style.backgroundImage = `url("${src}")`;
+      b.classList.add('is-on');
+      a.classList.remove('is-on');
+      frontRef.current = 1 - frontRef.current;
+    };
+
+    const sampleNow = () => {
+      const next = sampler.sample(getVideo());
+      if (next) {
+        liveReady = true;
+        push(next);
+      }
+      return !!next;
+    };
+
+    if (!sampleNow()) {
+      push(`https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg`);
+    }
+
+    const video = getVideo();
+    const events = ['loadeddata', 'seeked', 'play'];
+    events.forEach((e) => video?.addEventListener?.(e, sampleNow));
+    const timer = setInterval(() => {
+      const v = getVideo();
+      if (v && (!v.paused || !liveReady)) sampleNow();
+    }, 1800);
+
+    return () => {
+      clearInterval(timer);
+      events.forEach((e) => video?.removeEventListener?.(e, sampleNow));
+    };
+  }, [videoId, dark, getVideo, doc]);
+
+  return (
+    <div className="light" aria-hidden="true">
+      <i ref={aRef} />
+      <i ref={bRef} />
     </div>
   );
 }

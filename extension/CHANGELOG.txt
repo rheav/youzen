@@ -67,6 +67,24 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 19/11/2026 - v1.3.0 Released:
+
+NEW - Transcript panel in fullscreen & live video colour leak:
+- Fullscreen support with two selectable modes in the Transcript tab ("In
+  fullscreen"):
+  • Side by side (default): places the 400px panel beside the video without
+    covering any part of the frame; the player resizes cleanly and expands back
+    when closed via the player button or ✕.
+  • Floating (frosted glass): keeps the video edge-to-edge at 100% and floats a
+    translucent, blurred glass panel over the right side above the player's
+    bottom controls, plus an "Hidden" option if you prefer fullscreen clean.
+- Live colour leak (socialmate-hub Glow style): in dark mode, two cross-fading
+  room-light layers sample the playing video as scenes change (lifting dark
+  diagrams/slides toward their accent colour and taming bright white screens),
+  with zero animation while a scene holds.
+
+--------------------------------------------------------------------------------
+
 🆕 04/11/2026 - v1.2.0 Released:
 
 NEW - Nord look for the whole extension:

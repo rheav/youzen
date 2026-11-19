@@ -1,9 +1,11 @@
 /**
  * Where the transcript panel sits on the watch page.
  *
- *   theater → its own 400px column right of the player (#full-bleed-container is a flex row)
- *   columns → first thing in the right column, as tall as the player
- *   single  → narrow window: first thing below the player
+ *   fullscreen-split    → 400px column right of the player in #full-bleed-container (100vh)
+ *   fullscreen-floating → 400px frosted-glass card floating over the right side of the player
+ *   theater             → its own 400px column right of the player (#full-bleed-container is a flex row)
+ *   columns             → first thing in the right column, as tall as the player
+ *   single              → narrow window: first thing below the player
  *
  * The host element itself moves between slots; the React tree inside its
  * shadow root survives the move.
@@ -11,9 +13,12 @@
 
 const PANEL_WIDTH = 400;
 const THEATER_INSET = 8;
+const FLOATING_INSET = 14;
+const FLOATING_BOTTOM = 72;
 const MIN_HEIGHT = 360;
 const GAP = 12;
 const SINGLE_HEIGHT = 'clamp(240px, 40vh, 480px)';
+const FLOATING_ATTR = 'data-yz-floating';
 
 /** @param {Element} flexy ytd-watch-flexy @returns {'theater'|'columns'|'single'} */
 export function detectLayout(flexy) {
@@ -30,17 +35,40 @@ const applyCss = (el, css) => {
 
 /**
  * Moves `host` into the slot for the current layout and sizes it.
- * @returns {'theater'|'columns'|'single'|null} null when hidden (no watch page, fullscreen, no anchor)
+ * @param {HTMLElement} host
+ * @param {Document} [doc]
+ * @param {'split'|'floating'|'off'} [fullscreenMode]
+ * @returns {'fullscreen-split'|'fullscreen-floating'|'theater'|'columns'|'single'|null}
  */
-export function placeHost(host, doc = document) {
+export function placeHost(host, doc = document, fullscreenMode = 'split') {
   const flexy = doc.querySelector('ytd-watch-flexy');
-  if (!flexy || flexy.hidden || flexy.hasAttribute('fullscreen') || doc.fullscreenElement) {
-    host.hidden = true;
-    return null;
-  }
-  const layout = detectLayout(flexy);
+  if (!flexy || flexy.hidden) return hide(host);
+
   // No inline `display`: it would override the `hidden` attribute.
   const base = 'box-sizing: border-box;';
+
+  if (flexy.hasAttribute('fullscreen') || doc.fullscreenElement) {
+    if (fullscreenMode === 'off') return hide(host);
+    const anchor = flexy.querySelector('#full-bleed-container > #player-full-bleed-container');
+    if (!anchor) return hide(host);
+    if (anchor.nextElementSibling !== host) anchor.after(host);
+    if (fullscreenMode === 'floating') {
+      host.setAttribute(FLOATING_ATTR, '');
+      applyCss(
+        host,
+        `${base} position: absolute; top: ${FLOATING_INSET}px; right: ${FLOATING_INSET}px; bottom: ${FLOATING_BOTTOM}px; width: ${PANEL_WIDTH}px; z-index: 65;`,
+      );
+      host.hidden = false;
+      return 'fullscreen-floating';
+    }
+    host.removeAttribute(FLOATING_ATTR);
+    applyCss(host, `${base} flex: 0 0 ${PANEL_WIDTH}px; width: ${PANEL_WIDTH}px; align-self: stretch; padding: ${THEATER_INSET}px;`);
+    host.hidden = false;
+    return 'fullscreen-split';
+  }
+
+  host.removeAttribute(FLOATING_ATTR);
+  const layout = detectLayout(flexy);
 
   if (layout === 'theater') {
     const anchor = flexy.querySelector('#full-bleed-container > #player-full-bleed-container');
@@ -65,5 +93,6 @@ export function placeHost(host, doc = document) {
 
 function hide(host) {
   host.hidden = true;
+  host.removeAttribute(FLOATING_ATTR);
   return null;
 }

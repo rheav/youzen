@@ -386,8 +386,17 @@ html[data-ytc-collapse-desc] ytd-watch-metadata ytd-text-inline-expander:not([is
  * ─────────────────────────────────────────────────────────── */
 
 /* ───────────────────────────────────────────────────────────
- * Transcript panel — player button (the panel itself is a shadow root)
+ * Transcript panel — player button & fullscreen container layout
  * ─────────────────────────────────────────────────────────── */
+html[data-yz-transcript-open] ytd-watch-flexy #player-full-bleed-container {
+  min-width: 0 !important;
+}
+html[data-yz-transcript-open] ytd-watch-flexy[fullscreen] #full-bleed-container {
+  display: flex !important;
+  flex-direction: row !important;
+  position: relative !important;
+}
+
 .yz-transcript-button {
   position: relative;
   display: inline-flex !important;

@@ -14,10 +14,13 @@ import { isPausedNow, onPauseChange } from '../modules/pause-state.js';
 import { nudgePlayerResize } from '../modules/attribute-applier.js';
 
 const FLAG = 'transcriptPanel';
+const FS_MODE_KEY = 'transcriptFullscreenMode';
+const DEFAULT_FS_MODE = 'split';
 const OPEN_KEY = 'yz-transcript-open';
 const OPEN_ATTR = 'data-yz-transcript-open';
 const TICK_MS = 500;
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const WIDTH_LAYOUTS = new Set(['theater', 'fullscreen-split']);
 // lucide "scroll-text"
 const ICON_PATHS = [
   'M15 12h-5',
@@ -69,6 +72,7 @@ export function makeTranscriptHandler(ch = chrome, { doc = document, win = windo
   // Listen from document_start: the player may fetch captions before the panel opens.
   const source = createCaptionSource({ win, doc });
   let enabled = false;
+  let fullscreenMode = DEFAULT_FS_MODE;
   let button = null;
   let host = null;
   let panel = null;
@@ -77,8 +81,10 @@ export function makeTranscriptHandler(ch = chrome, { doc = document, win = windo
 
   const place = () => {
     if (!host) return;
-    const next = placeHost(host, doc);
-    if (next !== layout && (next === 'theater' || layout === 'theater')) nudgePlayerResize();
+    const next = placeHost(host, doc, fullscreenMode);
+    if (next !== layout && (WIDTH_LAYOUTS.has(next) || WIDTH_LAYOUTS.has(layout))) {
+      nudgePlayerResize();
+    }
     layout = next;
   };
 
@@ -107,6 +113,8 @@ export function makeTranscriptHandler(ch = chrome, { doc = document, win = windo
     if (!host) {
       host = doc.createElement('div');
       host.id = 'yz-transcript';
+      // Keep wheel scrolling inside the transcript from pulling up YouTube's fullscreen grid.
+      host.addEventListener('wheel', (e) => e.stopPropagation());
       doc.documentElement.setAttribute(OPEN_ATTR, '');
       nudgePlayerResize();
     }
@@ -152,8 +160,11 @@ export function makeTranscriptHandler(ch = chrome, { doc = document, win = windo
   }
 
   const refreshEnabled = async () => {
-    const stored = await new Promise((resolve) => ch.storage.local.get(FLAG, (r) => resolve(r ?? {})));
+    const stored = await new Promise((resolve) =>
+      ch.storage.local.get([FLAG, FS_MODE_KEY], (r) => resolve(r ?? {})),
+    );
     const on = stored[FLAG] ?? findFeature(FLAG).default;
+    fullscreenMode = stored[FS_MODE_KEY] ?? DEFAULT_FS_MODE;
     enabled = !!on && !(await isPausedNow(ch));
     sync();
   };
@@ -164,13 +175,17 @@ export function makeTranscriptHandler(ch = chrome, { doc = document, win = windo
     onEnter: () => {
       void refreshEnabled();
       const onStorage = (changes, area) => {
-        if (area === 'local' && FLAG in changes) void refreshEnabled();
+        if (area === 'local' && (FLAG in changes || FS_MODE_KEY in changes)) void refreshEnabled();
       };
       ch.storage.onChanged.addListener(onStorage);
       const disposePause = onPauseChange(() => void refreshEnabled());
       const onLayout = () => enabled && place();
+      const onFullscreen = () => {
+        onLayout();
+        if (typeof win.requestAnimationFrame === 'function') win.requestAnimationFrame(onLayout);
+      };
       win.addEventListener('resize', onLayout);
-      doc.addEventListener('fullscreenchange', onLayout);
+      doc.addEventListener('fullscreenchange', onFullscreen);
       doc.addEventListener('yt-navigate-finish', onLayout);
       // YouTube re-renders the controls and columns on its own schedule; re-check cheaply.
       const timer = setInterval(() => {
@@ -184,7 +199,7 @@ export function makeTranscriptHandler(ch = chrome, { doc = document, win = windo
         ch.storage.onChanged.removeListener(onStorage);
         disposePause();
         win.removeEventListener('resize', onLayout);
-        doc.removeEventListener('fullscreenchange', onLayout);
+        doc.removeEventListener('fullscreenchange', onFullscreen);
         doc.removeEventListener('yt-navigate-finish', onLayout);
         enabled = false;
         button?.remove();
