@@ -396,6 +396,32 @@ html[data-yz-transcript-open] ytd-watch-flexy[fullscreen] #full-bleed-container 
   flex-direction: row !important;
   position: relative !important;
 }
+/* Floating (frosted glass) panel in fullscreen: it sits over the player's
+ * bottom-right corner, where YouTube opens the gear menu. While the player has
+ * .ytp-settings-shown (set exactly while that menu is open) the panel slides
+ * aside and fades, then comes back when the menu closes. visibility waits for
+ * the fade so the panel is never focusable or clickable while hidden. */
+#yz-transcript[data-yz-floating] {
+  transition:
+    opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0s;
+}
+#full-bleed-container:has(.html5-video-player.ytp-settings-shown) > #yz-transcript[data-yz-floating] {
+  opacity: 0;
+  transform: translateX(16px) scale(0.985);
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  #yz-transcript[data-yz-floating] {
+    transition: none !important;
+  }
+}
 
 .yz-transcript-button {
   position: relative;

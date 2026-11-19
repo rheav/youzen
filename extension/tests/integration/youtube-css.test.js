@@ -575,3 +575,37 @@ describe('youtube.css — blocklist marker', () => {
     expect(isHidden(document.querySelector('#kept'))).toBe(false);
   });
 });
+
+describe('youtube.css — floating transcript steps aside for the player settings menu', () => {
+  const snippet = `
+    <ytd-watch-flexy fullscreen>
+      <div id="full-bleed-container">
+        <div id="player-full-bleed-container">
+          <div id="movie_player" class="html5-video-player"></div>
+        </div>
+        <div id="yz-transcript" data-yz-floating></div>
+      </div>
+    </ytd-watch-flexy>
+  `;
+  const cs = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
+
+  it('fades the floating panel out while the settings menu is open, and back when it closes', () => {
+    mountSnippet(document, snippet);
+    const host = document.querySelector('#yz-transcript');
+    const player = document.querySelector('#movie_player');
+    expect(cs(host).opacity).not.toBe('0');
+    player.classList.add('ytp-settings-shown');
+    expect(cs(host).opacity).toBe('0');
+    expect(cs(host).pointerEvents).toBe('none');
+    player.classList.remove('ytp-settings-shown');
+    expect(cs(host).opacity).not.toBe('0');
+  });
+
+  it('leaves the side-by-side panel alone (the menu sits inside the player there)', () => {
+    mountSnippet(document, snippet);
+    const host = document.querySelector('#yz-transcript');
+    host.removeAttribute('data-yz-floating');
+    document.querySelector('#movie_player').classList.add('ytp-settings-shown');
+    expect(cs(host).opacity).not.toBe('0');
+  });
+});

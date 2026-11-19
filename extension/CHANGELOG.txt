@@ -67,6 +67,16 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 19/11/2026 - v1.4.1 Released:
+
+IMPROVED - Floating panel steps aside for the player's settings:
+- In fullscreen with the floating (frosted glass) panel, opening YouTube's
+  gear menu now slides and fades the panel out of the way, and brings it back
+  smoothly when the menu closes (submenus like Quality included). Side by
+  side mode is unchanged. Reduced-motion turns the animation off.
+
+--------------------------------------------------------------------------------
+
 🆕 19/11/2026 - v1.4.0 Released:
 
 NEW - Floating glass darkness:
