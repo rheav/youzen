@@ -131,6 +131,15 @@ describe('transcript panel', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('sets the floating glass darkness from storage, live', async () => {
+    const { container, setStorage } = setup();
+    await screen.findByText('Hello there.');
+    const root = container.querySelector('.yz-root');
+    expect(root.style.getPropertyValue('--yz-glass')).toBe('0.44');
+    setStorage({ transcriptGlassDarkness: 80 });
+    expect(root.style.getPropertyValue('--yz-glass')).toBe('0.8');
+  });
+
   it('toggles dynamic color leak glow live when transcriptColorLeak changes', async () => {
     document.documentElement.setAttribute('dark', '');
     const { container, setStorage } = setup();

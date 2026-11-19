@@ -23,6 +23,7 @@ const SETTINGS = {
   showTime: ['transcriptShowTime', TRANSCRIPT_DEFAULTS.transcriptShowTime],
   autoScroll: ['transcriptAutoScroll', TRANSCRIPT_DEFAULTS.transcriptAutoScroll],
   colorLeak: ['transcriptColorLeak', TRANSCRIPT_DEFAULTS.transcriptColorLeak],
+  glassDarkness: ['transcriptGlassDarkness', TRANSCRIPT_DEFAULTS.transcriptGlassDarkness],
 };
 const POLL_MS = 500;
 const TOAST_MS = 1400;
@@ -348,7 +349,11 @@ export default function Panel({ source, doc = document, ch = chrome, getVideoId,
   const rootClass = `yz-root${dark ? '' : ' is-light'}${editing ? ' editing' : ''}`;
 
   return (
-    <div className={rootClass} onKeyDown={onKeyDown}>
+    <div
+      className={rootClass}
+      style={{ '--yz-glass': (settings?.glassDarkness ?? TRANSCRIPT_DEFAULTS.transcriptGlassDarkness) / 100 }}
+      onKeyDown={onKeyDown}
+    >
       <RoomGlow videoId={videoId} getVideo={getVideo} dark={dark} enabled={settings?.colorLeak ?? true} doc={doc} />
       <i className="vignette" />
 

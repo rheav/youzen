@@ -67,6 +67,15 @@ never leave the browser.
 
 --------------------------------------------------------------------------------
 
+🆕 19/11/2026 - v1.4.0 Released:
+
+NEW - Floating glass darkness:
+- A "Floating glass darkness" slider in the Transcript tab (20–95%, default
+  44%) sets how much the frosted-glass panel darkens the video behind it in
+  fullscreen. Changes apply live while the panel is open.
+
+--------------------------------------------------------------------------------
+
 🆕 19/11/2026 - v1.3.2 Released:
 
 IMPROVED - Transcript panel polish:

@@ -64,6 +64,20 @@ describe('<TranscriptTab />', () => {
     expect(env.store.transcriptFullscreenMode).toBe('off');
   });
 
+  it('renders the floating glass darkness slider defaulting to 44 and saves changes', async () => {
+    const env = setupChromeStorage();
+    render(<TranscriptTab />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const range = screen.getByLabelText('Floating glass darkness');
+    expect(range.value).toBe('44');
+    fireEvent.change(range, { target: { value: '80' } });
+    expect(env.store.transcriptGlassDarkness).toBe(80);
+    expect(screen.getByText('80%')).toBeTruthy();
+  });
+
   it('renders dynamic color glow toggle defaulting to on and persists changes', async () => {
     const env = setupChromeStorage();
     render(<TranscriptTab />);

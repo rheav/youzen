@@ -2,6 +2,7 @@ import { MousePointerClick, Search, Languages, Download, PencilLine, Captions } 
 import Card from '../ui/Card';
 import FeatureRow from '../ui/FeatureRow';
 import SelectRow from '../ui/SelectRow';
+import SliderRow from '../ui/SliderRow';
 import { useStorageState } from '../../hooks/useStorageState';
 import { findFeature, TRANSCRIPT_DEFAULTS } from '@/config/features';
 
@@ -16,6 +17,7 @@ const KEYS = [
   'transcriptAutoScroll',
   'transcriptColorLeak',
   'transcriptFullscreenMode',
+  'transcriptGlassDarkness',
   'transcriptTranslateLang',
   'globallyPaused',
 ];
@@ -104,6 +106,15 @@ export default function TranscriptTab() {
           value={state.transcriptFullscreenMode ?? TRANSCRIPT_DEFAULTS.transcriptFullscreenMode}
           onChange={(v) => setValue('transcriptFullscreenMode', v)}
           options={FULLSCREEN_MODES}
+          disabled={paused}
+        />
+        <SliderRow
+          label="Floating glass darkness"
+          description="How much the frosted glass darkens the video behind it"
+          value={state.transcriptGlassDarkness ?? TRANSCRIPT_DEFAULTS.transcriptGlassDarkness}
+          onChange={(v) => setValue('transcriptGlassDarkness', v)}
+          min={20}
+          max={95}
           disabled={paused}
         />
         <SelectRow

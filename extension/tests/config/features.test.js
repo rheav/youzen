@@ -168,6 +168,7 @@ describe('config/features — expected feature set', () => {
       transcriptAutoScroll: true,
       transcriptColorLeak: true,
       transcriptFullscreenMode: 'split',
+      transcriptGlassDarkness: 44,
     });
   });
 

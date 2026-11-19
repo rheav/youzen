@@ -418,6 +418,7 @@ export const TRANSCRIPT_DEFAULTS = {
   transcriptAutoScroll: true,
   transcriptColorLeak: true,
   transcriptFullscreenMode: 'split',
+  transcriptGlassDarkness: 44, // % opacity of the floating glass in fullscreen (dark theme)
 };
 
 /**
